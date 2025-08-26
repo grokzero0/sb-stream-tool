@@ -1,24 +1,45 @@
-import type {AppModule} from '../AppModule.js';
-import {ModuleContext} from '../ModuleContext.js';
-import {BrowserWindow} from 'electron';
-import type {AppInitConfig} from '../AppInitConfig.js';
+import type { AppModule } from "../AppModule.js";
+import { ModuleContext } from "../ModuleContext.js";
+import { BrowserWindow, Menu } from "electron";
+import type { AppInitConfig } from "../AppInitConfig.js";
+import { Socket, io } from "socket.io-client";
+import {
+  ClientToServerEvents,
+  ServerToClientEvents,
+} from "../socketio/types.js";
+import { ObsController } from "../ObsController.js";
+import { buildMenu } from "../menu.js";
+import { ipcSetup } from "../ipc.js";
 
 class WindowManager implements AppModule {
-  readonly #preload: {path: string};
-  readonly #renderer: {path: string} | URL;
+  readonly #preload: { path: string };
+  readonly #renderer: { path: string } | URL;
   readonly #openDevTools;
+  private obs: ObsController;
+  private mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  private game: string;
 
-  constructor({initConfig, openDevTools = false}: {initConfig: AppInitConfig, openDevTools?: boolean}) {
+  constructor({
+    initConfig,
+    openDevTools = false,
+  }: {
+    initConfig: AppInitConfig;
+    openDevTools?: boolean;
+  }) {
     this.#preload = initConfig.preload;
     this.#renderer = initConfig.renderer;
     this.#openDevTools = openDevTools;
+    this.obs = new ObsController();
+    this.mainSocket = io("http://localhost:20242");
+    this.game = "melee";
   }
 
-  async enable({app}: ModuleContext): Promise<void> {
+  async enable({ app }: ModuleContext): Promise<void> {
     await app.whenReady();
+    ipcSetup(this.mainSocket, this.obs);
     await this.restoreOrCreateWindow(true);
-    app.on('second-instance', () => this.restoreOrCreateWindow(true));
-    app.on('activate', () => this.restoreOrCreateWindow(true));
+    app.on("second-instance", () => this.restoreOrCreateWindow(true));
+    app.on("activate", () => this.restoreOrCreateWindow(true));
   }
 
   async createWindow(): Promise<BrowserWindow> {
@@ -33,6 +54,9 @@ class WindowManager implements AppModule {
       },
     });
 
+    const menu = buildMenu(browserWindow, this.obs);
+    Menu.setApplicationMenu(menu);
+
     if (this.#renderer instanceof URL) {
       await browserWindow.loadURL(this.#renderer.href);
     } else {
@@ -43,7 +67,7 @@ class WindowManager implements AppModule {
   }
 
   async restoreOrCreateWindow(show = false) {
-    let window = BrowserWindow.getAllWindows().find(w => !w.isDestroyed());
+    let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
 
     if (window === undefined) {
       window = await this.createWindow();
@@ -67,9 +91,10 @@ class WindowManager implements AppModule {
 
     return window;
   }
-
 }
 
-export function createWindowManagerModule(...args: ConstructorParameters<typeof WindowManager>) {
+export function createWindowManagerModule(
+  ...args: ConstructorParameters<typeof WindowManager>
+) {
   return new WindowManager(...args);
 }

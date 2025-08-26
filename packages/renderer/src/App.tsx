@@ -1,34 +1,61 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { Route, Router, Switch } from "wouter";
+import { useHashLocation } from "wouter/use-hash-location";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { ApolloProvider } from "@apollo/client/react";
+import { ThemeProvider } from "./lib/providers";
+import Layout from "./layout";
+import Tournament from "./components/Tournament";
+import Settings from "./components/Settings";
+import NavigationHandler from "./components/NavigationHandler";
+import Obs from "./components/Obs";
+
+const client = new ApolloClient({
+  link: new HttpLink({
+    uri: "https://api.start.gg/gql/alpha",
+    headers: {
+      Authorization: import.meta.env.VITE_STARTGG_AUTH_TOKEN,
+      "Content-Type": "application/json",
+    },
+  }),
+  cache: new InMemoryCache(),
+});
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <ApolloProvider client={client}>
+      <ThemeProvider defaultTheme="dark">
+        <Layout>
+          <Router hook={useHashLocation}>
+            <NavigationHandler>
+              <Switch>
+                <Route path="/" component={Tournament}></Route>
+                <Route path="/settings" nest>
+                  <Settings>
+                    <Switch>
+                      <Route path="/" component={Obs}></Route>
+                      <Route path="/obs" component={Obs}></Route>
+                    </Switch>
+                  </Settings>
+                </Route>
+                {/* fallback route (route does not exist) */}
+
+                <Route>
+                  {(params) => (
+                    <center>
+                      <b>404:</b> Sorry, this page{" "}
+                      <code>&quot;{params["*" as any]}/&quot;</code> does not
+                      exist!
+                    </center>
+                  )}
+                </Route>
+              </Switch>
+            </NavigationHandler>
+          </Router>
+        </Layout>
+      </ThemeProvider>
+    </ApolloProvider>
+  );
 }
 
-export default App
+export default App;

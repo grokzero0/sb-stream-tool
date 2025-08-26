@@ -1,0 +1,92 @@
+import { BrowserWindow, Menu, shell } from "electron";
+import { ObsController } from "./ObsController.js";
+
+export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
+  const menu = Menu.buildFromTemplate([
+    {
+      label: "Game",
+      submenu: [
+        {
+          label: "Melee",
+          click: () => browserWindow.webContents.send("swap-to-game", "melee"),
+          type: "radio",
+        },
+        {
+          label: "P+",
+          click: () => browserWindow.webContents.send("swap-to-game", "p+"),
+          type: "radio",
+        },
+        {
+          label: "etc",
+          click: () => browserWindow.webContents.send("swap-to-game", "etc"),
+          type: "radio",
+        },
+      ],
+    },
+    {
+      label: "File",
+      submenu: [
+        {
+          label: "Settings",
+          click: () => browserWindow.webContents.send("navigation", "settings"),
+        },
+        {
+          role: "quit",
+        },
+      ],
+    },
+    {
+      label: "OBS",
+      submenu: [
+        {
+          label: "Play game start scenes",
+          click: () => obs.playGameStartScenes(),
+        },
+        {
+          label: "Play game end scenes",
+          click: () => obs.playGameEndScenes(),
+        },
+        {
+          label: "Play set end scenes",
+          click: () => obs.playSetEndScenes(),
+        },
+      ],
+    },
+    {
+      label: "View",
+      submenu: [
+        { role: "reload" },
+        { role: "forceReload" },
+        { role: "toggleDevTools" },
+        { type: "separator" },
+        { role: "zoomIn" },
+        { role: "zoomOut" },
+        { role: "resetZoom" },
+        { type: "separator" },
+        { role: "togglefullscreen" },
+      ],
+    },
+    {
+      label: "Window",
+      submenu: [{ role: "minimize" }],
+    },
+    {
+      label: "Help",
+      submenu: [
+        {
+          label: "Learn More",
+          click: () =>
+            shell.openExternal("https://www.youtube.com/watch?v=t7W4NJjfFMg"),
+          accelerator: "Control+F11",
+        },
+        {
+          label: "Actually Learn More",
+          click: () =>
+            shell.openExternal("https://www.youtube.com/watch?v=pufA00QrXog"),
+          accelerator: "Control+F12",
+        },
+      ],
+    },
+  ]);
+  return menu;
+}
