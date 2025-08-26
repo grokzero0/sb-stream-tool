@@ -34,6 +34,9 @@ function getPlayerNames(players, inLosers) {
 }
 
 function getPort(nodes, players) {
+  for (let j = 0; j < nodes.length; j++) {
+    nodes[j].src = "noport.svg"
+  }
   for (let i = 0; i < players.length; i++) {
     nodes[portToNum[players[i].gameInfo.port]].src =
       portToImg[players[i].gameInfo.port];
