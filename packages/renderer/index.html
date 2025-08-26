@@ -1,9 +1,20 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; connect-src ws: wss: https://api.start.gg/gql/alpha; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+    />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="preload"
+      href="src/fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2"
+      as="font"
+      type="font/woff2"
+      crossorigin
+    />
     <title>Vite + React + TS</title>
   </head>
   <body>
