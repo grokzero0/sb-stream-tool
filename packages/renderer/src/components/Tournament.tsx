@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import Teams from "./Teams";
 import Commentators from "./Commentators";
 import { Button } from "./ui/button";
-// import Query from "./Query";
+import Query from "./Query";
 import { updateOverlay } from "@app/preload";
 function Tournament() {
   const methods = useForm({ defaultValues: TournamentDefaultValues });
@@ -46,7 +46,7 @@ function Tournament() {
           </Tabs>
         </PlayerFormFieldArrayProvider>
         <Button className="my-2 w-full">Update Overlay</Button>
-        {/* <Query /> */}
+        <Query />
       </form>
     </Form>
   );
