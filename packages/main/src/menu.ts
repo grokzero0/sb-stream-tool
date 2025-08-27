@@ -50,6 +50,9 @@ export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
           label: "Play set end scenes",
           click: () => obs.playScenes("set-end"),
         },
+        {label: "Send a connecting message",
+          click: () => browserWindow.webContents.send("toast-message", "Connecting", "To OBS")
+        }
       ],
     },
     {

@@ -9,6 +9,8 @@ import Tournament from "./components/Tournament";
 import Settings from "./components/Settings";
 import NavigationHandler from "./components/NavigationHandler";
 import Obs from "./components/Obs";
+import ToastHandler from "./components/ToastHandler";
+import { Toaster } from "sonner";
 
 const client = new ApolloClient({
   link: new HttpLink({
@@ -28,6 +30,8 @@ function App() {
         <Layout>
           <Router hook={useHashLocation}>
             <NavigationHandler>
+              <Toaster />
+              <ToastHandler />
               <Switch>
                 <Route path="/" component={Tournament}></Route>
                 <Route path="/settings" nest>

@@ -15,8 +15,12 @@ function navigation(callback: (location: string) => void) {
   return ipcRenderer.on("navigation", (_event, location) => callback(location));
 }
 
+function toastMessage(callback: (message?: string, description?: string) => void) {
+  return ipcRenderer.on("toast-message", (_event, message, description) => callback(message, description))
+}
+
 function updateOverlay(data: TournamentState) {
   return ipcRenderer.invoke("overlay/update", data)
 } 
 
-export { send, asyncSend, navigation, updateOverlay };
+export { send, asyncSend, navigation, updateOverlay, toastMessage };

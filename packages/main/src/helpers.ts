@@ -14,11 +14,11 @@ export function writeToFiles(data: TournamentState) {
     if (err) throw err;
     console.log("round-format.txt has been saved!");
   });
-  writeFile("custom-round-format.txt", data.customRoundFormat || "", (err) => {
+  writeFile("custom-round-format.txt", data.customRoundFormat || " ", (err) => {
     if (err) throw err;
     console.log("custom-round-format.txt has been saved!");
   });
-  writeFile("round-number.txt", data.roundNumber?.toString() || "", (err) => {
+  writeFile("round-number.txt", data.roundNumber?.toString() || " ", (err) => {
     if (err) throw err;
     console.log("round-number.txt has been saved!");
   });
