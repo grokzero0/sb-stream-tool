@@ -68,8 +68,8 @@ function mockExposed() {
           return (
             s +
             (key === 'default'
-              ? `export default globalThis['${btoa(key)}'];\n`
-              : `export const ${key} = globalThis['${btoa(key)}'];\n`)
+              ? `export default globalThis['${Buffer.from(key).toString('base64')}'];\n`
+              : `export const ${key} = globalThis['${Buffer.from(key).toString('base64')}'];\n`)
           );
         }, '');
       }
