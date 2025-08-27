@@ -10,6 +10,7 @@ import {
 import { ObsController } from "../ObsController.js";
 import { buildMenu } from "../menu.js";
 import { ipcSetup } from "../ipc.js";
+import { ToastMessageCommunicator } from "../ToastMessageCommunicator.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
@@ -30,6 +31,7 @@ class WindowManager implements AppModule {
     this.#renderer = initConfig.renderer;
     this.#openDevTools = openDevTools;
     this.obs = new ObsController();
+    this.obs.initEvents()
     this.mainSocket = io("http://localhost:20242");
     this.game = "melee";
   }
@@ -53,6 +55,9 @@ class WindowManager implements AppModule {
         preload: this.#preload.path,
       },
     });
+
+    const toast = new ToastMessageCommunicator(browserWindow)
+    this.obs.attach(toast)
 
     const menu = buildMenu(browserWindow, this.obs);
     Menu.setApplicationMenu(menu);

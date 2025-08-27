@@ -1,5 +1,6 @@
 import OBSWebSocket from "obs-websocket-js";
 import { ObsScene } from "../../../types/obs.js";
+import { Messenger, Notifier } from "./ToastMessageCommunicator.js";
 
 class SceneCollection {
   private scenes: ObsScene[];
@@ -37,35 +38,63 @@ class SceneCollection {
 
   async update(newScenes: ObsScene[]) {
     this.stop();
-    this.sceneTimeoutIds = []
+    this.sceneTimeoutIds = [];
     this.scenes = newScenes;
   }
 }
 
-export class ObsController {
+export class ObsController implements Notifier {
   private socket: OBSWebSocket;
   private gameStartScenes: SceneCollection;
   private gameEndScenes: SceneCollection;
   private setEndScenes: SceneCollection;
+  private messengers: Messenger[];
 
   constructor() {
     this.socket = new OBSWebSocket();
     this.gameStartScenes = new SceneCollection(this.socket);
     this.setEndScenes = new SceneCollection(this.socket);
     this.gameEndScenes = new SceneCollection(this.socket);
+    this.messengers = [];
+  }
 
+  attach(messenger: Messenger): void {
+    this.messengers.push(messenger);
+  }
+
+  detach(messenger: Messenger): void {
+    const messengerIndex = this.messengers.indexOf(messenger);
+    if (messengerIndex === -1) {
+      return console.log(`No messenger found at index ${messengerIndex}`);
+    }
+    this.messengers.splice(messengerIndex, 1);
+    console.log(`Detached a messenger at index ${messengerIndex}`);
+  }
+
+  notify(message?: string, description?: string): void {
+    for (const messenger of this.messengers) {
+      messenger.send(message, description);
+    }
+  }
+
+  // while you could put this in the constructor, i personally don't like it, just a design choice
+  async initEvents() {
     this.socket.on("ConnectionError", () => {
       console.log("Connection Error");
+      this.notify("OBS Connection Error", "Connection Error");
     });
 
     this.socket.on("ConnectionOpened", () => {
       console.log("Connection Opened");
+      this.notify("OBS Connection Success", "Connection Opened");
     });
 
     this.socket.on("CurrentProgramSceneChanged", (scene) => {
       console.log(`Scene Changed to ${scene.sceneName}`);
+      this.notify(`OBS Scene Change", "Scene Changed to ${scene.sceneName}`);
     });
   }
+
   async connect(
     protocol: string,
     url: string,
@@ -73,6 +102,7 @@ export class ObsController {
     password: string
   ): Promise<void> {
     console.log(`Connecting to ${protocol}${url}:${port}`);
+    this.notify("OBS Connection", `Connecting to ${protocol}${url}:${port}`);
     await this.socket
       .connect(`${protocol}${url}:${port}`, password)
       .then(() => {
