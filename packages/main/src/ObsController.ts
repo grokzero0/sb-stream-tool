@@ -1,28 +1,58 @@
 import OBSWebSocket from "obs-websocket-js";
-// import { AppModule } from "src/AppModule.js";
-// import { ModuleContext } from "src/ModuleContext.js";
-export type ObsScene = {
-  scene: string;
-  start: number;
-};
-export class ObsController {
-  private readonly socket: OBSWebSocket;
-  private gameStartScenes: ObsScene[];
-  private gameEndScenes: ObsScene[];
-  private setEndScenes: ObsScene[];
+import { ObsScene } from "../../../types/obs.js";
 
-  private gameStartScenesTimeoutIds: NodeJS.Timeout[];
-  private gameEndScenesTimeoutIds: NodeJS.Timeout[];
-  private setEndScenesTimeoutIds: NodeJS.Timeout[];
+class SceneCollection {
+  private scenes: ObsScene[];
+  private sceneTimeoutIds: NodeJS.Timeout[];
+  private socket: OBSWebSocket;
+
+  constructor(socket: OBSWebSocket) {
+    this.sceneTimeoutIds = [];
+    this.scenes = [];
+    this.socket = socket;
+  }
+
+  async stop() {
+    for (const id of this.sceneTimeoutIds) {
+      clearTimeout(id);
+    }
+  }
+
+  async play() {
+    this.stop();
+    for (const scene of this.scenes) {
+      this.sceneTimeoutIds.push(
+        setTimeout(() => {
+          this.socket
+            .call("SetCurrentProgramScene", {
+              sceneName: scene.scene,
+            })
+            .catch((err) => {
+              console.log(`Error: ${err}`);
+            });
+        }, scene.start * 1000)
+      );
+    }
+  }
+
+  async update(newScenes: ObsScene[]) {
+    this.stop();
+    this.sceneTimeoutIds = []
+    this.scenes = newScenes;
+  }
+}
+
+export class ObsController {
+  private socket: OBSWebSocket;
+  private gameStartScenes: SceneCollection;
+  private gameEndScenes: SceneCollection;
+  private setEndScenes: SceneCollection;
 
   constructor() {
     this.socket = new OBSWebSocket();
-    this.gameStartScenes = [];
-    this.gameEndScenes = [];
-    this.setEndScenes = [];
-    this.gameStartScenesTimeoutIds = [];
-    this.gameEndScenesTimeoutIds = [];
-    this.setEndScenesTimeoutIds = [];
+    this.gameStartScenes = new SceneCollection(this.socket);
+    this.setEndScenes = new SceneCollection(this.socket);
+    this.gameEndScenes = new SceneCollection(this.socket);
 
     this.socket.on("ConnectionError", () => {
       console.log("Connection Error");
@@ -36,61 +66,6 @@ export class ObsController {
       console.log(`Scene Changed to ${scene.sceneName}`);
     });
   }
-
-  async playGameStartScenes(): Promise<void> {
-    console.log('playGameStartScenes')
-    this.stopScenes("gameStart");
-    for (const scene of this.gameStartScenes) {
-      this.gameStartScenesTimeoutIds.push(
-        setTimeout(() => {
-          this.socket
-            .call("SetCurrentProgramScene", {
-              sceneName: scene.scene,
-            })
-            .catch((err) => {
-              console.log(`Error: ${err}`);
-            });
-        }, scene.start * 1000)
-      );
-    }
-  }
-
-  async playGameEndScenes(): Promise<void> {
-    console.log('playGameEndScenes')
-    this.stopScenes("gameEnd");
-    for (const scene of this.gameEndScenes) {
-      this.gameEndScenesTimeoutIds.push(
-        setTimeout(() => {
-          this.socket
-            .call("SetCurrentProgramScene", {
-              sceneName: scene.scene,
-            })
-            .catch((err) => {
-              console.log(`Error: ${err}`);
-            });
-        }, scene.start * 1000)
-      );
-    }
-  }
-
-  async playSetEndScenes(): Promise<void> {
-    console.log('playSetEndScenes')
-    this.stopScenes("setEnd");
-    for (const scene of this.setEndScenes) {
-      this.setEndScenesTimeoutIds.push(
-        setTimeout(() => {
-          this.socket
-            .call("SetCurrentProgramScene", {
-              sceneName: scene.scene,
-            })
-            .catch((err) => {
-              console.log(`Error: ${err}`);
-            });
-        }, scene.start * 1000)
-      );
-    }
-  }
-
   async connect(
     protocol: string,
     url: string,
@@ -108,35 +83,45 @@ export class ObsController {
       });
   }
 
-  async stopScenes(scenes: "gameStart" | "gameEnd" | "setEnd") {
-    if (scenes === "gameStart") {
-      for (const id of this.gameStartScenesTimeoutIds) {
-        clearTimeout(id);
-      }
-    } else if (scenes === "gameEnd") {
-      for (const id of this.gameEndScenesTimeoutIds) {
-        clearTimeout(id);
-      }
-    } else {
-      for (const id of this.setEndScenesTimeoutIds) {
-        clearTimeout(id);
-      }
+  async playScenes(sceneCollection: "game-start" | "game-end" | "set-end") {
+    switch (sceneCollection) {
+      case "game-start":
+        this.gameStartScenes.play();
+        break;
+      case "game-end":
+        this.gameEndScenes.play();
+        break;
+      case "set-end":
+        this.setEndScenes.play();
+        break;
+      default:
+        throw new Error(`Scene collection not found: ${sceneCollection}`);
     }
   }
+
+  async stopScenes(sceneCollection: "game-start" | "game-end" | "set-end") {
+    switch (sceneCollection) {
+      case "game-start":
+        this.gameStartScenes.stop();
+        break;
+      case "game-end":
+        this.gameEndScenes.stop();
+        break;
+      case "set-end":
+        this.setEndScenes.stop();
+        break;
+      default:
+        throw new Error(`Scene collection not found: ${sceneCollection}`);
+    }
+  }
+
   async updateScenes(
     newGameStartScenes: ObsScene[],
     newGameEndScenes: ObsScene[],
     newSetEndScenes: ObsScene[]
   ) {
-    this.stopScenes("gameStart");
-    this.stopScenes("gameEnd");
-    this.stopScenes("setEnd");
-    this.gameStartScenes = newGameStartScenes;
-    this.gameEndScenes = newGameEndScenes;
-    this.setEndScenes = newSetEndScenes;
+    this.gameStartScenes.update(newGameStartScenes);
+    this.gameEndScenes.update(newGameEndScenes);
+    this.setEndScenes.update(newSetEndScenes);
   }
-
-  // enable({ app }: ModuleContext): Promise<void> | void {
-  //     console.log(app)
-  // }
 }

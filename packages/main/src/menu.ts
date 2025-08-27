@@ -40,15 +40,15 @@ export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
       submenu: [
         {
           label: "Play game start scenes",
-          click: () => obs.playGameStartScenes(),
+          click: () => obs.playScenes("game-start"),
         },
         {
           label: "Play game end scenes",
-          click: () => obs.playGameEndScenes(),
+          click: () => obs.playScenes("game-end"),
         },
         {
           label: "Play set end scenes",
-          click: () => obs.playSetEndScenes(),
+          click: () => obs.playScenes("set-end"),
         },
       ],
     },
