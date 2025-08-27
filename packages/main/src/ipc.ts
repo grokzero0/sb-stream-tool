@@ -1,5 +1,5 @@
 import { ipcMain } from "electron";
-import type { TournamentState } from './tournament-types.js'
+import type { TournamentState } from '../../../types/tournament.js'
 import { Socket } from "socket.io-client";
 import {
   ClientToServerEvents,

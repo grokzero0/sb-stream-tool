@@ -1,6 +1,6 @@
-import { TournamentState } from './tournament-types.js';
-import {sha256sum} from './nodeCrypto.js';
-import {versions} from './versions.js';
+import { TournamentState } from '../../../types/tournament.js';
+// import {sha256sum} from './nodeCrypto.js';
+// import {versions} from './versions.js';
 import {ipcRenderer} from 'electron';
 
 function send(channel: string, ...args: any[]) {
@@ -19,4 +19,4 @@ function updateOverlay(data: TournamentState) {
   return ipcRenderer.invoke("overlay/update", data)
 } 
 
-export { sha256sum, versions, send, asyncSend, navigation, updateOverlay };
+export { send, asyncSend, navigation, updateOverlay };

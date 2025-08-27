@@ -1,5 +1,5 @@
 import { mkdirSync, writeFile } from "node:fs";
-import { TournamentState } from "./tournament-types.js";
+import { TournamentState } from "../../../types/tournament.js";
 
 export function writeToFiles(data: TournamentState) {
   writeFile("tournament-name.txt", data.name, (err) => {
