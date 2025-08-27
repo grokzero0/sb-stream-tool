@@ -10,7 +10,7 @@ import {
 import { ObsController } from "../ObsController.js";
 import { buildMenu } from "../menu.js";
 import { ipcSetup } from "../ipc.js";
-import { ToastMessageCommunicator } from "../ToastMessageCommunicator.js";
+import { ToastMessageCommunicator } from "../ToastMessageCommunication.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };

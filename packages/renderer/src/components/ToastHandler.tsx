@@ -4,11 +4,16 @@ import { toast } from "sonner";
 
 function ToastHandler() {
   toastMessage((message, description) => {
-    console.log("ToastHandler")
-    console.log(message)
-    console.log(description)
+    // console.log("ToastHandler");
+    // console.log(message);
+    // console.log(description);
     toast(message, {
-      action: <X />,
+      action: {
+        label: <X />,
+        onClick: () => {
+          return;
+        },
+      },
       description: description,
     });
   });

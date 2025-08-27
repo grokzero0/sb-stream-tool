@@ -1,6 +1,6 @@
 import OBSWebSocket from "obs-websocket-js";
 import { ObsScene } from "../../../types/obs.js";
-import { Messenger, Notifier } from "./ToastMessageCommunicator.js";
+import { EventSink, EventStream } from "./observer.js";
 
 class SceneCollection {
   private scenes: ObsScene[];
@@ -43,37 +43,39 @@ class SceneCollection {
   }
 }
 
-export class ObsController implements Notifier {
+export class ObsController implements EventStream {
   private socket: OBSWebSocket;
   private gameStartScenes: SceneCollection;
   private gameEndScenes: SceneCollection;
   private setEndScenes: SceneCollection;
-  private messengers: Messenger[];
+
+  // list of EventSinks "attached" to this EventStream
+  private observers: EventSink[]
 
   constructor() {
     this.socket = new OBSWebSocket();
     this.gameStartScenes = new SceneCollection(this.socket);
     this.setEndScenes = new SceneCollection(this.socket);
     this.gameEndScenes = new SceneCollection(this.socket);
-    this.messengers = [];
+    this.observers = []
   }
 
-  attach(messenger: Messenger): void {
-    this.messengers.push(messenger);
+  attach(newObserver: EventSink): void {
+    this.observers.push(newObserver)
   }
 
-  detach(messenger: Messenger): void {
-    const messengerIndex = this.messengers.indexOf(messenger);
-    if (messengerIndex === -1) {
-      return console.log(`No messenger found at index ${messengerIndex}`);
+  detach(observer: EventSink): void {
+    const observerIndex = this.observers.indexOf(observer);
+    if (observerIndex === -1) {
+      return console.log(`No observer found at index ${observerIndex}`);
     }
-    this.messengers.splice(messengerIndex, 1);
-    console.log(`Detached a messenger at index ${messengerIndex}`);
+    this.observers.splice(observerIndex, 1);
+    console.log(`Detached an observer at index ${observerIndex}`);
   }
 
   notify(message?: string, description?: string): void {
-    for (const messenger of this.messengers) {
-      messenger.send(message, description);
+    for (const observer of this.observers) {
+      observer.update(message, description);
     }
   }
 
