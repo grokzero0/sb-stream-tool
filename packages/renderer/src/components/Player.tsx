@@ -265,7 +265,7 @@ function Player({
                         value={color}
                       >
                         <img
-                          src={`/characters/melee/${characterSelected.toLowerCase()}/icons/${color.toLowerCase()}.png`}
+                          src={new URL(`../assets/characters/melee/${characterSelected.toLowerCase()}/icons/${color.toLowerCase()}.png`, import.meta.url).href}
                           width={28}
                           height={28}
                         />
@@ -280,7 +280,7 @@ function Player({
         </div>
         <div className="w-3/5 flex items-center">
           <img
-            src={`/characters/melee/${characterSelected.toLowerCase()}/renders/${altCostumeSelected.toLowerCase()}.png`}
+            src={new URL(`../assets/characters/melee/${characterSelected.toLowerCase()}/renders/${altCostumeSelected.toLowerCase()}.png`, import.meta.url).href}
           />
         </div>
       </div>

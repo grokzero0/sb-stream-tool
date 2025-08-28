@@ -24,6 +24,17 @@ export default /** @type import('electron-builder').Configuration */
     '!node_modules/@app/**',
     ...await getListOfFilesFromEachWorkspace(),
   ],
+
+  extraFiles: [
+    {
+      from: "./packages/renderer/src/assets/characters",
+      to: "."
+    },
+    {
+      from: "./packages/renderer/src/assets/overlay",
+      to: "."
+    }
+  ]
 });
 
 /**
