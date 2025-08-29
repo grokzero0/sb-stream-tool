@@ -1,5 +1,5 @@
-import Scenes from "./settings/obs/Scenes";
-import WebsocketInputs from "./settings/obs/WebsocketInputs";
+import Scenes from "./Scenes";
+import WebsocketInputs from "./WebsocketInputs";
 
 function Obs() {
   return (

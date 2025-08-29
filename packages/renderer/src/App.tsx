@@ -6,9 +6,9 @@ import { ApolloProvider } from "@apollo/client/react";
 import { ThemeProvider } from "./lib/providers";
 import Layout from "./layout";
 import Tournament from "./components/Tournament";
-import Settings from "./components/Settings";
+import Settings from "./components/settings/Settings";
 import NavigationHandler from "./components/NavigationHandler";
-import Obs from "./components/Obs";
+import Obs from "./components/settings/obs/Obs";
 import ToastHandler from "./components/ToastHandler";
 import { Toaster } from "sonner";
 
