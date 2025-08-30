@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import {
   Dialog,
@@ -16,40 +16,54 @@ import { useFormContext } from "react-hook-form";
 
 function Query() {
   const [setID, setSetID] = useState("");
-  // const [isSetIDEmpty, setIsSetIDEmpty] = useState(false);
-  const [isNullSetID, setIsNullSetID] = useState(false);
+  const [message, setMessage] = useState("");
   const [getData, { loading, error }] = useLazyQuery(SetEntrantsDocument);
-  const [open, setOpen] = useState(false);
-  const { setValue, getValues } = useFormContext()
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const { setValue, getValues } = useFormContext();
+  const timeoutId = useRef<NodeJS.Timeout | undefined>(undefined);
 
   const handleClick = async () => {
+    setMessage("");
     if (setID === "") {
+      setMessage("Please type in a set ID");
       return;
     }
-    console.log("Getting data from api");
-    console.log(setID);
     getData({ variables: { setId: setID } }).then(({ data }) => {
-      setIsNullSetID(false);
+      setMessage(`Set ${setID} found! Applying information...`);
       console.log(data);
-      setValue("name", data?.set?.event?.tournament?.name)
+      setValue("name", data?.set?.event?.tournament?.name);
       for (let i = 0; i < getValues("teams").length; i++) {
         for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
           setValue(`teams.${i}.players.${j}.info`, {
-            teamName: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.prefix ?? '',
-            playerTag: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.gamerTag ?? '',
-            pronouns: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user?.genderPronoun ?? '',
+            teamName:
+              data?.set?.slots?.[i]?.entrant?.participants?.[j]?.prefix ?? "",
+            playerTag:
+              data?.set?.slots?.[i]?.entrant?.participants?.[j]?.gamerTag ?? "",
+            pronouns:
+              data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user
+                ?.genderPronoun ?? "",
             twitter:
-              data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user?.authorizations?.[0]
-                ?.externalUsername ?? ''
-          }
-          )
+              data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user
+                ?.authorizations?.[0]?.externalUsername ?? "",
+          });
         }
       }
     });
+    clearTimeout(timeoutId.current);
+    timeoutId.current = setTimeout(() => {
+      setMessage("");
+      setDialogOpen(false);
+    }, 2000);
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog
+      open={dialogOpen}
+      onOpenChange={(open) => {
+        setMessage("");
+        setDialogOpen(open);
+      }}
+    >
       <DialogTrigger asChild>
         <Button className="w-full">
           Automatically fill in player data from a set
@@ -73,7 +87,7 @@ function Query() {
         {loading && (
           <p>Fetching information from set {setID}, please wait...</p>
         )}
-        {isNullSetID && <p>Not valid Set ID, try again</p>}
+        {message}
         {error && <p>An error occurred, please try again later</p>}
         <Button type="button" onClick={handleClick}>
           Fetch Data
