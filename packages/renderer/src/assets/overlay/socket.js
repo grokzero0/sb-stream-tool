@@ -6,10 +6,10 @@ const portToNum = {
   Yellow: 3,
 };
 const portToImg = {
-  Red: "port1.svg",
-  Blue: "port2.svg",
-  Green: "port3.svg",
-  Yellow: "port4.svg",
+  Red: "ports/port1.svg",
+  Blue: "ports/port2.svg",
+  Green: "ports/port3.svg",
+  Yellow: "ports/port4.svg",
 };
 function getPlayerNames(players, inLosers) {
   const nameList = [];
@@ -35,7 +35,7 @@ function getPlayerNames(players, inLosers) {
 
 function getPort(nodes, players) {
   for (let j = 0; j < nodes.length; j++) {
-    nodes[j].src = "noport.svg"
+    nodes[j].src = "./ports/noport.svg"
   }
   for (let i = 0; i < players.length; i++) {
     nodes[portToNum[players[i].gameInfo.port]].src =
@@ -68,9 +68,9 @@ function getCharacters(nodes, players) {
     nodes[i].style.height = "30px";
     // console.log(players[i].gameInfo.character)
     if (players[i].gameInfo.character == "Random") {
-      nodes[i].src =  "characters/melee/random/icons/overlay-default.png"
+      nodes[i].src =  "../characters/melee/random/icons/overlay-default.png"
     } else {
-      nodes[i].src = `characters/melee/${players[
+      nodes[i].src = `../characters/melee/${players[
         i
       ].gameInfo.character.toLowerCase()}/icons/${players[
         i

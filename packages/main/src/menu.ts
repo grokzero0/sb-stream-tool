@@ -41,18 +41,18 @@ export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
         {
           label: "Play game start scenes",
           click: () => obs.playScenes("game-start"),
+          accelerator: "Control+F1",
         },
         {
           label: "Play game end scenes",
           click: () => obs.playScenes("game-end"),
+          accelerator: "Control+F2",
         },
         {
           label: "Play set end scenes",
           click: () => obs.playScenes("set-end"),
+          accelerator: "Control+F3",
         },
-        {label: "Send a connecting message",
-          click: () => browserWindow.webContents.send("toast-message", "Connecting", "To OBS")
-        }
       ],
     },
     {

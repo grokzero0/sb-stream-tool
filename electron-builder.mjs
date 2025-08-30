@@ -28,11 +28,11 @@ export default /** @type import('electron-builder').Configuration */
   extraFiles: [
     {
       from: "./packages/renderer/src/assets/characters",
-      to: "."
+      to: "./characters"
     },
     {
       from: "./packages/renderer/src/assets/overlay",
-      to: "."
+      to: "./overlay"
     }
   ]
 });

@@ -7,9 +7,12 @@ import {hardwareAccelerationMode} from './modules/HardwareAccelerationModule.js'
 import {autoUpdater} from './modules/AutoUpdater.js';
 import {allowInternalOrigins} from './modules/BlockNotAllowdOrigins.js';
 import {allowExternalUrls} from './modules/ExternalUrls.js';
+import { setupSocketio } from './socketio/server.js';
 
 
 export async function initApp(initConfig: AppInitConfig) {
+  setupSocketio()
+  
   const moduleRunner = createModuleRunner()
     .init(createWindowManagerModule({initConfig, openDevTools: import.meta.env.DEV}))
     .init(disallowMultipleAppInstance())
