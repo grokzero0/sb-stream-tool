@@ -6,7 +6,7 @@ import { Socket, io } from "socket.io-client";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
-} from "../socketio/types.js";
+} from "./Socketio/types.js";
 import { ObsController } from "../ObsController.js";
 import { buildMenu } from "../menu.js";
 import { ipcSetup } from "../ipc.js";

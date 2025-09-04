@@ -28,7 +28,7 @@ export default /** @type import('electron-builder').Configuration */
     ...await getListOfFilesFromEachWorkspace(),
   ],
 
-  extraFiles: [
+  extraResources: [
     {
       from: "./packages/renderer/src/assets/characters",
       to: "./characters"

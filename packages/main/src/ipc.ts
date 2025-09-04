@@ -4,7 +4,7 @@ import { Socket } from "socket.io-client";
 import {
   ClientToServerEvents,
   ServerToClientEvents,
-} from "./socketio/types.js";
+} from "./modules/Socketio/types.js";
 import { ObsController } from "./ObsController.js";
 import { ObsScene } from "../../../types/obs.js";
 import { writeToFiles } from "./helpers.js";

@@ -7,13 +7,14 @@ import {hardwareAccelerationMode} from './modules/HardwareAccelerationModule.js'
 import {autoUpdater} from './modules/AutoUpdater.js';
 import {allowInternalOrigins} from './modules/BlockNotAllowdOrigins.js';
 import {allowExternalUrls} from './modules/ExternalUrls.js';
-import { setupSocketio } from './socketio/server.js';
+import { createSocketioServerModule } from './modules/Socketio/SocketioServerModule.js';
+import createDirs from './createDirs.js';
 
 
 export async function initApp(initConfig: AppInitConfig) {
-  setupSocketio()
-  
+  createDirs()
   const moduleRunner = createModuleRunner()
+    .init(createSocketioServerModule())
     .init(createWindowManagerModule({initConfig, openDevTools: import.meta.env.DEV}))
     .init(disallowMultipleAppInstance())
     .init(terminateAppOnLastWindowClose())

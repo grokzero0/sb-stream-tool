@@ -1,4 +1,4 @@
-import { TournamentState } from '../tournament-types.js'
+import { TournamentState } from "../../../../../types/tournament.js"
 
 // declare your socket.io events here
 export interface ServerToClientEvents {
