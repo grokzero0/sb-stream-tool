@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, writeFile } from "node:fs";
+import { existsSync, mkdirSync, readFile, writeFile } from "node:fs";
 import { TournamentState } from "../../../types/tournament.js";
 import { app } from "electron";
 import path from "node:path";
@@ -179,4 +179,55 @@ export function writeToFiles(data: TournamentState) {
       }
     );
   }
+}
+
+export function getApiKey() {
+  let configRootPath = path.join(app.getAppPath(), "..", "config");
+  if (process.env.NODE_ENV !== "development") {
+    switch (process.platform) {
+      case "win32": {
+        configRootPath = path.join(
+          process.env.PORTABLE_EXECUTABLE_DIR as string,
+          "config"
+        );
+        break;
+      }
+      default: {
+        console.log();
+      }
+    }
+  }
+  readFile(`${configRootPath}/api_key.txt`, (err, data) => {
+    if (!err) {
+      return data.toString()
+    }
+    if (err.code === "ENOENT") {
+      writeFile(`${configRootPath}/api_key.txt`, "", () => console.log("Created new file"))
+      return ""
+    }
+    console.error(err)
+  })
+}
+
+export function updateApiKey(newApiKey: string) {
+  let configRootPath = path.join(app.getAppPath(), "..", "config");
+  if (process.env.NODE_ENV !== "development") {
+    switch (process.platform) {
+      case "win32": {
+        configRootPath = path.join(
+          process.env.PORTABLE_EXECUTABLE_DIR as string,
+          "config"
+        );
+        break;
+      }
+      default: {
+        console.log();
+      }
+    }
+  }
+  writeFile(`${configRootPath}/api_key.txt`, newApiKey, (err) => {
+    if (err) {
+      throw err
+    }
+  })
 }

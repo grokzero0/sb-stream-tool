@@ -1,5 +1,6 @@
 import { BrowserWindow, Menu, shell } from "electron";
 import { ObsController } from "./ObsController.js";
+import { getApiKey } from "./helpers.js";
 
 export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
   const menu = Menu.buildFromTemplate([
@@ -87,6 +88,11 @@ export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
           click: () =>
             shell.openExternal("https://www.youtube.com/watch?v=pufA00QrXog"),
           accelerator: "Control+F12",
+        },
+        {
+          label: "Test",
+          click: getApiKey,
+          // accelerator: "Control+F12",
         },
       ],
     },

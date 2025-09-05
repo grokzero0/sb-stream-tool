@@ -7,7 +7,7 @@ import {
 } from "./modules/Socketio/types.js";
 import { ObsController } from "./ObsController.js";
 import { ObsScene } from "../../../types/obs.js";
-import { writeToFiles } from "./helpers.js";
+import { getApiKey, updateApiKey, writeToFiles } from "./helpers.js";
 
 export function ipcSetup(
   mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>,
@@ -47,4 +47,10 @@ export function ipcSetup(
   ipcMain.handle("obs/play-game-end-scenes", () => obs.playScenes("game-end"));
 
   ipcMain.handle("obs/play-set-end-scenes", () => obs.playScenes("set-end"));
+
+  ipcMain.handle("startgg/get-api-key", getApiKey);
+
+  ipcMain.handle("startgg/update-api-key", (_event, newApiKey) =>
+    updateApiKey(newApiKey)
+  );
 }

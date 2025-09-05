@@ -7,7 +7,8 @@ const config: CodegenConfig = {
     {
       "https://api.start.gg/gql/alpha": {
         headers: {
-          Authorization: `${process.env.VITE_STARTGG_AUTH_TOKEN}`,
+          // it is required that you have an .env file in the root of the renderer folder with the key-value pair VITE_STARTGG_AUTH_TOKEN="Bearer (your key here)" if you want to generate new apollo query files
+          Authorization: `${process.env.VITE_STARTGG_AUTH_TOKEN}`, 
           "Content-Type": "application/json",
         },
       },

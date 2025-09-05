@@ -11,6 +11,7 @@ import { ObsController } from "../ObsController.js";
 import { buildMenu } from "../menu.js";
 import { ipcSetup } from "../ipc.js";
 import { ToastMessageCommunicator } from "../ToastMessageCommunication.js";
+import path, { join } from "node:path";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
@@ -45,6 +46,7 @@ class WindowManager implements AppModule {
   }
 
   async createWindow(): Promise<BrowserWindow> {
+    console.log(import.meta.filename)
     const browserWindow = new BrowserWindow({
       show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
       webPreferences: {
@@ -54,8 +56,10 @@ class WindowManager implements AppModule {
         webviewTag: false, // The webview tag is not recommended. Consider alternatives like an iframe or Electron's BrowserView. @see https://www.electronjs.org/docs/latest/api/webview-tag#warning
         preload: this.#preload.path,
       },
+      icon: join(import.meta.dirname, "..", "src", "assets", "icon.ico")
     });
 
+    // observer model putting to good use ig
     const toast = new ToastMessageCommunicator(browserWindow)
     this.obs.attach(toast)
 
