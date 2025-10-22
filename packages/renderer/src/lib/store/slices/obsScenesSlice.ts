@@ -1,4 +1,5 @@
 import { StateCreator } from 'zustand'
+import { StoreSliceType } from './slice'
 export type ObsScene = {
     scene: string,
     start: number
@@ -12,7 +13,7 @@ export type ObsScenesSlice = {
 
 }
 
-export const createObsScenesSlice: StateCreator<ObsScenesSlice, [['zustand/immer', never]], [], ObsScenesSlice> = (set) => ({
+export const createObsScenesSlice: StateCreator<StoreSliceType, [['zustand/immer', never]], [], ObsScenesSlice> = (set) => ({
     gameStartScenes: [],
     gameEndScenes: [],
     setEndScenes: [],

@@ -84,6 +84,7 @@ function Scenes() {
                 scene: e.currentTarget.value,
               })
             }
+            type="text"
             placeholder="Scene Name"
           />
         </div>

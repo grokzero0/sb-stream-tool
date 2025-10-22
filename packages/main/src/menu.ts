@@ -2,6 +2,19 @@ import { BrowserWindow, Menu, shell } from "electron";
 import { ObsController } from "./ObsController.js";
 import { getApiKey } from "./helpers.js";
 
+const highlights = [
+  "https://clips.twitch.tv/VainVivaciousCurlewDoubleRainbow-tg-LUGc37J6inQSy",
+  "https://www.youtube.com/watch?v=t7W4NJjfFMg",
+  "https://www.youtube.com/watch?v=pufA00QrXog",
+  "https://youtube.com/clip/UgkxH4VbrDOQnpExz-8sbLwkZ2q6HEi76SIR?si=Hcxq0aohT4-MXnza",
+  "https://clips.twitch.tv/SwissLaconicShieldArgieB8-FbMqt_VJsnvfWGGo",
+  "https://www.youtube.com/clip/UgkxF_0841f-FwMJ_T40xSr_0fjl5IdxOSbj",
+  "https://www.youtube.com/watch?v=ljrIkINkawM",
+  "https://www.youtube.com/watch?v=Uu9Kpyi5qG4",
+  "https://www.youtube.com/watch?v=uyup7rN_7ko",
+  "https://www.youtube.com/watch?v=rEtbBQnU_Xk"
+]
+
 export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
   const menu = Menu.buildFromTemplate([
     {
@@ -80,19 +93,14 @@ export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
         {
           label: "Learn More",
           click: () =>
-            shell.openExternal("https://www.youtube.com/watch?v=t7W4NJjfFMg"),
+            shell.openExternal("https://clips.twitch.tv/VainVivaciousCurlewDoubleRainbow-tg-LUGc37J6inQSy"),
           accelerator: "Control+F11",
         },
         {
           label: "Actually Learn More",
           click: () =>
-            shell.openExternal("https://www.youtube.com/watch?v=pufA00QrXog"),
+            shell.openExternal(highlights[Math.floor(Math.random() * highlights.length)]),
           accelerator: "Control+F12",
-        },
-        {
-          label: "Test",
-          click: getApiKey,
-          // accelerator: "Control+F12",
         },
       ],
     },

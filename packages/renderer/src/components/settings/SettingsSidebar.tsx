@@ -10,13 +10,18 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "../ui/sidebar";
-import { Video, Gamepad2 } from "lucide-react";
+import { Video, Gamepad2, Webhook } from "lucide-react";
 
 const items = [
   {
     title: "OBS",
     url: "/obs",
     icon: Video,
+  },
+  {
+    title: "start.gg",
+    url: "/startgg",
+    icon: Webhook,
   },
   {
     title: "Slippi",

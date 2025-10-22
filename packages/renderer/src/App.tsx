@@ -11,6 +11,7 @@ import NavigationHandler from "./components/NavigationHandler";
 import Obs from "./components/settings/obs/Obs";
 import ToastHandler from "./components/ToastHandler";
 import { Toaster } from "sonner";
+import Startgg from "./components/settings/startgg/Startgg";
 
 const client = new ApolloClient({
   link: new HttpLink({
@@ -38,7 +39,8 @@ function App() {
                   <Settings>
                     <Switch>
                       <Route path="/" component={Obs}></Route>
-                      <Route path="/obs" component={Obs}></Route>
+                      <Route path="/obs" component={Obs}></Route>,
+                      <Route path="/startgg" component={Startgg}></Route>
                     </Switch>
                   </Settings>
                 </Route>

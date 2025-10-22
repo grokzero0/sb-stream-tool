@@ -198,12 +198,14 @@ export function getApiKey() {
     }
   }
   readFile(`${configRootPath}/api_key.txt`, (err, data) => {
+    console.log("readFileee")
     if (!err) {
+      console.log("found")
       return data.toString()
     }
     if (err.code === "ENOENT") {
       writeFile(`${configRootPath}/api_key.txt`, "", () => console.log("Created new file"))
-      return ""
+      return "not found"
     }
     console.error(err)
   })
