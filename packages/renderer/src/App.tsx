@@ -11,9 +11,34 @@ import Obs from "./components/settings/obs/Obs";
 import ToastHandler from "./components/ToastHandler";
 import { Toaster } from "sonner";
 import Startgg from "./components/settings/startgg/Startgg";
-import { client } from "./client";
+import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
+import { useSettingsStore } from "./lib/store/store";
+
+const client = new ApolloClient({
+  link: new HttpLink({
+    uri: "https://api.start.gg/gql/alpha",
+    headers: {
+      Authorization: "", // initiated upon the store being created
+      "Content-Type": "application/json",
+    },
+  }),
+  cache: new InMemoryCache(),
+});
+
+useSettingsStore.subscribe((state) =>
+  client.setLink(
+    new HttpLink({
+      uri: "https://api.start.gg/gql/alpha",
+      headers: {
+        Authorization: `Bearer ${state.apiKey}`, // initiated upon the store being created
+        "Content-Type": "application/json",
+      },
+    })
+  )
+);
 
 function App() {
+  // console.log(apiKey)
   return (
     <ApolloProvider client={client}>
       <ThemeProvider defaultTheme="dark">
