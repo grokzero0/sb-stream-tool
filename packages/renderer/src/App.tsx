@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Route, Router, Switch } from "wouter";
 import { useHashLocation } from "wouter/use-hash-location";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
 import { ApolloProvider } from "@apollo/client/react";
 import { ThemeProvider } from "./lib/providers";
 import Layout from "./layout";
@@ -12,17 +11,7 @@ import Obs from "./components/settings/obs/Obs";
 import ToastHandler from "./components/ToastHandler";
 import { Toaster } from "sonner";
 import Startgg from "./components/settings/startgg/Startgg";
-
-const client = new ApolloClient({
-  link: new HttpLink({
-    uri: "https://api.start.gg/gql/alpha",
-    headers: {
-      Authorization: import.meta.env.VITE_STARTGG_AUTH_TOKEN,
-      "Content-Type": "application/json",
-    },
-  }),
-  cache: new InMemoryCache(),
-});
+import { client } from "./client";
 
 function App() {
   return (
