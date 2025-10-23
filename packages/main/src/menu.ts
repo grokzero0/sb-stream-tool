@@ -1,6 +1,5 @@
 import { BrowserWindow, Menu, shell } from "electron";
 import { ObsController } from "./ObsController.js";
-import { getApiKey } from "./helpers.js";
 
 const highlights = [
   "https://clips.twitch.tv/VainVivaciousCurlewDoubleRainbow-tg-LUGc37J6inQSy",
@@ -18,7 +17,7 @@ const highlights = [
 export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
   const menu = Menu.buildFromTemplate([
     {
-      label: "Game",
+      label: "Game (Not implemented yet lol)",
       submenu: [
         {
           label: "Melee",

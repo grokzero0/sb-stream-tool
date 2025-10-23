@@ -96,6 +96,10 @@ function updateOverlay(newData) {
     newData.teams[1].players,
     newData.teams[1].inLosers
   );
+
+  document.getElementById("left-score").innerText = newData.teams[0].score
+  document.getElementById("right-score").innerText = newData.teams[1].score
+
   getPort(
     document.getElementById("left-port").getElementsByTagName("img"),
     newData.teams[0].players

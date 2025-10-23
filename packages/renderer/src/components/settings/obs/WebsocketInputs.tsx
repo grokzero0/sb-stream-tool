@@ -5,8 +5,8 @@ import { send } from "@app/preload";
 import { useState } from "react";
 
 function WebsocketInputs() {
-  const [ip, setIp] = useState("");
-  const [port, setPort] = useState("");
+  const [ip, setIp] = useState("127.0.0.1");
+  const [port, setPort] = useState("4455");
   const [password, setPassword] = useState("");
   return (
     <form

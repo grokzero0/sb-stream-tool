@@ -7,25 +7,23 @@ import {
 } from "./modules/Socketio/types.js";
 import { ObsController } from "./ObsController.js";
 import { ObsScene } from "../../../types/obs.js";
-import { getApiKey, updateApiKey, writeToFiles } from "./helpers.js";
+import { FileReaderWriter } from "./FileReaderWriter.js";
 
 export function ipcSetup(
   mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>,
-  obs: ObsController
+  obs: ObsController,
+  fileDataManager: FileReaderWriter
 ) {
   ipcMain.handle(
     "obs/connect",
     (_event, ip: string, port: string, password: string) => {
-      console.log("Connecting to OBS");
       obs.connect("ws://", ip, port, password);
     }
   );
 
   ipcMain.handle("overlay/update", (_event, newData: TournamentState) => {
-    console.log("overlay/update");
-    // console.log(newData);
     mainSocket.emit("sendDataToServer", newData);
-    writeToFiles(newData);
+    fileDataManager.writeData(newData)
   });
 
   ipcMain.handle(
@@ -48,9 +46,12 @@ export function ipcSetup(
 
   ipcMain.handle("obs/play-set-end-scenes", () => obs.playScenes("set-end"));
 
-  ipcMain.handle("startgg/get-api-key", getApiKey);
+  ipcMain.handle(
+    "startgg/get-api-key",
+    async () => await fileDataManager.getApiKey()
+  );
 
   ipcMain.handle("startgg/update-api-key", (_event, newApiKey) =>
-    updateApiKey(newApiKey)
+    fileDataManager.writeApiKey(newApiKey)
   );
 }

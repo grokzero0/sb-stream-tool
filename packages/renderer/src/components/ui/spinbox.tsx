@@ -23,7 +23,7 @@ const Spinbox = React.forwardRef<HTMLInputElement, SpinboxProps>(
       onChangeNumber,
       max,
       min,
-      showButtons,
+      showButtons = true,
       ...props
     },
     ref

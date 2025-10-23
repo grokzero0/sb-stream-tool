@@ -92,18 +92,40 @@ body {
   background-color: white;
   min-height: 60px;
   min-width: 50px;
+  color: black;
+  text-align: center;
+  font-size: large;
 }
 
 #left-playercam-corner {
   bottom: 0;
   left: 0;
+  color: black;
+  text-align: center;
 }
 
 #right-playercam-corner {
   bottom: 0;
   right: 0;
+  color: black;
+  text-align: center;
 }
 
+#right-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  font-size: 45px;
+}
+
+#left-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  font-size: 45px;
+}
 .winners {
   background-color: white;
   font-weight: bold;
