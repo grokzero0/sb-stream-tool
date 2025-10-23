@@ -1,4 +1,5 @@
-import { existsSync, mkdirSync, readFile, writeFile } from "node:fs";
+import { existsSync, mkdirSync, writeFile } from "node:fs";
+import { readFile } from "node:fs/promises";
 import { TournamentState } from "../../../types/tournament.js";
 import { app } from "electron";
 import path from "node:path";
@@ -183,6 +184,7 @@ export function writeToFiles(data: TournamentState) {
 
 export function getApiKey() {
   let configRootPath = path.join(app.getAppPath(), "..", "config");
+  console.log(configRootPath)
   if (process.env.NODE_ENV !== "development") {
     switch (process.platform) {
       case "win32": {
@@ -197,18 +199,15 @@ export function getApiKey() {
       }
     }
   }
-  readFile(`${configRootPath}/api_key.txt`, (err, data) => {
-    console.log("readFileee")
-    if (!err) {
-      console.log("found")
-      return data.toString()
-    }
-    if (err.code === "ENOENT") {
-      writeFile(`${configRootPath}/api_key.txt`, "", () => console.log("Created new file"))
-      return "not found"
-    }
-    console.error(err)
-  })
+  return readFile(`${configRootPath}/api_key.txt`, "utf-8")
+    .then((value) => value)
+    .catch((error) => {
+      if (error.code === "ENOENT") {
+        writeFile(`${configRootPath}/api_key.txt`, "", () =>
+          console.log("Created new file")
+        );
+      }
+    });
 }
 
 export function updateApiKey(newApiKey: string) {
@@ -229,7 +228,7 @@ export function updateApiKey(newApiKey: string) {
   }
   writeFile(`${configRootPath}/api_key.txt`, newApiKey, (err) => {
     if (err) {
-      throw err
+      throw err;
     }
-  })
+  });
 }

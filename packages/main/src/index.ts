@@ -9,12 +9,9 @@ import {allowInternalOrigins} from './modules/BlockNotAllowdOrigins.js';
 import {allowExternalUrls} from './modules/ExternalUrls.js';
 import { createSocketioServerModule } from './modules/Socketio/SocketioServerModule.js';
 import createDirs from './createDirs.js';
-import { getApiKey } from './helpers.js';
-
 
 export async function initApp(initConfig: AppInitConfig) {
   createDirs()
-  getApiKey()
   const moduleRunner = createModuleRunner()
     .init(createSocketioServerModule())
     .init(createWindowManagerModule({initConfig, openDevTools: import.meta.env.DEV}))
