@@ -159,9 +159,9 @@ body {
 
 @font-face {
   font-family: "Overused Grotesk";
-  src: url("./fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
+  src: url("./assets/fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
       format("woff2 supports variations"),
-    url("./fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
+    url("./assets/fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
       format("woff2-variations");
   font-weight: 300 900;
 }

@@ -7,9 +7,9 @@
 
 @font-face {
   font-family: "Overused Grotesk";
-  src: url("../src/fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
+  src: url("../../../fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
       format("woff2 supports variations"),
-    url("../src/fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
+    url("../../../fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
       format("woff2-variations");
   font-weight: 300 900;
 }

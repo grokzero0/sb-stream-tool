@@ -8,11 +8,13 @@ import {
 import { ObsController } from "./ObsController.js";
 import { ObsScene } from "../../../types/obs.js";
 import { FileReaderWriter } from "./FileReaderWriter.js";
+import { SlpRealTimeWrapper } from "./SlpRealTimeWrapper.js";
 
 export function ipcSetup(
   mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>,
   obs: ObsController,
-  fileDataManager: FileReaderWriter
+  fileDataManager: FileReaderWriter,
+  slpRealtime: SlpRealTimeWrapper
 ) {
   ipcMain.handle(
     "obs/connect",
@@ -23,7 +25,7 @@ export function ipcSetup(
 
   ipcMain.handle("overlay/update", (_event, newData: TournamentState) => {
     mainSocket.emit("sendDataToServer", newData);
-    fileDataManager.writeData(newData)
+    fileDataManager.writeData(newData);
   });
 
   ipcMain.handle(
@@ -53,5 +55,9 @@ export function ipcSetup(
 
   ipcMain.handle("startgg/update-api-key", (_event, newApiKey) =>
     fileDataManager.writeApiKey(newApiKey)
+  );
+
+  ipcMain.handle("slippi/connect", (_event, address, slpPort) =>
+    slpRealtime.connect(address, slpPort)
   );
 }

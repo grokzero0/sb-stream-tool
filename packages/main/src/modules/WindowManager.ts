@@ -11,14 +11,16 @@ import { ObsController } from "../ObsController.js";
 import { buildMenu } from "../menu.js";
 import { ipcSetup } from "../ipc.js";
 import { ToastMessageCommunicator } from "../ToastMessageCommunication.js";
-import path, { join } from "node:path";
+import { join } from "node:path";
 import { FileReaderWriter } from "../FileReaderWriter.js";
+import { SlpRealTimeWrapper } from "../SlpRealTimeWrapper.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
   readonly #renderer: { path: string } | URL;
   readonly #openDevTools;
   private obs: ObsController;
+  private slpRealtime: SlpRealTimeWrapper
   private dataFileManager: FileReaderWriter;
   private mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>;
   private game: string;
@@ -34,15 +36,17 @@ class WindowManager implements AppModule {
     this.#renderer = initConfig.renderer;
     this.#openDevTools = openDevTools;
     this.obs = new ObsController();
+
     this.dataFileManager = new FileReaderWriter();
     this.obs.initEvents();
     this.mainSocket = io("http://localhost:20242");
+    this.slpRealtime = new SlpRealTimeWrapper()
     this.game = "melee";
   }
 
   async enable({ app }: ModuleContext): Promise<void> {
     await app.whenReady();
-    ipcSetup(this.mainSocket, this.obs, this.dataFileManager);
+    ipcSetup(this.mainSocket, this.obs, this.dataFileManager, this.slpRealtime);
     await this.restoreOrCreateWindow(true);
     app.on("second-instance", () => this.restoreOrCreateWindow(true));
     app.on("activate", () => this.restoreOrCreateWindow(true));
@@ -62,10 +66,15 @@ class WindowManager implements AppModule {
       icon: join(import.meta.dirname, "..", "src", "assets", "icon.ico"),
     });
 
+    // set up slp-realtime for sending data back to renderer
+    this.slpRealtime.addBrowser(browserWindow)
+    this.slpRealtime.setupListeners()
+  
     // observer model putting to good use ig
     const toast = new ToastMessageCommunicator(browserWindow);
     this.obs.attach(toast);
     this.dataFileManager.attach(toast);
+    this.slpRealtime.attach(toast)
 
     const menu = buildMenu(browserWindow, this.obs);
     Menu.setApplicationMenu(menu);
