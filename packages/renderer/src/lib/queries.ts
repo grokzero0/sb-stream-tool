@@ -67,3 +67,46 @@ export const GET_ENTRANTS_INFO = gql`
     }
   }
 `;
+
+export const GET_SETS_IN_EVENT = gql`
+  query EventSets($eventSlug: String!, $page: Int!, $perPage: Int!) {
+    event(slug: $eventSlug) {
+      id
+      name
+      sets(page: $page, perPage: $perPage, sortType: STANDARD) {
+        pageInfo {
+          total
+          totalPages
+        }
+        nodes {
+          # id
+          fullRoundText
+          state
+          stream {
+            streamSource
+            streamName
+          }
+          slots {
+            id
+            entrant {
+              id
+              name
+              participants {
+                id
+                prefix
+                gamerTag
+                user {
+                  genderPronoun
+                  authorizations(types: TWITTER) {
+                    externalUsername
+                  }
+                }
+                connectedAccounts
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`;

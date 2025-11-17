@@ -16,26 +16,26 @@ const highlights = [
 
 export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
   const menu = Menu.buildFromTemplate([
-    {
-      label: "Game (Not implemented yet lol)",
-      submenu: [
-        {
-          label: "Melee",
-          click: () => browserWindow.webContents.send("swap-to-game", "melee"),
-          type: "radio",
-        },
-        {
-          label: "P+",
-          click: () => browserWindow.webContents.send("swap-to-game", "p+"),
-          type: "radio",
-        },
-        {
-          label: "etc",
-          click: () => browserWindow.webContents.send("swap-to-game", "etc"),
-          type: "radio",
-        },
-      ],
-    },
+    // {
+    //   label: "Game (Not implemented yet lol)",
+    //   submenu: [
+    //     {
+    //       label: "Melee",
+    //       click: () => browserWindow.webContents.send("swap-to-game", "melee"),
+    //       type: "radio",
+    //     },
+    //     {
+    //       label: "P+",
+    //       click: () => browserWindow.webContents.send("swap-to-game", "p+"),
+    //       type: "radio",
+    //     },
+    //     {
+    //       label: "etc",
+    //       click: () => browserWindow.webContents.send("swap-to-game", "etc"),
+    //       type: "radio",
+    //     },
+    //   ],
+    // },
     {
       label: "File",
       submenu: [

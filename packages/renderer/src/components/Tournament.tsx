@@ -9,6 +9,8 @@ import Commentators from "./Commentators";
 import { Button } from "./ui/button";
 import Query from "./Query";
 import { updateOverlay } from "@app/preload";
+import FetchTournament from "./FetchTournament";
+import Sets from "./Sets";
 function Tournament() {
   const methods = useForm({ defaultValues: TournamentDefaultValues });
   const onSubmit = (data: typeof TournamentDefaultValues) => {
@@ -31,6 +33,7 @@ function Tournament() {
       {/* see https://github.com/react-hook-form/react-hook-form/issues/1561#issuecomment-623398286 for more details */}
       <form onSubmit={methods.handleSubmit(onSubmit)}>
         <PlayerFormFieldArrayProvider>
+          <FetchTournament />
           <Header />
           <Tabs defaultValue="players">
             <TabsList className="w-full">
@@ -45,8 +48,11 @@ function Tournament() {
             </TabsContent>
           </Tabs>
         </PlayerFormFieldArrayProvider>
-        <Button className="my-2 w-full">Update Overlay</Button>
-        <Query />
+        <div className="flex flex-col gap-2 my-2">
+          <Button className="w-full">Update Overlay</Button>
+          <Query />
+          <Sets />
+        </div>
       </form>
     </Form>
   );
