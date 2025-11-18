@@ -1,0 +1,16 @@
+[
+  { "placement": "Friendlies" },
+  { "placement": "Exhibition Match" },
+  { "placement": "Money Match" },
+  { "placement": "Losers Round" },
+  { "placement": "Winners Round" },
+  { "placement": "Winners Quarter-Finals" },
+  { "placement": "Winners Semi-Finals" },
+  { "placement": "Winners Finals" },
+  { "placement": "Losers Quarter-Finals" },
+  { "placement": "Losers Semi-Finals" },
+  { "placement": "Losers Finals" },
+  { "placement": "Grand Finals" },
+  { "placement": "Grand Finals Reset" },
+  { "placement": "Custom Match" }
+]
