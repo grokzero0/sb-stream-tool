@@ -1,8 +1,20 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import { ObsController } from './ObsController'
+import { FileReaderWriter } from './components/FileReaderWriter'
+import { ToastMessageCommunicator } from './components/ToastMessageCommunication'
+import { buildMenu } from './components/menu'
+import { ipcSetup } from './components/ipc'
+import { ClientToServerEvents, ServerToClientEvents } from './types'
+import { Socket, io } from 'socket.io-client'
 
+const obs = new ObsController()
+const dataFileManager = new FileReaderWriter()
+const mainSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:20242')
+
+obs.initEvents()
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
@@ -19,6 +31,13 @@ function createWindow(): void {
       webviewTag: false
     }
   })
+
+  const toast = new ToastMessageCommunicator(mainWindow)
+  obs.attach(toast)
+  dataFileManager.attach(toast)
+
+  const menu = buildMenu(mainWindow, obs)
+  Menu.setApplicationMenu(menu)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -45,6 +64,7 @@ app.whenReady().then(() => {
   // Set app user model id for windows
   electronApp.setAppUserModelId('com.electron')
 
+  ipcSetup(mainSocket, obs, dataFileManager)
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
