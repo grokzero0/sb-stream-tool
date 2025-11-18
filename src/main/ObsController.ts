@@ -1,4 +1,4 @@
-import OBSWebSocket from 'obs-websocket-js'
+import { OBSWebSocket } from 'obs-websocket-js'
 import { EventSink, EventStream } from './components/observer'
 import { ObsScene } from './types'
 

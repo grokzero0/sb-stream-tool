@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { ApolloClient, HttpLink, InMemoryCache } from '@apollo/client'
 import { ApolloProvider } from '@apollo/client/react'
 import { Route, Router, Switch } from 'wouter'
@@ -8,6 +9,10 @@ import Layout from './layout'
 import NavigationHandler from './components/NavigationHandler'
 import { Toaster } from './components/ui/sonner'
 import ToastHandler from './components/ToastHandler'
+import Settings from './components/settings/Settings'
+import Tournament from './components/Tournament'
+import Obs from './components/settings/obs/Obs'
+import Startgg from './components/settings/startgg/Startgg'
 
 const client = new ApolloClient({
   link: new HttpLink({
@@ -42,7 +47,26 @@ function App(): React.JSX.Element {
               <Toaster />
               <ToastHandler />
               <Switch>
-                <Route></Route>
+                <Route path="/" component={Tournament}></Route>
+                <Route path="/settings" nest>
+                  <Settings>
+                    <Switch>
+                      <Route path="/" component={Obs}></Route>
+                      <Route path="/obs" component={Obs}></Route>,
+                      <Route path="/startgg" component={Startgg}></Route>
+                    </Switch>
+                  </Settings>
+                </Route>
+                {/* fallback route (route does not exist) */}
+
+                <Route>
+                  {(params) => (
+                    <center>
+                      <b>404:</b> Sorry, this page <code>&quot;{params['*' as any]}/&quot;</code>{' '}
+                      does not exist!
+                    </center>
+                  )}
+                </Route>
               </Switch>
             </NavigationHandler>
           </Router>

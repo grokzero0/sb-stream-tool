@@ -9,7 +9,9 @@ import { buildMenu } from './components/menu'
 import { ipcSetup } from './components/ipc'
 import { ClientToServerEvents, ServerToClientEvents } from './types'
 import { Socket, io } from 'socket.io-client'
+import createDirs from './components/createDirs'
 
+createDirs()
 const obs = new ObsController()
 const dataFileManager = new FileReaderWriter()
 const mainSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:20242')
