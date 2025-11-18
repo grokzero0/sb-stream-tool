@@ -1,8 +1,13 @@
-import { ElectronAPI } from '@electron-toolkit/preload'
-
+/* eslint-disable @typescript-eslint/no-explicit-any */
 declare global {
   interface Window {
-    electron: ElectronAPI
-    api: unknown
+    electronAPI: ElectronAPI
+    // api: unknown
   }
+}
+
+export interface ElectronAPI {
+  send: (channel: string, ...args: any[]) => Promise<any>
+  navigation: (callback: (location: string) => void) => void
+  toastMessage: (callback: (message?: string, description?: string) => void) => void
 }
