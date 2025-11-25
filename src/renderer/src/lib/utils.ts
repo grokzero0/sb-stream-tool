@@ -7,6 +7,9 @@ export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 
+export const sleep = (ms: number): Promise<unknown> =>
+  new Promise((resolve) => setTimeout(resolve, ms))
+
 export function filterSets(data: EventSetsQuery): SetEntry[] {
   const filteredSets = [] as SetEntry[]
   if (

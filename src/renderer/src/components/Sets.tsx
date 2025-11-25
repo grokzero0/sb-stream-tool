@@ -1,4 +1,4 @@
-import { JSX, useRef, useState } from 'react'
+import { JSX, useState } from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { Button } from './ui/button'
 import { useSettingsStore } from '@renderer/lib/zustand-store/store'
@@ -8,17 +8,14 @@ import { RowSelectionState } from '@tanstack/react-table'
 import { useLazyQuery } from '@apollo/client/react'
 import { EventSetsDocument } from '@renderer/lib/queries.generated'
 import { useFormContext } from 'react-hook-form'
-import { filterSets, updatePlayerForm } from '@renderer/lib/utils'
+import { filterSets, sleep, updatePlayerForm } from '@renderer/lib/utils'
 import { SetEntry, SetTableEntry } from '@renderer/lib/types/tournament'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
-
-const sleep = (ms: number): Promise<unknown> => new Promise((resolve) => setTimeout(resolve, ms))
 
 function Sets(): JSX.Element {
   const { setValue, getValues } = useFormContext()
   const savedTournamentSlug = useSettingsStore((state) => state.tournamentSlug)
   const [currentTournamentSlug, setCurrentTournamentSlug] = useState('')
-  const requestsMade = useRef(0)
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selection, setSelection] = useState<RowSelectionState>({})
   const selectedValue = Object.keys(selection)
@@ -35,6 +32,66 @@ function Sets(): JSX.Element {
       secondGroupName: set.groups[1].name
     }
   }) as SetTableEntry[]
+
+  const fetchSets = async (): Promise<void> => {
+    let pages = 1
+    for (let i = 1; i <= pages; i++) {
+      let requestsLimitExceeded = false
+      do {
+        if (requestsLimitExceeded) {
+          await sleep(60000)
+        }
+        const { data, error } = await getData({
+          variables: {
+            eventSlug: savedTournamentSlug,
+            page: i,
+            perPage: 50
+          }
+        })
+        if (!data || error) {
+          requestsLimitExceeded = true
+        } else {
+          requestsLimitExceeded = false
+          setCurrentTournamentSlug(savedTournamentSlug)
+          if (i == 1) {
+            // first page loaded should overwrite previous sets, the first page loaded also should set all information
+            setPagesLoaded(0)
+            pages = data.event!.sets!.pageInfo!.totalPages!
+            setTotalPages(pages)
+            setSets(filterSets(data))
+          } else {
+            setSets((prevSets) => [...prevSets, ...filterSets(data)])
+          }
+          setPagesLoaded((pages) => pages + 1)
+        }
+      } while (requestsLimitExceeded === true)
+    }
+  }
+
+  const applySet = (): void => {
+    const selected = parseInt(Object.keys(selection)[0])
+    if (Number.isNaN(selected) || sets[selected].groups.length <= 0) {
+      return
+    }
+    const setFormat = updatePlayerForm(
+      getValues('teams.0.players').length,
+      sets[selected].groups[0].players.length, // all sets are assured to have the same size
+      teams,
+      getValues('setFormat')
+    )
+    setValue('setFormat', setFormat)
+    for (let i = 0; i < getValues('teams').length; i++) {
+      for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
+        setValue(`teams.${i}.players.${j}.info`, {
+          teamName: sets[selected].groups[i].players[j].teamName,
+          playerTag: sets[selected].groups[i].players[j].playerTag,
+          pronouns: sets[selected].groups[i].players[j].pronouns,
+          twitter: sets[selected].groups[i].players[j].twitter
+        })
+      }
+    }
+    setDialogOpen(false)
+  }
   // console.log(`${typeof selection}, ${selection}, ${Object.keys(selection)}`)
   return (
     <Dialog
@@ -48,43 +105,7 @@ function Sets(): JSX.Element {
         ) {
           return
         }
-        setPagesLoaded(0)
-        setCurrentTournamentSlug(currentTournamentSlug)
-        if (requestsMade.current >= 80) {
-          await sleep(60000)
-          requestsMade.current = 0
-        }
-        const { data } = await getData({
-          variables: { eventSlug: savedTournamentSlug, page: 1, perPage: 50 }
-        })
-        if (!data) {
-          return
-        }
-        setSets(filterSets(data))
-        setPagesLoaded(1)
-        const pages = data.event!.sets!.pageInfo!.totalPages!
-        setTotalPages(pages)
-
-        requestsMade.current += 1
-        // if data exists, you can safely assume the totalPages information does exist
-        for (let i = 2; i < pages; i++) {
-          if (requestsMade.current >= 80) {
-            await sleep(60000)
-            requestsMade.current = 0
-          }
-          const { data } = await getData({
-            variables: {
-              eventSlug: savedTournamentSlug,
-              page: i,
-              perPage: 50
-            }
-          })
-          if (data) {
-            setSets((prevData) => [...prevData, ...filterSets(data)])
-            requestsMade.current += 1
-            setPagesLoaded(i)
-          }
-        }
+        fetchSets()
       }}
     >
       <DialogTrigger asChild>
@@ -110,37 +131,7 @@ function Sets(): JSX.Element {
             multiRows={false}
             className="max-h-[60vh] overflow-auto"
           />
-          <Button
-            type="button"
-            disabled={selectedValue.length <= 0}
-            onClick={() => {
-              const selected = parseInt(Object.keys(selection)[0])
-              if (Number.isNaN(selected)) {
-                return
-              }
-              if (sets[selected].groups.length <= 0) {
-                return
-              }
-              const setFormat = updatePlayerForm(
-                getValues('teams.0.players').length,
-                sets[selected].groups[0].players.length, // all sets are assured to have the same size
-                teams,
-                getValues('setFormat')
-              )
-              setValue('setFormat', setFormat)
-              for (let i = 0; i < getValues('teams').length; i++) {
-                for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
-                  setValue(`teams.${i}.players.${j}.info`, {
-                    teamName: sets[selected].groups[i].players[j].teamName,
-                    playerTag: sets[selected].groups[i].players[j].playerTag,
-                    pronouns: sets[selected].groups[i].players[j].pronouns,
-                    twitter: sets[selected].groups[i].players[j].twitter
-                  })
-                }
-              }
-              setDialogOpen(false)
-            }}
-          >
+          <Button type="button" disabled={selectedValue.length <= 0} onClick={applySet}>
             Apply this set
           </Button>
         </div>
