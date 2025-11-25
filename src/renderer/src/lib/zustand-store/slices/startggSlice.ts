@@ -27,5 +27,6 @@ export const createStartggSlice: StateCreator<
     set((state) => {
       state.apiKey = newApiKey
       // toast api key
+      window.electronAPI.send('startgg/update-api-key', newApiKey)
     })
 })

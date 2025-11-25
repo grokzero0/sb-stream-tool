@@ -1,46 +1,16 @@
 import { JSX } from 'react'
 import placements from '../assets/placements.json'
-import { useFormContext } from 'react-hook-form'
+import { useWatch } from 'react-hook-form'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 import { FormControl, FormField, FormItem, FormLabel } from './ui/form'
 import { Input } from './ui/input'
 import { Spinbox } from './ui/spinbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-const colors = ['Red', 'Blue', 'Green', 'Yellow']
+import { handleSetFormatChange } from '@renderer/lib/utils'
 function Header(): JSX.Element {
-  const { watch } = useFormContext()
   const teams = usePlayerFormFieldArrayContext()
-  const watchRoundFormat = watch('roundFormat')
+  const watchRoundFormat = useWatch({ name: 'roundFormat' })
 
-  const handleSetFormatChange = (setFormat: string): void => {
-    switch (setFormat) {
-      case 'Singles':
-        for (let i = 0; i < teams.length; i++) {
-          teams[i].remove(1)
-        }
-        break
-      case 'Doubles':
-        for (let i = 0; i < teams.length; i++) {
-          if (teams[i].fields.length < 2) {
-            teams[i].append({
-              info: {
-                teamName: '',
-                playerTag: '',
-                pronouns: '',
-                twitter: ''
-              },
-
-              character: 'Random',
-              altCostume: 'Default',
-              port: colors[2 + i]
-            })
-          }
-        }
-        break
-      default:
-        throw new Error(`Set format ${setFormat} does not exist!`)
-    }
-  }
   return (
     <>
       <FormField
@@ -81,7 +51,7 @@ function Header(): JSX.Element {
             render={({ field }) => (
               <FormItem>
                 <FormLabel htmlFor="round-format">Round Format</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={placements[0].placement}>
+                <Select onValueChange={field.onChange} value={field.value}>
                   <FormControl>
                     <SelectTrigger id="round-format">
                       <SelectValue placeholder="Click for options"></SelectValue>
@@ -139,9 +109,10 @@ function Header(): JSX.Element {
               <FormLabel>Set Format</FormLabel>
               <Select
                 onValueChange={(setFormat) => {
-                  handleSetFormatChange(setFormat)
+                  handleSetFormatChange(setFormat, teams)
                   field.onChange(setFormat)
                 }}
+                value={field.value}
                 defaultValue="Singles"
               >
                 <FormControl>

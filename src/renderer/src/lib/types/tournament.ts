@@ -1,4 +1,4 @@
-type PlayerInfo = {
+export type PlayerInfo = {
   teamName: string
   playerTag: string
   pronouns: string
@@ -42,14 +42,10 @@ export type SetEntry = {
   stream: string
   matchName: string
   status: number
-  firstGroup: {
+  groups: {
     name: string
-    players: PlayerInfo[]
-  }
-  secondGroup: {
-    name: string
-    players: PlayerInfo[]
-  }
+    players: PlayerInfo[] // always gonna be of size 2
+  }[]
 }
 
 export type SetTableEntry = {

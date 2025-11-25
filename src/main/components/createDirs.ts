@@ -5,8 +5,8 @@ import path from 'node:path'
 export default async function createDirs(): Promise<void> {
   let resourcesPath = path.join(app.getAppPath(), '..', 'resources')
   let configPath = path.join(app.getAppPath(), '..', 'config')
-  let overlayPath = `${app.getAppPath()}/packages/renderer/src/assets/overlay/`
-  let charactersPath = `${app.getAppPath()}/packages/renderer/src/assets/characters/`
+  let overlayPath = `${app.getAppPath()}/src/renderer/src/assets/overlay/`
+  let charactersPath = `${app.getAppPath()}/src/renderer/src/assets/characters/`
   if (process.env.NODE_ENV !== 'development') {
     overlayPath = `${process.resourcesPath}/overlay/`
     charactersPath = `${process.resourcesPath}/characters/`

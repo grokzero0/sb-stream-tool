@@ -10,6 +10,7 @@ import { Button } from './ui/button'
 import Query from './Query'
 import Teams from './Teams'
 import Header from './Header'
+import Sets from './Sets'
 
 function Tournament(): JSX.Element {
   const methods = useForm({ defaultValues: TournamentDefaultValues })
@@ -34,12 +35,12 @@ function Tournament(): JSX.Element {
               <Commentators />
             </TabsContent>
           </Tabs>
+          <div className="flex flex-col gap-2 my-2">
+            <Button className="w-full">Update Overlay</Button>
+            <Query />
+            <Sets />
+          </div>
         </PlayerFormFieldArrayProvider>
-        <div className="flex flex-col gap-2 my-2">
-          <Button className="w-full">Update Overlay</Button>
-          <Query />
-          {/* <Sets /> */}
-        </div>
       </form>
     </Form>
   )

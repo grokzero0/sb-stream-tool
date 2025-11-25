@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain, Menu } from 'electron'
+import { app, shell, BrowserWindow, Menu } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -9,11 +9,12 @@ import { buildMenu } from './components/menu'
 import { ipcSetup } from './components/ipc'
 import { ClientToServerEvents, ServerToClientEvents } from './types'
 import { Socket, io } from 'socket.io-client'
-import createDirs from './components/createDirs'
 
-createDirs()
 const obs = new ObsController()
 const dataFileManager = new FileReaderWriter()
+;(async () => {
+  await dataFileManager.createDirs()
+})()
 const mainSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:20242')
 
 obs.initEvents()
@@ -75,7 +76,7 @@ app.whenReady().then(() => {
   })
 
   // IPC test
-  ipcMain.handle('ping', () => console.log('pong'))
+  // ipcMain.handle('ping', () => console.log('pong'))
 
   createWindow()
 

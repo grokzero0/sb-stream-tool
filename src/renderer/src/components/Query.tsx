@@ -13,10 +13,13 @@ import {
 import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
+import { updatePlayerForm } from '@renderer/lib/utils'
+import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 
 function Query(): JSX.Element {
   const [setID, setSetID] = useState('')
   const [message, setMessage] = useState('')
+  const teams = usePlayerFormFieldArrayContext()
   const [getData, { loading, error }] = useLazyQuery(SetEntrantsDocument)
   const [dialogOpen, setDialogOpen] = useState(false)
   const { setValue, getValues } = useFormContext()
@@ -28,23 +31,34 @@ function Query(): JSX.Element {
       setMessage('Please type in a set ID')
       return
     }
-    getData({ variables: { setId: setID } }).then(({ data }) => {
-      setMessage(`Set ${setID} found! Applying information...`)
-      console.log(data)
-      setValue('name', data?.set?.event?.tournament?.name)
-      for (let i = 0; i < getValues('teams').length; i++) {
-        for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
-          setValue(`teams.${i}.players.${j}.info`, {
-            teamName: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.prefix ?? '',
-            playerTag: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.gamerTag ?? '',
-            pronouns: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user?.genderPronoun ?? '',
-            twitter:
-              data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user?.authorizations?.[0]
-                ?.externalUsername ?? ''
-          })
-        }
+
+    const { data } = await getData({ variables: { setId: setID } })
+    if (!data) {
+      return
+    }
+    setMessage(`Set ${setID} found! Applying information...`)
+    setValue('name', data?.set?.event?.tournament?.name)
+
+    const setFormat = updatePlayerForm(
+      getValues('teams.0.players').length,
+      data?.set?.slots?.[0]?.entrant?.participants?.length, // unlikely -1 will occur, but if it does, updateForm won't do anything since it returns if it detects -1
+      teams,
+      getValues('setFormat')
+    )
+    setValue('setFormat', setFormat)
+
+    for (let i = 0; i < getValues('teams').length; i++) {
+      for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
+        setValue(`teams.${i}.players.${j}.info`, {
+          teamName: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.prefix ?? '',
+          playerTag: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.gamerTag ?? '',
+          pronouns: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user?.genderPronoun ?? '',
+          twitter:
+            data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user?.authorizations?.[0]
+              ?.externalUsername ?? ''
+        })
       }
-    })
+    }
     clearTimeout(timeoutId.current)
     timeoutId.current = setTimeout(() => {
       setMessage('')

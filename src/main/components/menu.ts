@@ -11,7 +11,9 @@ const highlights = [
   'https://www.youtube.com/watch?v=ljrIkINkawM',
   'https://www.youtube.com/watch?v=Uu9Kpyi5qG4',
   'https://www.youtube.com/watch?v=uyup7rN_7ko',
-  'https://www.youtube.com/watch?v=rEtbBQnU_Xk'
+  'https://www.youtube.com/watch?v=rEtbBQnU_Xk',
+  'https://clips.twitch.tv/SpoopyObservantWrenchArsonNoSexy-0GCrZ0iQbeT3k7ck',
+  'https://clips.twitch.tv/DelightfulCaringNigiriPlanking-y5U74CH5MP9uv3Nn'
 ]
 
 export function buildMenu(browserWindow: BrowserWindow, obs: ObsController): Electron.Menu {
