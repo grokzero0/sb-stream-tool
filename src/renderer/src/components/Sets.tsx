@@ -16,6 +16,7 @@ import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 function Sets(): JSX.Element {
   const { setValue, getValues } = useFormContext()
   const savedTournamentSlug = useSettingsStore((state) => state.tournamentSlug)
+  const savedApiKey = useSettingsStore((state) => state.apiKey)
   const [currentTournamentSlug, setCurrentTournamentSlug] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selection, setSelection] = useState<RowSelectionState>({})
@@ -128,6 +129,11 @@ function Sets(): JSX.Element {
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
+          {!savedApiKey && (
+            <h1>
+              YOU MUST PUT IN A START.GG API KEY (GO TO SETTINGS FOR TUTORIAL) IN ORDER TO USE THIS
+            </h1>
+          )}
           <h1>
             Pages {pagesLoaded} of {totalPages} loaded
           </h1>
