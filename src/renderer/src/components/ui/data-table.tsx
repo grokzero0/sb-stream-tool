@@ -6,8 +6,7 @@ import {
   getFilteredRowModel,
   getPaginationRowModel,
   useReactTable,
-  // FilterFn,
-  // FilterFnOption
+  ColumnFiltersState
 } from '@tanstack/react-table'
 // import { rankItem } from '@tanstack/match-sorter-utils'
 import { JSX, useState } from 'react'
@@ -15,6 +14,8 @@ import { Input } from './input'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
 import { Button } from './button'
 import { cn } from '@renderer/lib/utils'
+// import { Checkbox } from './checkbox'
+// import { Label } from './label'
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
@@ -45,7 +46,7 @@ export function DataTable<TData, TValue>({
   className
 }: DataTableProps<TData, TValue>): JSX.Element {
   const [rowSelection, setRowSelection] = useState({})
-
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [globalFilter, setGlobalFilter] = useState<any>([])
   const table = useReactTable({
     data,
@@ -62,6 +63,7 @@ export function DataTable<TData, TValue>({
         setSelection(e)
       }
     },
+    onColumnFiltersChange: setColumnFilters,
     getPaginationRowModel: getPaginationRowModel(),
     onGlobalFilterChange: setGlobalFilter,
 
@@ -69,7 +71,8 @@ export function DataTable<TData, TValue>({
     autoResetPageIndex: false,
     state: {
       rowSelection,
-      globalFilter
+      globalFilter,
+      columnFilters
     },
     initialState: {
       pagination: {
@@ -81,13 +84,17 @@ export function DataTable<TData, TValue>({
 
   return (
     <div>
-      <div className="flex items-center py-4">
+      <div className="flex items-center py-4 space-x-4">
         <Input
           placeholder="Filter by keyword"
           value={(globalFilter as string) ?? ''}
           onChange={(event) => table.setGlobalFilter(String(event.target.value))}
           className="max-w-sm"
         />
+        {/* <div className="flex items-center space-x-2">
+          <Checkbox id="live-sets" onCheckedChange={table.getColumn('stream')?.setFilterValue} />
+          <Label htmlFor="live-sets">Only live sets</Label>
+        </div> */}
       </div>
       <div className={cn('overflow-hidden rounded-md border', className)}>
         <Table>

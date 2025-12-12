@@ -18,7 +18,13 @@ export const columns: ColumnDef<SetTableEntry>[] = [
 
   {
     accessorKey: 'stream',
-    header: 'Stream'
+    header: 'Stream',
+    // filterFn: (row, _, filterValue) => {
+    //   if (!filterValue) {
+    //     return true
+    //   }
+    //   return row.getValue('stream') !== ''
+    // }
   },
   {
     accessorKey: 'matchName',

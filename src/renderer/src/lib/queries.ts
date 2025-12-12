@@ -65,6 +65,44 @@ export const GET_ENTRANTS_INFO = gql`
   }
 `
 
+export const GET_LIVE_SETS = gql`
+  query StreamQueueOnTournament($tourneySlug: String!) {
+    tournament(slug: $tourneySlug) {
+      id
+      streamQueue {
+        sets {
+          id
+          fullRoundText
+          state
+          stream {
+            streamSource
+            streamName
+          }
+          slots {
+            id
+            entrant {
+              id
+              name
+              participants {
+                id
+                prefix
+                gamerTag
+                user {
+                  genderPronoun
+                  authorizations(types: TWITTER) {
+                    externalUsername
+                  }
+                }
+                connectedAccounts
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+`
+
 export const GET_SETS_IN_EVENT = gql`
   query EventSets($eventSlug: String!, $page: Int!, $perPage: Int!) {
     event(slug: $eventSlug) {

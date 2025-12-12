@@ -1,30 +1,29 @@
+import { useLazyQuery } from '@apollo/client/react'
+import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
+import { StreamQueueOnTournamentDocument } from '@renderer/lib/queries.generated'
+import { SetEntry, SetTableEntry } from '@renderer/lib/types/tournament'
+import { filterLiveSets, updatePlayerForm } from '@renderer/lib/utils'
+import { useSettingsStore } from '@renderer/lib/zustand-store/store'
+import { RowSelectionState } from '@tanstack/react-table'
 import { JSX, useState } from 'react'
+import { useFormContext } from 'react-hook-form'
+import { DataTable } from './ui/data-table'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from './ui/dialog'
 import { Button } from './ui/button'
-import { useSettingsStore } from '@renderer/lib/zustand-store/store'
-import { DataTable } from './ui/data-table'
 import { columns } from '@renderer/lib/types/columns'
-import { RowSelectionState } from '@tanstack/react-table'
-import { useLazyQuery } from '@apollo/client/react'
-import { EventSetsDocument } from '@renderer/lib/queries.generated'
-import { useFormContext } from 'react-hook-form'
-import { filterSets, sleep, updatePlayerForm } from '@renderer/lib/utils'
-import { SetEntry, SetTableEntry } from '@renderer/lib/types/tournament'
-import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 
-// TODO: filter by live sets only
-function Sets(): JSX.Element {
+function LiveSets(): JSX.Element {
   const { setValue, getValues } = useFormContext()
+  const savedApiKey = useSettingsStore((state) => state.apiKey)
   const savedTournamentSlug = useSettingsStore((state) => state.tournamentSlug)
   const [currentTournamentSlug, setCurrentTournamentSlug] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selection, setSelection] = useState<RowSelectionState>({})
   const selectedValue = Object.keys(selection)
   const [sets, setSets] = useState([] as SetEntry[])
-  const [pagesLoaded, setPagesLoaded] = useState(0)
-  const [totalPages, setTotalPages] = useState(0)
-  const [getData] = useLazyQuery(EventSetsDocument)
   const teams = usePlayerFormFieldArrayContext()
+  const [getData] = useLazyQuery(StreamQueueOnTournamentDocument)
+
   const data = sets.map((set) => {
     return {
       stream: set.stream,
@@ -33,49 +32,18 @@ function Sets(): JSX.Element {
       secondGroupName: set.groups[1].name
     }
   }) as SetTableEntry[]
-  // const testData = [
-  //   { stream: 'lol', matchName: '1', firstGroupName: '2', secondGroupName: '3' },
-  //   { stream: 'lol', matchName: '1', firstGroupName: '2', secondGroupName: '3' },
-  //   { stream: 'lol', matchName: '1', firstGroupName: '2', secondGroupName: '3' },
-  //   { stream: '', matchName: '1', firstGroupName: '2', secondGroupName: '3' },
-  //   { stream: '', matchName: '1', firstGroupName: '2', secondGroupName: '3' }
-  // ]
 
-  const fetchSets = async (): Promise<void> => {
-    let pages = 1
-    for (let i = 1; i <= pages; i++) {
-      let requestsLimitExceeded = false
-      do {
-        if (requestsLimitExceeded) {
-          await sleep(60000)
-        }
-        const { data, error } = await getData({
-          variables: {
-            eventSlug: savedTournamentSlug,
-            page: i,
-            perPage: 50
-          }
-        })
-        if (!data || error) {
-          requestsLimitExceeded = true
-        } else {
-          requestsLimitExceeded = false
-          setCurrentTournamentSlug(savedTournamentSlug)
-          if (i == 1) {
-            // first page loaded should overwrite previous sets, the first page loaded also should set all information
-            setPagesLoaded(0)
-            pages = data.event!.sets!.pageInfo!.totalPages!
-            setTotalPages(pages)
-            setSets(filterSets(data))
-          } else {
-            setSets((prevSets) => [...prevSets, ...filterSets(data)])
-          }
-          setPagesLoaded((pages) => pages + 1)
-        }
-      } while (requestsLimitExceeded === true)
+  const fetchLiveSets = async (): Promise<void> => {
+    const { data } = await getData({
+      variables: {
+        tourneySlug: savedTournamentSlug
+      }
+    })
+    if (data) {
+      setCurrentTournamentSlug(savedTournamentSlug)
+      setSets(filterLiveSets(data))
     }
   }
-
   const applySet = (): void => {
     const selected = parseInt(Object.keys(selection)[0])
     if (Number.isNaN(selected) || sets[selected].groups.length <= 0) {
@@ -100,7 +68,6 @@ function Sets(): JSX.Element {
     }
     setDialogOpen(false)
   }
-  // console.log(`${typeof selection}, ${selection}, ${Object.keys(selection)}`)
   return (
     <Dialog
       open={dialogOpen}
@@ -113,24 +80,26 @@ function Sets(): JSX.Element {
         ) {
           return
         }
-        fetchSets()
+        fetchLiveSets()
       }}
     >
       <DialogTrigger asChild>
         <Button disabled={savedTournamentSlug === ''}>
-          Choose set from {savedTournamentSlug !== '' ? savedTournamentSlug : 'tournament'}
+          Choose live set from {savedTournamentSlug !== '' ? savedTournamentSlug : 'tournament'}
         </Button>
       </DialogTrigger>
       <DialogContent className="max-w-[85vw] overflow-y-auto max-h-screen">
         <DialogHeader>
           <DialogTitle>
-            Sets in {savedTournamentSlug !== '' ? savedTournamentSlug : 'tournament'}
+            Live sets in {savedTournamentSlug !== '' ? savedTournamentSlug : 'tournament'}
           </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-4">
-          <h1>
-            Pages {pagesLoaded} of {totalPages} loaded
-          </h1>
+          {!savedApiKey && (
+            <h1>
+              YOU MUST PUT IN A START.GG API KEY (GO TO SETTINGS FOR TUTORIAL) IN ORDER TO USE THIS
+            </h1>
+          )}
           <DataTable
             columns={columns}
             data={data}
@@ -147,4 +116,4 @@ function Sets(): JSX.Element {
     </Dialog>
   )
 }
-export default Sets
+export default LiveSets

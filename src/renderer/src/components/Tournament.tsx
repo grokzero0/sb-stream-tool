@@ -11,6 +11,7 @@ import Query from './Query'
 import Teams from './Teams'
 import Header from './Header'
 import Sets from './Sets'
+import LiveSets from './LiveSets'
 
 function Tournament(): JSX.Element {
   const methods = useForm({ defaultValues: TournamentDefaultValues })
@@ -39,6 +40,7 @@ function Tournament(): JSX.Element {
             <Button className="w-full">Update Overlay</Button>
             <Query />
             <Sets />
+            <LiveSets />
           </div>
         </PlayerFormFieldArrayProvider>
       </form>
