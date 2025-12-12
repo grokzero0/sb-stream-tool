@@ -1,4 +1,4 @@
-appId: com.electron.app
+appId: sb-stream-tool
 productName: sb-stream-tool
 directories:
   buildResources: build
@@ -11,13 +11,25 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+publish:
+  - github
 win:
   executableName: sb-stream-tool
-nsis:
-  artifactName: ${name}-${version}-setup.${ext}
-  shortcutName: ${productName}
-  uninstallDisplayName: ${productName}
-  createDesktopShortcut: always
+  artifactName: ${productName}-${version}-${os}-${arch}.${ext}
+  target:
+    - portable
+    - tar.xz
+extraResources:
+  - from: "./src/renderer/src/assets/characters"
+    to: "./characters"
+  - from: "./src/renderer/src/assets/overlay"
+    to: "./overlay"
+
+# nsis:
+#   artifactName: ${name}-${version}-setup.${ext}
+#   shortcutName: ${productName}
+#   uninstallDisplayName: ${productName}
+#   createDesktopShortcut: always
 mac:
   entitlementsInherit: build/entitlements.mac.plist
   extendInfo:
@@ -26,18 +38,15 @@ mac:
     - NSDocumentsFolderUsageDescription: Application requests access to the user's Documents folder.
     - NSDownloadsFolderUsageDescription: Application requests access to the user's Downloads folder.
   notarize: false
-dmg:
-  artifactName: ${name}-${version}.${ext}
+# dmg:
+#   artifactName: ${name}-${version}.${ext}
 linux:
+  artifactName: ${productName}-${version}-${os}-${arch}.${ext}
   target:
     - AppImage
-    - snap
-    - deb
+    - tar.xz
   maintainer: electronjs.org
   category: Utility
 appImage:
-  artifactName: ${name}-${version}.${ext}
+  artifactName: ${productName}-${version}-${os}-${arch}.${ext}
 npmRebuild: false
-publish:
-  provider: generic
-  url: https://example.com/auto-updates
