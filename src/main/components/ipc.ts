@@ -1,14 +1,16 @@
-import { ipcMain } from 'electron'
+import { dialog, ipcMain } from 'electron'
 import { ObsController } from '../ObsController'
 import { Socket } from 'socket.io-client'
 import { ClientToServerEvents, ServerToClientEvents } from '../types'
 import { ObsScene, TournamentState } from '../types'
 import { FileReaderWriter } from './FileReaderWriter'
+import { SlippiFileMonitor } from './slippi'
 
 export function ipcSetup(
   mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>,
   obs: ObsController,
-  fileDataManager: FileReaderWriter
+  fileDataManager: FileReaderWriter,
+  fileMonitor: SlippiFileMonitor
 ): void {
   ipcMain.handle('obs/connect', (_event, ip: string, port: string, password: string) => {
     obs.connect('ws://', ip, port, password)
@@ -38,7 +40,14 @@ export function ipcSetup(
     fileDataManager.writeApiKey(newApiKey)
   )
 
-  //   ipcMain.handle('slippi/connect', (_event, address, slpPort) =>
-  //     slpRealtime.connect(address, slpPort)
-  //   )
+  ipcMain.handle('file:openDialog', async () => {
+    const { canceled, filePaths } = await dialog.showOpenDialog({ properties: ['openDirectory'] })
+    if (canceled) {
+      return ''
+    } else {
+      return filePaths[0]
+    }
+  })
+
+  ipcMain.handle('slippi:readDirectory', (_event, listenPath) => fileMonitor.setup(listenPath))
 }

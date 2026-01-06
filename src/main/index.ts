@@ -9,8 +9,10 @@ import { buildMenu } from './components/menu'
 import { ipcSetup } from './components/ipc'
 import { ClientToServerEvents, ServerToClientEvents } from './types'
 import { Socket, io } from 'socket.io-client'
+import { SlippiFileMonitor } from './components/slippi'
 
 const obs = new ObsController()
+const slippiFileMonitor = new SlippiFileMonitor()
 const dataFileManager = new FileReaderWriter()
 ;(async () => {
   await dataFileManager.createDirs()
@@ -38,6 +40,7 @@ function createWindow(): void {
   const toast = new ToastMessageCommunicator(mainWindow)
   obs.attach(toast)
   dataFileManager.attach(toast)
+  slippiFileMonitor.setBrowserWindow(mainWindow)
 
   const menu = buildMenu(mainWindow, obs)
   Menu.setApplicationMenu(menu)
@@ -65,9 +68,8 @@ function createWindow(): void {
 // Some APIs can only be used after this event occurs.
 app.whenReady().then(() => {
   // Set app user model id for windows
-  electronApp.setAppUserModelId('com.electron')
-
-  ipcSetup(mainSocket, obs, dataFileManager)
+  electronApp.setAppUserModelId('sb-stream-tool')
+  ipcSetup(mainSocket, obs, dataFileManager, slippiFileMonitor)
   // Default open or close DevTools by F12 in development
   // and ignore CommandOrControl + R in production.
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils

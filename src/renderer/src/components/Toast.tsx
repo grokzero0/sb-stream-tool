@@ -1,8 +1,9 @@
 import { X } from 'lucide-react'
 import { JSX } from 'react'
 import { toast } from 'sonner'
+import { Toaster } from './ui/sonner'
 
-function ToastHandler(): JSX.Element {
+function Toast(): JSX.Element {
   window.electronAPI.toastMessage((message, description) => {
     toast(message, {
       action: {
@@ -14,7 +15,7 @@ function ToastHandler(): JSX.Element {
       description: description
     })
   })
-  return <></>
+  return <Toaster />
 }
 
-export default ToastHandler
+export default Toast

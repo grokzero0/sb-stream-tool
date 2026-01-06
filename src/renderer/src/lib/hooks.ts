@@ -1,5 +1,6 @@
 import { useContext } from 'react'
-import type { UseFieldArrayReturn } from 'react-hook-form'
+import { useLocation } from 'wouter'
+import { type UseFieldArrayReturn } from 'react-hook-form'
 import { PlayerFormFieldArrayContext, ThemeProviderContext } from './contexts'
 import { ThemeProviderState } from './types/theme'
 
@@ -13,6 +14,21 @@ export const usePlayerFormFieldArrayContext = (): UseFieldArrayReturn[] => {
   }
 
   return context
+}
+
+export const useNavigationHandler = (): void => {
+  const [, navigate] = useLocation()
+  window.electronAPI.navigation((location) => {
+    navigate(`/${location}`)
+  })
+}
+
+export const useSlippiDataHandler = (): void => {
+  // const { setValue } = useFormContext()
+
+  window.electronAPI.slippiGameDataReceived((data) => {
+    console.log(data.players)
+  })
 }
 
 export const useTheme = (): ThemeProviderState => {

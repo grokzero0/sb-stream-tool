@@ -4,12 +4,14 @@ import { subscribeWithSelector } from 'zustand/middleware'
 import { createObsScenesSlice } from './slices/obsScenesSlice'
 import { createStartggSlice } from './slices/startggSlice'
 import { StoreSliceType } from './slices/slice'
+import { createSlippiSlice } from './slices/slippiSlice'
 
 export const useSettingsStore = create<StoreSliceType>()(
   subscribeWithSelector(
     immer((...a) => ({
       ...createObsScenesSlice(...a),
-      ...createStartggSlice(...a)
+      ...createStartggSlice(...a),
+      ...createSlippiSlice(...a)
     }))
   )
 )

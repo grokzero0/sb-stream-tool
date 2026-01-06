@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { contextBridge, ipcRenderer } from 'electron'
-
+import { SlippiGameData } from './types'
 const api = {
   send: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
   navigation: (callback: (location: string) => void) =>
@@ -8,7 +8,9 @@ const api = {
   toastMessage: (callback: (message?: string, description?: string) => void) =>
     ipcRenderer.on('toast-message', (_event, message, description) =>
       callback(message, description)
-    )
+    ),
+  slippiGameDataReceived: (callback: (data: SlippiGameData) => void) =>
+    ipcRenderer.on('slippi:received-data', (_event, data) => callback(data))
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

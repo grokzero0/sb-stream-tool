@@ -1,39 +1,52 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { SlippiGame, characters as characterUtils } from '@slippi/slippi-js/node'
 import { BrowserWindow } from 'electron'
 import chokidar, { FSWatcher } from 'chokidar'
 import * as _ from 'lodash-es'
 
 export class SlippiFileMonitor {
-  private browserWindow: BrowserWindow
+  private browserWindow?: BrowserWindow | null
+  private watcher?: FSWatcher | null
   private listenPath: string | null
-  private watcher: FSWatcher | null
-
-  constructor(browserWindow: BrowserWindow) {
-    this.browserWindow = browserWindow
-    this.listenPath = null
+  constructor() {
+    this.browserWindow = null
     this.watcher = null
+    this.listenPath = null
   }
 
-  async read(newListenPath: string): Promise<void> {
+  async setBrowserWindow(browserWindow: BrowserWindow): Promise<void> {
+    this.browserWindow = browserWindow
+  }
+
+  async stop(): Promise<void> {
+    if (this.listenPath) {
+      this.watcher?.unwatch(this.listenPath)
+      this.listenPath = null
+    }
+  }
+
+  async setup(newListenPath: string): Promise<void> {
+    this.browserWindow?.webContents.send('toast-message', 'slippi-test-read')
     this.listenPath = newListenPath
-    const watcher = chokidar.watch(this.listenPath, {
+    this.watcher = chokidar.watch(newListenPath, {
       ignored: '!*.slp', // TODO: This doesn't work. Use regex?
       depth: 0,
       persistent: true,
       usePolling: true,
       ignoreInitial: true
     })
-
+    this.read()
+  }
+  async read(): Promise<void> {
     const gameByPath = {}
-    watcher.on('change', (path) => {
-      const start = Date.now()
-
-      let gameState, settings, frames, latestFrame, gameEnd
+    this.watcher?.on('change', (path) => {
+      const gameState: Record<string, any> = {}
+      let settings: Record<string, any> = {}
+      let gameEnd: Record<string, any> = {}
       try {
         let game = _.get(gameByPath, [path, 'game'])
         if (!game) {
           console.log(`New file at: ${path}`)
-          // Make sure to enable `processOnTheFly` to get updated stats as the game progresses
           game = new SlippiGame(path, { processOnTheFly: true })
           gameByPath[path] = {
             game: game,
@@ -44,17 +57,8 @@ export class SlippiFileMonitor {
           }
         }
 
-        gameState = _.get(gameByPath, [path, 'state'])
-
         settings = game.getSettings()
 
-        // You can uncomment the stats calculation below to get complex stats in real-time. The problem
-        // is that these calculations have not been made to operate only on new data yet so as
-        // the game gets longer, the calculation will take longer and longer
-        // stats = game.getStats();
-
-        frames = game.getFrames()
-        latestFrame = game.getLatestFrame()
         gameEnd = game.getGameEnd()
       } catch (err) {
         console.log(err)
@@ -67,44 +71,15 @@ export class SlippiFileMonitor {
         gameState.settings = settings
       }
 
-      console.log(`We have ${_.size(frames)} frames.`)
       _.forEach(settings.players, (player) => {
-        const frameData = _.get(latestFrame, ['players', player.playerIndex])
-        if (!frameData) {
-          return
-        }
         console.log(
-          `${characterUtils.getCharacterName(player.characterId)} [Port ${player.port}] ` +
-            `${frameData.post.percent.toFixed(1)}% | ${frameData.post.stocksRemaining} stocks`
+          `${characterUtils.getCharacterName(player.characterId)}, ${characterUtils.getCharacterColorName(player.characterId, player.characterColor)} [Port ${player.port}] `
         )
       })
 
-      // Uncomment this if you uncomment the stats calculation above. See comment above for details
-      // // Do some conversion detection logging
-      // // console.log(stats);
-      // _.forEach(stats.conversions, conversion => {
-      //   const key = `${conversion.playerIndex}-${conversion.startFrame}`;
-      //   const detected = _.get(gameState, ['detectedPunishes', key]);
-      //   if (!detected) {
-      //     console.log(`[Punish Start] Frame ${conversion.startFrame} by player ${conversion.playerIndex + 1}`);
-      //     gameState.detectedPunishes[key] = conversion;
-      //     return;
-      //   }
-
-      //   // If punish was detected previously, but just ended, let's output that
-      //   if (!detected.endFrame && conversion.endFrame) {
-      //     const dmg = conversion.endPercent - conversion.startPercent;
-      //     const dur = conversion.endFrame - conversion.startFrame;
-      //     console.log(
-      //       `[Punish End] Player ${conversion.playerIndex + 1}'s punish did ${dmg} damage ` +
-      //       `with ${conversion.moves.length} moves over ${dur} frames`
-      //     );
-      //   }
-
-      //   gameState.detectedPunishes[key] = conversion;
-      // });
-
       if (gameEnd) {
+        console.log('game ended')
+        console.log(gameEnd)
         // NOTE: These values and the quitter index will not work until 2.0.0 recording code is
         // NOTE: used. This code has not been publicly released yet as it still has issues
         const endTypes = {
@@ -119,8 +94,6 @@ export class SlippiFileMonitor {
           gameEnd.gameEndMethod === 7 ? ` | Quitter Index: ${gameEnd.lrasInitiatorIndex}` : ''
         console.log(`[Game Complete] Type: ${endMessage}${lrasText}`)
       }
-
-      console.log(`Read took: ${Date.now() - start} ms`)
     })
   }
 }
