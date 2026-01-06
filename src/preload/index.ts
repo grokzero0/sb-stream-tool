@@ -10,7 +10,9 @@ const api = {
       callback(message, description)
     ),
   slippiGameDataReceived: (callback: (data: SlippiGameData) => void) =>
-    ipcRenderer.on('slippi:received-data', (_event, data) => callback(data))
+    ipcRenderer.on('slippi:received-data', (_event, data) => callback(data)),
+  slippiGameEnded: (callback: (winner: number) => void) =>
+    ipcRenderer.on('slippi:received-end-data', (_event, winner) => callback(winner))
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

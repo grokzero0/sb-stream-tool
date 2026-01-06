@@ -4,5 +4,10 @@ export type SlippiGameData = {
     character: string
     color: string
     playerId: number
+    port: number
   }[][]
+}
+
+export type SlippiGameEndData = {
+  winner: number
 }

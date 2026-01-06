@@ -1,5 +1,5 @@
 import { OBSWebSocket } from 'obs-websocket-js'
-import { EventSink, EventStream } from './components/observer'
+import { EventStream } from './components/observer'
 import { ObsScene } from './types'
 
 class SceneCollection {
@@ -43,40 +43,20 @@ class SceneCollection {
   }
 }
 
-export class ObsController implements EventStream {
+export class ObsController extends EventStream {
   private socket: OBSWebSocket
   private gameStartScenes: SceneCollection
   private gameEndScenes: SceneCollection
   private setEndScenes: SceneCollection
 
   // list of EventSinks "attached" to this EventStream
-  private observers: EventSink[]
 
   constructor() {
+    super()
     this.socket = new OBSWebSocket()
     this.gameStartScenes = new SceneCollection(this.socket)
     this.setEndScenes = new SceneCollection(this.socket)
     this.gameEndScenes = new SceneCollection(this.socket)
-    this.observers = []
-  }
-
-  attach(newObserver: EventSink): void {
-    this.observers.push(newObserver)
-  }
-
-  detach(observer: EventSink): void {
-    const observerIndex = this.observers.indexOf(observer)
-    if (observerIndex === -1) {
-      return console.log(`No observer found at index ${observerIndex}`)
-    }
-    this.observers.splice(observerIndex, 1)
-    console.log(`Detached an observer at index ${observerIndex}`)
-  }
-
-  notify(message?: string, description?: string): void {
-    for (const observer of this.observers) {
-      observer.update(message, description)
-    }
   }
 
   // while you could put this in the constructor, i personally don't like it, just a design choice

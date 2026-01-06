@@ -14,8 +14,8 @@ function Settings({ children }: { children: React.ReactNode }): JSX.Element {
         <SettingsSidebar />
         <div className="w-full">
           <div className="flex justify-between items-center p-4 ">
-            <SidebarTrigger />
-            <Button onClick={() => navigate('~')}>
+            <SidebarTrigger type="button" />
+            <Button type="button" onClick={() => navigate('~')}>
               <X />
             </Button>
           </div>

@@ -1,26 +1,42 @@
-import { Button } from '@renderer/components/ui/button'
-import { useSettingsStore } from '@renderer/lib/zustand-store/store'
+import { Label } from '@renderer/components/ui/label'
+import { RadioGroup, RadioGroupItem } from '@renderer/components/ui/radio-group'
 import { JSX } from 'react'
+import RelayTargetFolderBrowser from './RelayTargetFolderBrowser'
+import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 
 function Slippi(): JSX.Element {
-  const savedDirectory = useSettingsStore((state) => state.directory)
-  const update = useSettingsStore((state) => state.updateDirectory)
+  const relayStatus = useSettingsStore((state) => state.relayStatus)
+  const updateRelayStatus = useSettingsStore((state) => state.updateRelayStatus)
   return (
-    <div>
-      <h1>Select directory of the .slp files:</h1>
-      <Button
-        type="button"
-        onClick={async () => {
-          const directory = await window.electronAPI.send('file:openDialog')
-          update(directory)
-        }}
-      >
-        Browse
-      </Button>
-      <h1>{savedDirectory === '' ? 'No directory selected.' : savedDirectory}</h1>
-      <Button onClick={() => window.electronAPI.send('slippi:readDirectory', savedDirectory)}>
-        Save and start reading
-      </Button>
+    <div className="flex flex-col items-center gap-4 w-full">
+      <h1 className="text-center font-semibold text-xl">Slippi Relay Settings</h1>
+      <div>
+        {/* <h1></h1> */}
+        <RadioGroup
+          value={relayStatus}
+          onValueChange={(value) => {
+            updateRelayStatus(value as 'disabled' | 'folder' | 'direct')
+          }}
+          className="flex gap-4"
+        >
+          <div className="flex items-center gap-3">
+            <RadioGroupItem value="direct" id="r1" />
+            <Label htmlFor="r1">Connect via direct connection</Label>
+          </div>
+          <div className="flex items-center gap-3">
+            <RadioGroupItem value="folder" id="r2" />
+            <Label htmlFor="r2">Connect via folder</Label>
+          </div>
+          <div className="flex items-center gap-3">
+            <RadioGroupItem value="disabled" id="r3" />
+            <Label htmlFor="r3">Disabled</Label>
+          </div>
+        </RadioGroup>
+      </div>
+
+      <div className="flex flex-col gap-4 w-full">
+        <RelayTargetFolderBrowser disabled={relayStatus !== 'folder'} />
+      </div>
     </div>
   )
 }

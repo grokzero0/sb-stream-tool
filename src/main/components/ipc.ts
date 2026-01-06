@@ -4,13 +4,13 @@ import { Socket } from 'socket.io-client'
 import { ClientToServerEvents, ServerToClientEvents } from '../types'
 import { ObsScene, TournamentState } from '../types'
 import { FileReaderWriter } from './FileReaderWriter'
-import { SlippiFileMonitor } from './slippi'
+import { SlippiRelayHandler } from './SlippiRelayHandler'
 
 export function ipcSetup(
   mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>,
   obs: ObsController,
   fileDataManager: FileReaderWriter,
-  fileMonitor: SlippiFileMonitor
+  slippi: SlippiRelayHandler
 ): void {
   ipcMain.handle('obs/connect', (_event, ip: string, port: string, password: string) => {
     obs.connect('ws://', ip, port, password)
@@ -49,5 +49,7 @@ export function ipcSetup(
     }
   })
 
-  ipcMain.handle('slippi:readDirectory', (_event, listenPath) => fileMonitor.setup(listenPath))
+  ipcMain.handle('slippi:readFolder', (_event, listenPath) => slippi.setup(listenPath))
+
+  ipcMain.handle('slippi:stopReadingFolder', () => slippi.stop())
 }

@@ -3,26 +3,44 @@ import { SlippiGame, characters as characterUtils } from '@slippi/slippi-js/node
 import { BrowserWindow } from 'electron'
 import chokidar, { FSWatcher } from 'chokidar'
 import * as _ from 'lodash-es'
+import { EventStream } from './observer'
 
-export class SlippiFileMonitor {
+export class SlippiRelayHandler extends EventStream {
   private browserWindow?: BrowserWindow | null
   private watcher?: FSWatcher | null
   private listenPath: string | null
+  private ip: string | null
+  private port: string | null
   constructor() {
+    super()
     this.browserWindow = null
     this.watcher = null
     this.listenPath = null
+    this.ip = null
+    this.port = null
   }
 
   async setBrowserWindow(browserWindow: BrowserWindow): Promise<void> {
     this.browserWindow = browserWindow
   }
 
+  async setWiiPort(newPort: string): Promise<void> {
+    this.port = newPort
+  }
+
+  async setWiiIp(newIp: string): Promise<void> {
+    this.ip = newIp
+  }
+
   async stop(): Promise<void> {
+    console.log(this.ip)
+    console.log(this.port)
     if (this.listenPath) {
       this.watcher?.unwatch(this.listenPath)
+      this.watcher?.close()
       this.listenPath = null
     }
+    this.notify('Slippi Relay', 'Stopped Relay')
   }
 
   async setup(newListenPath: string): Promise<void> {
@@ -36,13 +54,15 @@ export class SlippiFileMonitor {
       ignoreInitial: true
     })
     this.read()
+    this.notify('Slippi Relay', 'Started Relay')
   }
+
   async read(): Promise<void> {
     const gameByPath = {}
+    const gameState: Record<string, any> = {}
+    let settings: Record<string, any> = {}
+    let gameEnd: Record<string, any> = {}
     this.watcher?.on('change', (path) => {
-      const gameState: Record<string, any> = {}
-      let settings: Record<string, any> = {}
-      let gameEnd: Record<string, any> = {}
       try {
         let game = _.get(gameByPath, [path, 'game'])
         if (!game) {
@@ -95,5 +115,6 @@ export class SlippiFileMonitor {
         console.log(`[Game Complete] Type: ${endMessage}${lrasText}`)
       }
     })
+    console.log('Done')
   }
 }

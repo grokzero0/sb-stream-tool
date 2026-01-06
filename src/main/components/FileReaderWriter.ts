@@ -1,42 +1,22 @@
 import path from 'node:path'
-import { EventSink, EventStream } from './observer'
+import { EventStream } from './observer'
 import { app } from 'electron'
 import { cp, mkdir } from 'node:fs/promises'
 import { TournamentState } from '../types'
 import { existsSync, mkdirSync, writeFile } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 
-export class FileReaderWriter implements EventStream {
+export class FileReaderWriter extends EventStream {
   private rootPath: string
   private configRootPath: string
-  private observers: EventSink[]
   constructor() {
+    super()
     if (process.env.NODE_ENV !== 'development' && process.platform === 'win32') {
       this.rootPath = process.env.PORTABLE_EXECUTABLE_DIR as string
     } else {
       this.rootPath = app.getAppPath()
     }
     this.configRootPath = path.join(this.rootPath, '..', 'config')
-    this.observers = []
-  }
-
-  attach(newObserver: EventSink): void {
-    this.observers.push(newObserver)
-  }
-
-  detach(observer: EventSink): void {
-    const observerIndex = this.observers.indexOf(observer)
-    if (observerIndex === -1) {
-      return console.log(`No observer found at index ${observerIndex}`)
-    }
-    this.observers.splice(observerIndex, 1)
-    console.log(`Detached an observer at index ${observerIndex}`)
-  }
-
-  notify(message?: string, description?: string): void {
-    for (const observer of this.observers) {
-      observer.update(message, description)
-    }
   }
 
   // writes data to text files
