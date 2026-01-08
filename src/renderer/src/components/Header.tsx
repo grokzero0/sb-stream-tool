@@ -6,7 +6,7 @@ import { FormControl, FormField, FormItem, FormLabel } from './ui/form'
 import { Input } from './ui/input'
 import { Spinbox } from './ui/spinbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select'
-import { handleSetFormatChange } from '@renderer/lib/utils'
+import { changeSetFormat } from '@renderer/lib/utils'
 function Header(): JSX.Element {
   const teams = usePlayerFormFieldArrayContext()
   const watchRoundFormat = useWatch({ name: 'roundFormat' })
@@ -109,7 +109,7 @@ function Header(): JSX.Element {
               <FormLabel>Set Format</FormLabel>
               <Select
                 onValueChange={(setFormat) => {
-                  handleSetFormatChange(setFormat, teams)
+                  changeSetFormat(setFormat, teams)
                   field.onChange(setFormat)
                 }}
                 value={field.value}

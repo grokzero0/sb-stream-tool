@@ -11,14 +11,15 @@ export type GameInfo = {
   port: 'Red' | 'Blue' | 'Green' | 'Yellow'
 }
 
+export type SlippiPlayer = {
+  character: string
+  color: string
+  playerId: number
+  port: number
+}
 export type SlippiGameData = {
-  isTeams: boolean
-  players: {
-    character: string
-    color: string
-    playerId: number
-    port: number
-  }[][]
+  isTeams?: boolean
+  players: SlippiPlayer[][]
 }
 
 export interface PlayerState {

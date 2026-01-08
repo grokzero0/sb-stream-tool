@@ -13,7 +13,7 @@ import {
 import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
-import { updatePlayerForm } from '@renderer/lib/utils'
+import { changeSetFormat, getSetFormat } from '@renderer/lib/utils'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 
 function Query(): JSX.Element {
@@ -39,17 +39,16 @@ function Query(): JSX.Element {
     setMessage(`Set ${setID} found! Applying information...`)
     setValue('name', data?.set?.event?.tournament?.name)
 
-    const setFormat = updatePlayerForm(
+    const setFormat = getSetFormat(
       getValues('teams.0.players').length,
-      data?.set?.slots?.[0]?.entrant?.participants?.length, // unlikely -1 will occur, but if it does, updateForm won't do anything since it returns if it detects -1
-      teams,
-      getValues('setFormat')
+      data?.set?.slots?.[0]?.entrant?.participants?.length
     )
+    changeSetFormat(setFormat, teams)
     setValue('setFormat', setFormat)
 
     for (let i = 0; i < getValues('teams').length; i++) {
       for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
-        setValue(`teams.${i}.players.${j}.info`, {
+        setValue(`teams.${i}.players.${j}.playerInfo`, {
           teamName: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.prefix ?? '',
           playerTag: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.gamerTag ?? '',
           pronouns: data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user?.genderPronoun ?? '',

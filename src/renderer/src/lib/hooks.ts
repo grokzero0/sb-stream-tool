@@ -3,7 +3,8 @@ import { useLocation } from 'wouter'
 import { useFormContext, type UseFieldArrayReturn } from 'react-hook-form'
 import { PlayerFormFieldArrayContext, ThemeProviderContext } from './contexts'
 import { ThemeProviderState } from './types/theme'
-import { portToColor } from './utils'
+import { changeSetFormat, portToColor } from './utils'
+import { useSettingsStore } from './zustand-store/store'
 
 export const usePlayerFormFieldArrayContext = (): UseFieldArrayReturn[] => {
   const context = useContext(PlayerFormFieldArrayContext)
@@ -29,14 +30,21 @@ export const useNavigationHandler = (): void => {
 
 export const useSlippiDataHandler = (): void => {
   const { setValue, getValues } = useFormContext()
-
+  const teams = usePlayerFormFieldArrayContext()
+  // const players = useSettingsStore((state) => state.players)
+  const setPlayers = useSettingsStore((state) => state.setPlayers)
   useEffect(() => {
     window.electronAPI.onNewSlippiGameData((data) => {
-      console.log(data.players)
-      // setValue(`team`)
+      setPlayers(data.players)
+      if (data.isTeams) {
+        changeSetFormat('Doubles', teams)
+        setValue('setFormat', 'Doubles')
+      } else {
+        changeSetFormat('Singles', teams)
+        setValue('setFormat', 'Singles')
+      }
       for (let i = 0; i < getValues('teams').length; i++) {
         for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
-          console.log(`${i}, ${j}`)
           setValue(`teams.${i}.players.${j}.gameInfo`, {
             character: data.players[i][j].character,
             altCostume: data.players[i][j].color,
@@ -46,7 +54,12 @@ export const useSlippiDataHandler = (): void => {
       }
     })
     return () => window.electronAPI.clearAllListeners('slippi:new-game-start-data')
-  }, [getValues, setValue])
+  }, [getValues, setPlayers, setValue, teams])
+  // useEffect(() => {
+  //   window.electronAPI.onNewSlippiGameEndData((winner) => {
+
+  //   })
+  // }, [])
 }
 
 export const useTheme = (): ThemeProviderState => {

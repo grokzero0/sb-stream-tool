@@ -16,3 +16,5 @@ export type SetTableEntry = {
   firstGroupName: string
   secondGroupName: string
 }
+
+export type SetFormat = 'Singles' | 'Doubles'

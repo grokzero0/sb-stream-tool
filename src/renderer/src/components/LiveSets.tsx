@@ -2,7 +2,7 @@ import { useLazyQuery } from '@apollo/client/react'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 import { StreamQueueOnTournamentDocument } from '@renderer/lib/queries.generated'
 import { SetEntry, SetTableEntry } from '@renderer/lib/types/tournament'
-import { filterLiveSets, updatePlayerForm } from '@renderer/lib/utils'
+import { changeSetFormat, filterLiveSets, getSetFormat } from '@renderer/lib/utils'
 import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 import { RowSelectionState } from '@tanstack/react-table'
 import { JSX, useState } from 'react'
@@ -49,16 +49,15 @@ function LiveSets(): JSX.Element {
     if (Number.isNaN(selected) || sets[selected].groups.length <= 0) {
       return
     }
-    const setFormat = updatePlayerForm(
+    const setFormat = getSetFormat(
       getValues('teams.0.players').length,
-      sets[selected].groups[0].players.length, // all sets are assured to have the same size
-      teams,
-      getValues('setFormat')
+      sets[selected].groups[0].players.length // all sets are assured to have the same size
     )
+    changeSetFormat(setFormat, teams)
     setValue('setFormat', setFormat)
     for (let i = 0; i < getValues('teams').length; i++) {
       for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
-        setValue(`teams.${i}.players.${j}.info`, {
+        setValue(`teams.${i}.players.${j}.playerInfo`, {
           teamName: sets[selected].groups[i].players[j].teamName,
           playerTag: sets[selected].groups[i].players[j].playerTag,
           pronouns: sets[selected].groups[i].players[j].pronouns,

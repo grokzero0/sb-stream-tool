@@ -1,6 +1,6 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
-import { SetEntry } from './types/tournament'
+import { SetEntry, SetFormat } from './types/tournament'
 import { EventSetsQuery, StreamQueueOnTournamentQuery } from './queries.generated'
 import { UseFieldArrayReturn } from 'react-hook-form'
 export function cn(...inputs: ClassValue[]): string {
@@ -100,44 +100,27 @@ export function filterSets(data: EventSetsQuery): SetEntry[] {
 }
 
 const colors = ['Red', 'Blue', 'Green', 'Yellow']
-// updates the player form and returns what type of set it is
-export function updatePlayerForm(
-  numPlayersInForm: number,
-  numPlayersInSet: number | undefined,
-  teams: UseFieldArrayReturn[],
-  currentSetFormat: string
-): string {
-  if (numPlayersInForm === numPlayersInSet || numPlayersInSet === undefined) {
-    return currentSetFormat
-  }
-  if (numPlayersInForm > numPlayersInSet) {
-    for (let i = 0; i < teams.length; i++) {
-      teams[i].remove(1)
-    }
-    return 'Singles'
-  } else {
-    for (let i = 0; i < teams.length; i++) {
-      if (teams[i].fields.length < 2) {
-        teams[i].append({
-          playerInfo: {
-            teamName: '',
-            playerTag: '',
-            pronouns: '',
-            twitter: ''
-          },
-          gameInfo: {
-            character: 'Random',
-            altCostume: 'Default',
-            port: colors[2 + i]
-          }
-        })
-      }
-    }
-    return 'Doubles'
-  }
-}
+// // updates the player form for doubles or singles
+// export function updatePlayerForm(
+//   setFormat: SetFormat,
+//   currentSetFormat: SetFormat,
+//   teams: UseFieldArrayReturn[]
+// ): void {
+//   if (setFormat !== currentSetFormat) {
+//     changeSetFormat(setFormat, teams)
+//   }
+// }
 
-export function handleSetFormatChange(setFormat: string, teams: UseFieldArrayReturn[]): void {
+export function getSetFormat(
+  numPlayersInForm: number | undefined,
+  numPlayersInSet: number | undefined
+): SetFormat {
+  if (!numPlayersInForm || !numPlayersInSet || numPlayersInForm > numPlayersInSet) {
+    return 'Singles'
+  }
+  return 'Doubles'
+}
+export function changeSetFormat(setFormat: string, teams: UseFieldArrayReturn[]): void {
   switch (setFormat) {
     case 'Singles':
       for (let i = 0; i < teams.length; i++) {
