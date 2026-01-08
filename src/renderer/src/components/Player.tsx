@@ -208,7 +208,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                 {/* value is set here because the value is "controlled" by the characters combobox as well as this select, meaning that this is technically a controlled component */}
                 <Select
                   onValueChange={(e) => {
-                    console.log(`e value is: ${e}`)
+                    if (e === '') return
                     field.onChange(e)
                   }}
                   value={field.value}
