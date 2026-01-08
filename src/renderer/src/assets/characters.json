@@ -15,7 +15,7 @@
     "Mario",
     "Marth",
     "Mewtwo",
-    "Mr. Game And Watch",
+    "Mr. Game & Watch",
     "Ness",
     "Peach",
     "Pichu",
@@ -72,7 +72,7 @@
     "Jigglypuff": {
       "characterName": "Jigglypuff",
       "numberOfCostumes": 5,
-      "colors": ["Default", "Red", "Blue", "Green", "Yellow"]
+      "colors": ["Default", "Red", "Blue", "Headband", "Crown"]
     },
     "Kirby": {
       "characterName": "Kirby",
@@ -82,12 +82,12 @@
     "Link": {
       "characterName": "Link",
       "numberOfCostumes": 5,
-      "colors": ["Default", "Green", "Blue", "Black", "White"]
+      "colors": ["Default", "Red", "Blue", "Black", "White"]
     },
     "Luigi": {
       "characterName": "Luigi",
       "numberOfCostumes": 4,
-      "colors": ["Default", "White", "Blue", "Pink"]
+      "colors": ["Default", "White", "Blue", "Red"]
     },
     "Mario": {
       "characterName": "Mario",
@@ -104,8 +104,8 @@
       "numberOfCostumes": 4,
       "colors": ["Default", "Red", "Blue", "Green"]
     },
-    "Mr. Game And Watch": {
-      "characterName": "Mr. Game And Watch",
+    "Mr. Game & Watch": {
+      "characterName": "Mr. Game & Watch",
       "numberOfCostumes": 4,
       "colors": ["Default", "Red", "Blue", "Green"]
     },
@@ -127,7 +127,7 @@
     "Pikachu": {
       "characterName": "Pikachu",
       "numberOfCostumes": 4,
-      "colors": ["Default", "Red", "Blue", "Green"]
+      "colors": ["Default", "Red", "Party Hat", "Cowboy Hat"]
     },
     "Roy": {
       "characterName": "Roy",
