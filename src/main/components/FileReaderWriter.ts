@@ -2,9 +2,9 @@ import path from 'node:path'
 import { EventStream } from './observer'
 import { app } from 'electron'
 import { cp, mkdir } from 'node:fs/promises'
-import { TournamentState } from '../types'
 import { existsSync, mkdirSync, writeFile } from 'node:fs'
 import { readFile } from 'node:fs/promises'
+import { TournamentState } from '../../common/types'
 
 export class FileReaderWriter extends EventStream {
   private rootPath: string

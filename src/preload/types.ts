@@ -7,7 +7,3 @@ export type SlippiGameData = {
     port: number
   }[][]
 }
-
-export type SlippiGameEndData = {
-  winner: number
-}

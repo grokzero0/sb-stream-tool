@@ -1,8 +1,10 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { contextBridge, ipcRenderer } from 'electron'
 import { SlippiGameData } from './types'
+import { TournamentState } from '../common/types'
 const api = {
   send: (channel: string, ...args: any[]) => ipcRenderer.invoke(channel, ...args),
+  updateOverlay: (data: TournamentState) => ipcRenderer.invoke('overlay/update', data),
   navigation: (callback: (location: string) => void) =>
     ipcRenderer.on('navigation', (_event, location) => callback(location)),
   toastMessage: (callback: (message?: string, description?: string) => void) =>
@@ -10,9 +12,10 @@ const api = {
       callback(message, description)
     ),
   slippiGameDataReceived: (callback: (data: SlippiGameData) => void) =>
-    ipcRenderer.on('slippi:received-data', (_event, data) => callback(data)),
+    ipcRenderer.on('slippi:new-game-start-data', (_event, data) => callback(data)),
   slippiGameEnded: (callback: (winner: number) => void) =>
-    ipcRenderer.on('slippi:received-end-data', (_event, winner) => callback(winner))
+    ipcRenderer.on('slippi:new-game-end-data', (_event, winner) => callback(winner)),
+  clearAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel)
 }
 
 // Use `contextBridge` APIs to expose Electron APIs to

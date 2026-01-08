@@ -59,7 +59,7 @@ export class SlippiRelayHandler extends EventStream {
 
   async read(): Promise<void> {
     const gameByPath = {}
-    const gameState: Record<string, any> = {}
+    let gameState: Record<string, any> = {}
     let settings: Record<string, any> = {}
     let gameEnd: Record<string, any> = {}
     this.watcher?.on('change', (path) => {
@@ -87,17 +87,64 @@ export class SlippiRelayHandler extends EventStream {
 
       if (!gameState.settings && settings) {
         console.log(`[Game Start] New game has started`)
-        console.log(settings)
+        // console.log(settings)
+        const playerData = [] as any[]
+        if (!settings.isTeams) {
+          console.log('singles')
+          for (const player of settings.players) {
+            const a = [] as any[]
+            a.push({
+              character: characterUtils.getCharacterName(player.characterId),
+              color: characterUtils.getCharacterColorName(
+                player.characterId,
+                player.characterColor
+              ),
+              playerId: player.playerIndex,
+              port: player.port
+            })
+            playerData.push(a)
+          }
+        } else {
+          console.log('doubles')
+          const teamIdsIndex = new Map<number, number>()
+          for (const player of settings.players) {
+            if (teamIdsIndex.get(player.teamId) === undefined) {
+              const a = [] as any[]
+              teamIdsIndex.set(player.teamId, playerData.length)
+              a.push({
+                character: characterUtils.getCharacterName(player.characterId),
+                color: characterUtils.getCharacterColorName(
+                  player.characterId,
+                  player.characterColor
+                ),
+                playerId: player.playerIndex,
+                port: player.port
+              })
+              playerData.push(a)
+            } else {
+              playerData[teamIdsIndex.get(player.teamId) as number].push({
+                character: characterUtils.getCharacterName(player.characterId),
+                color: characterUtils.getCharacterColorName(
+                  player.characterId,
+                  player.characterColor
+                ),
+                playerId: player.playerIndex,
+                port: player.port
+              })
+            }
+          }
+        }
         gameState.settings = settings
+        this.browserWindow?.webContents.send('slippi:new-game-start-data', {
+          isTeams: settings.isTeams,
+          players: playerData
+        })
       }
 
-      _.forEach(settings.players, (player) => {
-        console.log(
-          `${characterUtils.getCharacterName(player.characterId)}, ${characterUtils.getCharacterColorName(player.characterId, player.characterColor)} [Port ${player.port}] `
-        )
-      })
-
       if (gameEnd) {
+        gameState = {}
+        settings = {}
+        gameEnd = {}
         console.log('game ended')
         console.log(gameEnd)
         // NOTE: These values and the quitter index will not work until 2.0.0 recording code is
@@ -115,6 +162,5 @@ export class SlippiRelayHandler extends EventStream {
         console.log(`[Game Complete] Type: ${endMessage}${lrasText}`)
       }
     })
-    console.log('Done')
   }
 }

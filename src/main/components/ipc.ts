@@ -2,9 +2,10 @@ import { dialog, ipcMain } from 'electron'
 import { ObsController } from '../ObsController'
 import { Socket } from 'socket.io-client'
 import { ClientToServerEvents, ServerToClientEvents } from '../types'
-import { ObsScene, TournamentState } from '../types'
+import { ObsScene } from '../types'
 import { FileReaderWriter } from './FileReaderWriter'
 import { SlippiRelayHandler } from './SlippiRelayHandler'
+import { TournamentState } from '../../common/types'
 
 export function ipcSetup(
   mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>,
