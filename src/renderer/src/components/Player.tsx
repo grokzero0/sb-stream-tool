@@ -9,6 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command'
 
 import melee from '../assets/characters.json'
+import { portToColor } from '@renderer/lib/utils'
 
 const borderColorVariants: { [key: string]: string } = {
   // corresponds to port
@@ -16,13 +17,6 @@ const borderColorVariants: { [key: string]: string } = {
   Red: 'border-red-500',
   Green: 'border-green-500',
   Yellow: 'border-yellow-500'
-}
-
-const portToColor: { [key: string]: string } = {
-  0: 'Red',
-  1: 'Blue',
-  2: 'Green',
-  3: 'Yellow'
 }
 
 const colorToPort: { [key: string]: number } = {
@@ -36,13 +30,13 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
   const { setValue } = useFormContext()
 
   const characterSelected = useWatch({
-    name: `teams.${teamNum}.players.${playerNum}.character`
+    name: `teams.${teamNum}.players.${playerNum}.gameInfo.character`
   }) as string
   const altCostumeSelected = useWatch({
-    name: `teams.${teamNum}.players.${playerNum}.altCostume`
+    name: `teams.${teamNum}.players.${playerNum}.gameInfo.altCostume`
   }) as string
   const port = useWatch({
-    name: `teams.${teamNum}.players.${playerNum}.port`
+    name: `teams.${teamNum}.players.${playerNum}.gameInfo.port`
   }) as string
   const [characterPopoverOpen, setCharacterPopoverOpen] = useState(false)
 
@@ -55,15 +49,17 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
             type="button"
             onClick={() =>
               setValue(`teams.${teamNum}.players.${playerNum}`, {
-                info: {
+                playerInfo: {
                   teamName: '',
                   playerTag: '',
                   pronouns: '',
                   twitter: ''
                 },
-                character: 'Random',
-                altCostume: 'Default',
-                port: portToColor[playerNum.toString()]
+                gameInfo: {
+                  character: 'Random',
+                  altCostume: 'Default',
+                  port: portToColor[playerNum.toString()]
+                }
               })
             }
             className="w-full"
@@ -76,7 +72,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
       <div className="flex gap-2">
         <div className="w-full grid grid-cols-8 gap-x-2 gap-y-3">
           <FormField
-            name={`teams.${teamNum}.players.${playerNum}.info.teamName`}
+            name={`teams.${teamNum}.players.${playerNum}.playerInfo.teamName`}
             render={({ field }) => (
               <FormItem className="col-start-1 col-end-4">
                 <FormLabel htmlFor={`${teamNum}-${playerNum}-teamName`}>Team Name</FormLabel>
@@ -87,7 +83,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
             )}
           />
           <FormField
-            name={`teams.${teamNum}.players.${playerNum}.info.playerTag`}
+            name={`teams.${teamNum}.players.${playerNum}.playerInfo.playerTag`}
             render={({ field }) => (
               <FormItem className="col-start-4 col-end-9">
                 <FormLabel htmlFor={`${teamNum}-${playerNum}-playerTag`}>Player Tag</FormLabel>
@@ -98,7 +94,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
             )}
           />
           <FormField
-            name={`teams.${teamNum}.players.${playerNum}.info.pronouns`}
+            name={`teams.${teamNum}.players.${playerNum}.playerInfo.pronouns`}
             render={({ field }) => (
               <FormItem className="col-start-1 col-end-4">
                 <FormLabel htmlFor={`${teamNum}-${playerNum}-pronouns`}>Pronouns</FormLabel>
@@ -109,7 +105,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
             )}
           />
           <FormField
-            name={`teams.${teamNum}.players.${playerNum}.info.twitter`}
+            name={`teams.${teamNum}.players.${playerNum}.playerInfo.twitter`}
             render={({ field }) => (
               <FormItem className="col-start-4 col-end-7">
                 <FormLabel htmlFor={`${teamNum}-${playerNum}-twitter`}>Twitter</FormLabel>
@@ -120,7 +116,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
             )}
           />
           <FormField
-            name={`teams.${teamNum}.players.${playerNum}.port`}
+            name={`teams.${teamNum}.players.${playerNum}.gameInfo.port`}
             render={({ field }) => (
               <FormItem className="col-start-7 col-end-9">
                 <FormLabel htmlFor={`${teamNum}-${playerNum}-port`}>Port</FormLabel>
@@ -153,7 +149,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
             )}
           />
           <FormField
-            name={`teams.${teamNum}.players.${playerNum}.character`}
+            name={`teams.${teamNum}.players.${playerNum}.gameInfo.character`}
             render={({ field }) => (
               <FormItem className="col-start-1 col-end-9">
                 <FormLabel htmlFor={`${teamNum}-${playerNum}-character`}>Character</FormLabel>
@@ -181,9 +177,12 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                             value={character}
                             key={character}
                             onSelect={() => {
-                              setValue(`teams.${teamNum}.players.${playerNum}.character`, character)
                               setValue(
-                                `teams.${teamNum}.players.${playerNum}.altCostume`,
+                                `teams.${teamNum}.players.${playerNum}.gameInfo.character`,
+                                character
+                              )
+                              setValue(
+                                `teams.${teamNum}.players.${playerNum}.gameInfo.altCostume`,
                                 'Default'
                               )
                               setCharacterPopoverOpen(false)
@@ -200,7 +199,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
             )}
           />
           <FormField
-            name={`teams.${teamNum}.players.${playerNum}.altCostume`}
+            name={`teams.${teamNum}.players.${playerNum}.gameInfo.altCostume`}
             render={({ field }) => (
               <FormItem className="col-start-1 col-end-9">
                 <FormLabel htmlFor={`${teamNum}-${playerNum}-altCostume`}>Costume</FormLabel>
@@ -219,7 +218,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                         <img
                           src={
                             new URL(
-                              `../assets/characters/melee/${characterSelected.toLowerCase()}/icons/${color.toLowerCase()}.png`,
+                              `../assets/characters/melee/${characterSelected.toLowerCase()}/icons/${color.replace(/\s/g, '').toLowerCase()}.png`,
                               import.meta.url
                             ).href
                           }
@@ -239,7 +238,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
           <img
             src={
               new URL(
-                `../assets/characters/melee/${characterSelected.toLowerCase()}/renders/${altCostumeSelected.toLowerCase()}.png`,
+                `../assets/characters/melee/${characterSelected.toLowerCase()}/renders/${altCostumeSelected.replace(/\s/g, '').toLowerCase()}.png`,
                 import.meta.url
               ).href
             }

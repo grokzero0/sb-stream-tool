@@ -1,4 +1,6 @@
-export const TournamentDefaultValues = {
+import { TournamentState } from 'src/common/types'
+
+export const TournamentDefaultValues: TournamentState = {
   name: '',
   bestOf: 1,
   roundFormat: 'Friendlies',
@@ -12,15 +14,17 @@ export const TournamentDefaultValues = {
       inLosers: false,
       players: [
         {
-          info: {
+          playerInfo: {
             teamName: '',
             playerTag: '',
             pronouns: '',
             twitter: ''
           },
-          character: 'Random',
-          altCostume: 'Default',
-          port: 'Red' as 'Red' | 'Blue' | 'Green' | 'Yellow'
+          gameInfo: {
+            character: 'Random',
+            altCostume: 'Default',
+            port: 'Red' as 'Red' | 'Blue' | 'Green' | 'Yellow'
+          }
         }
       ]
     },
@@ -30,15 +34,17 @@ export const TournamentDefaultValues = {
       inLosers: false,
       players: [
         {
-          info: {
+          playerInfo: {
             teamName: '',
             playerTag: '',
             pronouns: '',
             twitter: ''
           },
-          character: 'Random',
-          altCostume: 'Default',
-          port: 'Blue' as 'Red' | 'Blue' | 'Green' | 'Yellow'
+          gameInfo: {
+            character: 'Random',
+            altCostume: 'Default',
+            port: 'Blue' as 'Red' | 'Blue' | 'Green' | 'Yellow'
+          }
         }
       ]
     }

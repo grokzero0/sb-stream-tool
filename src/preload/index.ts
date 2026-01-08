@@ -11,9 +11,9 @@ const api = {
     ipcRenderer.on('toast-message', (_event, message, description) =>
       callback(message, description)
     ),
-  slippiGameDataReceived: (callback: (data: SlippiGameData) => void) =>
+  onNewSlippiGameData: (callback: (data: SlippiGameData) => void) =>
     ipcRenderer.on('slippi:new-game-start-data', (_event, data) => callback(data)),
-  slippiGameEnded: (callback: (winner: number) => void) =>
+  onNewSlippiGameEndData: (callback: (winner: number) => void) =>
     ipcRenderer.on('slippi:new-game-end-data', (_event, winner) => callback(winner)),
   clearAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel)
 }

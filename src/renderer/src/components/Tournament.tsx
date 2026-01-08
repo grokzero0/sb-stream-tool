@@ -8,10 +8,12 @@ import Teams from './Teams'
 import Header from './Header'
 import Sets from './Sets'
 import LiveSets from './LiveSets'
+import { useFormContext } from 'react-hook-form'
 
 function Tournament(): JSX.Element {
+  const { handleSubmit } = useFormContext()
   return (
-    <>
+    <form onSubmit={handleSubmit((e) => console.log(e))}>
       <FetchTournament />
       <Header />
       <Tabs defaultValue="players">
@@ -32,7 +34,7 @@ function Tournament(): JSX.Element {
         <Sets />
         <LiveSets />
       </div>
-    </>
+    </form>
   )
 }
 

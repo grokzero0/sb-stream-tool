@@ -7,6 +7,13 @@ export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 
+export const portToColor: Record<number, string> = {
+  1: 'Red',
+  2: 'Blue',
+  3: 'Green',
+  4: 'Yellow'
+}
+
 export const sleep = (ms: number): Promise<unknown> =>
   new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -112,16 +119,17 @@ export function updatePlayerForm(
     for (let i = 0; i < teams.length; i++) {
       if (teams[i].fields.length < 2) {
         teams[i].append({
-          info: {
+          playerInfo: {
             teamName: '',
             playerTag: '',
             pronouns: '',
             twitter: ''
           },
-
-          character: 'Random',
-          altCostume: 'Default',
-          port: colors[2 + i]
+          gameInfo: {
+            character: 'Random',
+            altCostume: 'Default',
+            port: colors[2 + i]
+          }
         })
       }
     }
@@ -140,16 +148,17 @@ export function handleSetFormatChange(setFormat: string, teams: UseFieldArrayRet
       for (let i = 0; i < teams.length; i++) {
         if (teams[i].fields.length < 2) {
           teams[i].append({
-            info: {
+            playerInfo: {
               teamName: '',
               playerTag: '',
               pronouns: '',
               twitter: ''
             },
-
-            character: 'Random',
-            altCostume: 'Default',
-            port: colors[2 + i]
+            gameInfo: {
+              character: 'Random',
+              altCostume: 'Default',
+              port: colors[2 + i]
+            }
           })
         }
       }

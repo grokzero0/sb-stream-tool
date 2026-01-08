@@ -50,39 +50,37 @@ function App(): React.JSX.Element {
           <Form {...methods}>
             {/* Both Header and Teams require the SAME playerinfo field arrays (different arrays = different scopes, so appending or removing inputs will not be reflected in the ui), so its wrapped in a context */}
             {/* see https://github.com/react-hook-form/react-hook-form/issues/1561#issuecomment-623398286 for more details */}
-            <form onSubmit={(d) => console.log(d)}>
-              <PlayerFormFieldArrayProvider>
-                <Router hook={useHashLocation}>
-                  {/* this component is how the slippi data is processed and received, and how navigation to settings/etc happens */}
-                  <Handlers>
-                    <Toast />
-                    <Switch>
-                      <Route path="/" component={Tournament}></Route>
-                      <Route path="/settings" nest>
-                        <Settings>
-                          <Switch>
-                            <Route path="/" component={Obs}></Route>
-                            <Route path="/obs" component={Obs}></Route>
-                            <Route path="/slippi" component={Slippi}></Route>
-                            <Route path="/startgg" component={Startgg}></Route>
-                          </Switch>
-                        </Settings>
-                      </Route>
-                      {/* fallback route (route does not exist) */}
+            <PlayerFormFieldArrayProvider>
+              <Router hook={useHashLocation}>
+                {/* this component is how the slippi data is processed and received, and how navigation to settings/etc happens */}
+                <Handlers>
+                  <Toast />
+                  <Switch>
+                    <Route path="/" component={Tournament}></Route>
+                    <Route path="/settings" nest>
+                      <Settings>
+                        <Switch>
+                          <Route path="/" component={Obs}></Route>
+                          <Route path="/obs" component={Obs}></Route>
+                          <Route path="/slippi" component={Slippi}></Route>
+                          <Route path="/startgg" component={Startgg}></Route>
+                        </Switch>
+                      </Settings>
+                    </Route>
+                    {/* fallback route (route does not exist) */}
 
-                      <Route>
-                        {(params) => (
-                          <center>
-                            <b>404:</b> Sorry, this page{' '}
-                            <code>&quot;{params['*' as any]}/&quot;</code> does not exist!
-                          </center>
-                        )}
-                      </Route>
-                    </Switch>
-                  </Handlers>
-                </Router>
-              </PlayerFormFieldArrayProvider>
-            </form>
+                    <Route>
+                      {(params) => (
+                        <center>
+                          <b>404:</b> Sorry, this page{' '}
+                          <code>&quot;{params['*' as any]}/&quot;</code> does not exist!
+                        </center>
+                      )}
+                    </Route>
+                  </Switch>
+                </Handlers>
+              </Router>
+            </PlayerFormFieldArrayProvider>
           </Form>
         </Layout>
       </ThemeProvider>
