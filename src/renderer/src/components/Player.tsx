@@ -208,6 +208,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                 {/* value is set here because the value is "controlled" by the characters combobox as well as this select, meaning that this is technically a controlled component */}
                 <Select
                   onValueChange={(e) => {
+                    // https://github.com/radix-ui/primitives/issues/3068
                     if (e === '') return
                     field.onChange(e)
                   }}
