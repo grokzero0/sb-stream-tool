@@ -18,7 +18,7 @@ export type SlippiPlayer = {
   port: number
 }
 export type SlippiGameData = {
-  isTeams?: boolean
+  isTeams: boolean
   players: SlippiPlayer[][]
 }
 

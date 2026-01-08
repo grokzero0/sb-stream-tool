@@ -15,6 +15,7 @@ const api = {
     ipcRenderer.on('slippi:new-game-start-data', (_event, data) => callback(data)),
   onNewSlippiGameEndData: (callback: (winner: number) => void) =>
     ipcRenderer.on('slippi:new-game-end-data', (_event, winner) => callback(winner)),
+  autoStopSlippiRelay: () => ipcRenderer.invoke('slippi:autoStopReadingFolder'),
   clearAllListeners: (channel: string) => ipcRenderer.removeAllListeners(channel)
 }
 

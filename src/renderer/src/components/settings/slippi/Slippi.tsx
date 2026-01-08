@@ -10,6 +10,11 @@ function Slippi(): JSX.Element {
   return (
     <div className="flex flex-col items-center gap-4 w-full">
       <h1 className="text-center font-semibold text-xl">Slippi Relay Settings</h1>
+      <h2 className="text-center font-semibold text-sm">
+        IMPORTANT: Manually adjusting the character info in the tournament section will STOP the
+        relay!! (This is to avoid the relay automatically setting character data when you don&apos;t
+        want it to/forgot to stop it!!!!)
+      </h2>
       <div>
         {/* <h1></h1> */}
         <RadioGroup

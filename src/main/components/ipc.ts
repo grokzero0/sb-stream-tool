@@ -52,5 +52,7 @@ export function ipcSetup(
 
   ipcMain.handle('slippi:readFolder', (_event, listenPath) => slippi.setup(listenPath))
 
-  ipcMain.handle('slippi:stopReadingFolder', () => slippi.stop())
+  ipcMain.handle('slippi:stopReadingFolder', () => slippi.stop(false))
+
+  ipcMain.handle('slippi:autoStopReadingFolder', () => slippi.stop(true))
 }

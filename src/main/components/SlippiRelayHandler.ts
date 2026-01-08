@@ -4,6 +4,7 @@ import { BrowserWindow } from 'electron'
 import chokidar, { FSWatcher } from 'chokidar'
 import * as _ from 'lodash-es'
 import { EventStream } from './observer'
+import { SlippiGameData } from '../../common/types'
 
 export class SlippiRelayHandler extends EventStream {
   private browserWindow?: BrowserWindow | null
@@ -11,6 +12,7 @@ export class SlippiRelayHandler extends EventStream {
   private listenPath: string | null
   private ip: string | null
   private port: string | null
+  private players: SlippiGameData | null
   constructor() {
     super()
     this.browserWindow = null
@@ -18,6 +20,11 @@ export class SlippiRelayHandler extends EventStream {
     this.listenPath = null
     this.ip = null
     this.port = null
+    this.players = null
+  }
+
+  async getPlayers(): Promise<SlippiGameData | null> {
+    return this.players
   }
 
   async setBrowserWindow(browserWindow: BrowserWindow): Promise<void> {
@@ -26,25 +33,26 @@ export class SlippiRelayHandler extends EventStream {
 
   async setWiiPort(newPort: string): Promise<void> {
     this.port = newPort
+    console.log(this.ip)
+    console.log(this.port)
   }
 
   async setWiiIp(newIp: string): Promise<void> {
     this.ip = newIp
   }
 
-  async stop(): Promise<void> {
-    console.log(this.ip)
-    console.log(this.port)
+  async stop(quiet: boolean): Promise<void> {
     if (this.listenPath) {
       this.watcher?.unwatch(this.listenPath)
       this.watcher?.close()
       this.listenPath = null
     }
-    this.notify('Slippi Relay', 'Stopped Relay')
+    if (!quiet) {
+      this.notify('Slippi Relay', 'Stopped Relay')
+    }
   }
 
   async setup(newListenPath: string): Promise<void> {
-    this.browserWindow?.webContents.send('toast-message', 'slippi-test-read')
     this.listenPath = newListenPath
     this.watcher = chokidar.watch(newListenPath, {
       ignored: '!*.slp', // TODO: This doesn't work. Use regex?
@@ -57,6 +65,24 @@ export class SlippiRelayHandler extends EventStream {
     this.notify('Slippi Relay', 'Started Relay')
   }
 
+  private isSameGame(previousGame: SlippiGameData | null, currentGame: SlippiGameData): boolean {
+    if (
+      !previousGame ||
+      (previousGame.isTeams && currentGame.isTeams && previousGame.isTeams !== currentGame.isTeams) // covers different sized games (singles vs doubles) case
+    ) {
+      return false
+    }
+    for (let i = 0; i < currentGame.players.length; i++) {
+      for (let j = 0; j < currentGame.players[i].length; j++) {
+        const playerOne = currentGame.players[i][j]
+        const playerTwo = previousGame.players[i][j]
+        if (playerOne.character !== playerTwo.character || playerOne.color !== playerTwo.color) {
+          return false
+        }
+      }
+    }
+    return true
+  }
   async read(): Promise<void> {
     const gameByPath = {}
     let gameState: Record<string, any> = {}
@@ -87,7 +113,7 @@ export class SlippiRelayHandler extends EventStream {
 
       if (!gameState.settings && settings) {
         console.log(`[Game Start] New game has started`)
-        // console.log(settings)
+        console.log(settings)
         const playerData = [] as any[]
         if (!settings.isTeams) {
           console.log('singles')
@@ -135,18 +161,20 @@ export class SlippiRelayHandler extends EventStream {
           }
         }
         gameState.settings = settings
-        this.browserWindow?.webContents.send('slippi:new-game-start-data', {
+        const newData: SlippiGameData = {
           isTeams: settings.isTeams,
           players: playerData
-        })
+        }
+        if (!this.isSameGame(this.players, newData)) {
+          this.browserWindow?.webContents.send('slippi:new-game-start-data', newData)
+        }
+        this.players = newData
       }
 
       if (gameEnd) {
-        gameState = {}
-        settings = {}
-        gameEnd = {}
         console.log('game ended')
-        console.log(gameEnd)
+        // console.log(gameEnd)
+
         // NOTE: These values and the quitter index will not work until 2.0.0 recording code is
         // NOTE: used. This code has not been publicly released yet as it still has issues
         const endTypes = {
@@ -156,10 +184,17 @@ export class SlippiRelayHandler extends EventStream {
         }
 
         const endMessage = _.get(endTypes, gameEnd.gameEndMethod) || 'Unknown'
-
+        if (gameEnd.gameEndMethod !== 7) {
+          const winner = gameEnd.placements.find((player) => player.position === 0)
+          if (winner)
+            this.browserWindow?.webContents.send('slippi:new-game-end-data', winner.playerIndex)
+        }
         const lrasText =
           gameEnd.gameEndMethod === 7 ? ` | Quitter Index: ${gameEnd.lrasInitiatorIndex}` : ''
         console.log(`[Game Complete] Type: ${endMessage}${lrasText}`)
+        gameState = {}
+        settings = {}
+        gameEnd = {}
       }
     })
   }

@@ -15,4 +15,5 @@ export interface ElectronAPI {
   onNewSlippiGameEndData: (callback: (winner: number) => void) => void
   updateOverlay: (data: TournamentState) => void
   clearAllListeners: (channel: string) => void
+  autoStopSlippiRelay: () => void
 }

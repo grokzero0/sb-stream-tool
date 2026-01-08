@@ -10,6 +10,7 @@ import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from '.
 
 import melee from '../assets/characters.json'
 import { portToColor } from '@renderer/lib/utils'
+import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 
 const borderColorVariants: { [key: string]: string } = {
   // corresponds to port
@@ -28,6 +29,12 @@ const colorToPort: { [key: string]: number } = {
 
 function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }): JSX.Element {
   const { setValue } = useFormContext()
+  const setPlayers = useSettingsStore((state) => state.setPlayers)
+
+  const stopRelay = (): void => {
+    window.electronAPI.autoStopSlippiRelay()
+    setPlayers([])
+  }
 
   const characterSelected = useWatch({
     name: `teams.${teamNum}.players.${playerNum}.gameInfo.character`
@@ -39,9 +46,9 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
     name: `teams.${teamNum}.players.${playerNum}.gameInfo.port`
   }) as string
   const [characterPopoverOpen, setCharacterPopoverOpen] = useState(false)
-  console.log(
-    `team ${teamNum}, player ${playerNum}, altCostume = ${altCostumeSelected}, character = ${characterSelected}`
-  )
+  // console.log(
+  //   `team ${teamNum}, player ${playerNum}, altCostume = ${altCostumeSelected}, character = ${characterSelected}`
+  // )
   return (
     <div className={`rounded-md border-2 ${borderColorVariants[port]} py-2 px-2`}>
       <div>
@@ -187,6 +194,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                                 `teams.${teamNum}.players.${playerNum}.gameInfo.altCostume`,
                                 'Default'
                               )
+                              stopRelay()
                               setCharacterPopoverOpen(false)
                             }}
                           >
@@ -213,6 +221,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                       console.log(altCostumeSelected)
                       return
                     }
+                    stopRelay()
                     field.onChange(e)
                   }}
                   value={field.value}

@@ -1,4 +1,4 @@
-import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
+import { usePlayerFormFieldArrayContext, useTeamArrayMethods } from '@renderer/lib/hooks'
 import { JSX } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 import { Button } from './ui/button'
@@ -6,17 +6,37 @@ import { FormControl, FormField, FormItem, FormLabel } from './ui/form'
 import { Spinbox } from './ui/spinbox'
 import { Switch } from './ui/switch'
 import Player from './Player'
+import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 
 function Teams(): JSX.Element {
   const { setValue } = useFormContext()
+  const { swapGameData } = useTeamArrayMethods() // visual character data swap
   const { fields, swap } = useFieldArray({ name: 'teams' })
+  const swapCharacters = useSettingsStore((state) => state.swap) // internal logic character data swap
   const players = usePlayerFormFieldArrayContext()
 
   return (
     <>
-      <div className="px-8 py-1">
-        <Button type="button" onClick={() => swap(0, 1)} className="mb-2 w-full">
+      <div className="px-8 py-1 mb-2 flex gap-4">
+        <Button
+          type="button"
+          onClick={() => {
+            swap(0, 1)
+            swapCharacters(0, 1)
+          }}
+          className="w-1/2"
+        >
           Swap Teams
+        </Button>
+        <Button
+          className="w-1/2"
+          type="button"
+          onClick={() => {
+            swapGameData(0, 1)
+            swapCharacters(0, 1)
+          }}
+        >
+          Swap characters
         </Button>
       </div>
       <div className="flex gap-1">
