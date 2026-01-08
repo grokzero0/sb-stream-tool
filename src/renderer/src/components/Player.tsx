@@ -39,7 +39,9 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
     name: `teams.${teamNum}.players.${playerNum}.gameInfo.port`
   }) as string
   const [characterPopoverOpen, setCharacterPopoverOpen] = useState(false)
-
+  console.log(
+    `team ${teamNum}, player ${playerNum}, altCostume = ${altCostumeSelected}, character = ${characterSelected}`
+  )
   return (
     <div className={`rounded-md border-2 ${borderColorVariants[port]} py-2 px-2`}>
       <div>
@@ -58,7 +60,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                 gameInfo: {
                   character: 'Random',
                   altCostume: 'Default',
-                  port: portToColor[playerNum.toString()]
+                  port: portToColor[playerNum + 1]
                 }
               })
             }
@@ -204,7 +206,13 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
               <FormItem className="col-start-1 col-end-9">
                 <FormLabel htmlFor={`${teamNum}-${playerNum}-altCostume`}>Costume</FormLabel>
                 {/* value is set here because the value is "controlled" by the characters combobox as well as this select, meaning that this is technically a controlled component */}
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={(e) => {
+                    console.log(`e value is: ${e}`)
+                    field.onChange(e)
+                  }}
+                  value={field.value}
+                >
                   <FormControl>
                     <SelectTrigger id={`${teamNum}-${playerNum}-altCostume`} className="w-full">
                       <SelectValue placeholder="Click for options" />
@@ -213,8 +221,8 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                   <SelectContent>
                     {melee.altCostumes[
                       characterSelected as keyof typeof melee.altCostumes
-                    ].colors.map((color: string) => (
-                      <SelectItem key={`${characterSelected}-${color}`} value={color}>
+                    ].colors.map((color: string, index) => (
+                      <SelectItem key={`characterSelected-color-${index}`} value={color}>
                         <img
                           src={
                             new URL(
