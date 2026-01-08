@@ -209,7 +209,10 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                 <Select
                   onValueChange={(e) => {
                     // https://github.com/radix-ui/primitives/issues/3068
-                    if (e === '') return
+                    if (e === '') {
+                      console.log(altCostumeSelected)
+                      return
+                    }
                     field.onChange(e)
                   }}
                   value={field.value}
