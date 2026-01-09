@@ -120,13 +120,22 @@ export const useSlippiDataHandler = (): void => {
         }
       }
     })
+    window.electronAPI.send('obs/play-game-start-scenes')
     return () => window.electronAPI.clearAllListeners('slippi:new-game-start-data')
   }, [getValues, setPlayers, setValue, teams])
   useEffect(() => {
     window.electronAPI.onNewSlippiGameEndData((winner) => {
       const teamWinner = findTeamWinner(players, winner)
+      const bestOf = getValues('bestOf')
+      const scoreToBeat = bestOf % 2 === 0 ? bestOf / 2 + 1 : Math.ceil(bestOf / 2)
       if (teamWinner !== -1) {
-        setValue(`teams.${teamWinner}.score`, getValues(`teams.${teamWinner}.score`) + 1)
+        const newScore = getValues(`teams.${teamWinner}.score`) + 1
+        setValue(`teams.${teamWinner}.score`, newScore)
+        if (newScore >= scoreToBeat) {
+          window.electronAPI.send('obs/play-set-end-scenes')
+        } else {
+          window.electronAPI.send('obs/play-game-end-scenes')
+        }
       }
     })
     return () => window.electronAPI.clearAllListeners('slippi:new-game-end-data')

@@ -115,8 +115,15 @@ export function getSetFormat(
   numPlayersInForm: number | undefined,
   numPlayersInSet: number | undefined
 ): SetFormat {
+  const numPlayersToSetFormat: Record<number, SetFormat> = {
+    1: 'Singles',
+    2: 'Doubles'
+  }
   if (!numPlayersInForm || !numPlayersInSet || numPlayersInForm > numPlayersInSet) {
     return 'Singles'
+  }
+  if (numPlayersInForm === numPlayersInSet) {
+    return numPlayersToSetFormat[numPlayersInSet]
   }
   return 'Doubles'
 }
