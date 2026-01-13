@@ -1,4 +1,4 @@
-import { TournamentState } from 'src/common/types'
+import { TeamState, TournamentState } from 'src/common/types'
 
 export const TournamentDefaultValues: TournamentState = {
   name: '',
@@ -50,4 +50,17 @@ export const TournamentDefaultValues: TournamentState = {
     }
   ],
   commentators: [{ name: '', pronouns: '', twitter: '' }]
+}
+
+export const getTeamState = (teams: TournamentState['teams']): TeamState[] => {
+  const t = [] as TeamState[]
+  for (const team of teams) {
+    t.push({
+      name: team.name,
+      score: team.score,
+      inLosers: team.inLosers,
+      players: team.players
+    })
+  }
+  return t
 }

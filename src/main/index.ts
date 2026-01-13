@@ -9,6 +9,7 @@ import { ipcSetup } from './components/ipc'
 import { ClientToServerEvents, ServerToClientEvents } from './types'
 import { Socket, io } from 'socket.io-client'
 import { SlippiRelayHandler } from './components/SlippiRelayHandler'
+import { SocketioServer } from './socketio/server'
 
 const obs = new ObsController()
 const slippi = new SlippiRelayHandler()
@@ -16,6 +17,8 @@ const dataFileManager = new FileReaderWriter()
 ;(async () => {
   await dataFileManager.createDirs()
 })()
+const wsServer = new SocketioServer()
+wsServer.enable()
 const mainSocket: Socket<ServerToClientEvents, ClientToServerEvents> = io('http://localhost:20242')
 
 obs.initEvents()

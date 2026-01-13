@@ -7,25 +7,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { ChevronsUpDown, Square } from 'lucide-react'
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover'
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from './ui/command'
-
 import melee from '../assets/characters.json'
-import { portToColor } from '@renderer/lib/utils'
+import { portToColor, colorToPort, borderColorVariants } from '@renderer/lib/utils'
 import { useSettingsStore } from '@renderer/lib/zustand-store/store'
-
-const borderColorVariants: { [key: string]: string } = {
-  // corresponds to port
-  Blue: 'border-blue-500',
-  Red: 'border-red-500',
-  Green: 'border-green-500',
-  Yellow: 'border-yellow-500'
-}
-
-const colorToPort: { [key: string]: number } = {
-  Red: 1,
-  Blue: 2,
-  Green: 3,
-  Yellow: 4
-}
 
 function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }): JSX.Element {
   const { setValue } = useFormContext()
@@ -218,7 +202,7 @@ function Player({ teamNum, playerNum }: { teamNum: number; playerNum: number }):
                   onValueChange={(e) => {
                     // https://github.com/radix-ui/primitives/issues/3068
                     if (e === '') {
-                      console.log(altCostumeSelected)
+                      // console.log(altCostumeSelected)
                       return
                     }
                     stopRelay()

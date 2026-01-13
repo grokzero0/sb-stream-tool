@@ -9,19 +9,30 @@ import { TournamentState } from '../../common/types'
 export class FileReaderWriter extends EventStream {
   private rootPath: string
   private configRootPath: string
+  private resourcesRootPath: string
+  private overlayRootPath: string
+  private charactersRootPath: string
   constructor() {
     super()
-    if (process.env.NODE_ENV !== 'development' && process.platform === 'win32') {
-      this.rootPath = process.env.PORTABLE_EXECUTABLE_DIR as string
-    } else {
-      this.rootPath = app.getAppPath()
-    }
+    this.rootPath = app.getAppPath()
+    this.resourcesRootPath = path.join(this.rootPath, '..', 'resources')
     this.configRootPath = path.join(this.rootPath, '..', 'config')
+    this.overlayRootPath = `${this.rootPath}/src/renderer/src/assets/overlay/`
+    this.charactersRootPath = `${this.rootPath}/src/renderer/src/assets/characters/`
+    if (process.env.NODE_ENV !== 'development') {
+      this.overlayRootPath = `${process.resourcesPath}/overlay/`
+      this.charactersRootPath = `${process.resourcesPath}/characters/`
+      if (process.platform == 'win32') {
+        this.rootPath = process.env.PORTABLE_EXECUTABLE_DIR ?? 'undefined'
+        this.resourcesRootPath = path.join(this.rootPath, 'resources')
+        this.configRootPath = path.join(this.rootPath, 'config')
+      }
+    }
   }
 
   // writes data to text files
   writeData(data: TournamentState): void {
-    const dataPath = path.join(this.rootPath, '..', 'resources', 'texts')
+    const dataPath = path.join(this.resourcesRootPath, 'texts')
     const errors = [] as NodeJS.ErrnoException[]
     writeFile(`${dataPath}/tournament-name.txt`, data.name, (err) => {
       if (err) errors.push(err)
@@ -169,7 +180,7 @@ export class FileReaderWriter extends EventStream {
       .then((key) => key)
       .catch((error) => {
         if (error.code === 'ENOENT') {
-          writeFile(`${this.configRootPath}/api_key.txt`, '', (err) => {
+          writeFile(`${this.configRootPath}/api_key.txt`, ' ', (err) => {
             if (err) {
               this.notify(err.message)
             }
@@ -180,37 +191,18 @@ export class FileReaderWriter extends EventStream {
   }
 
   async createDirs(): Promise<void> {
-    let resourcesPath = path.join(app.getAppPath(), '..', 'resources')
-    let configPath = path.join(app.getAppPath(), '..', 'config')
-    let overlayPath = `${app.getAppPath()}/src/renderer/src/assets/overlay/`
-    let charactersPath = `${app.getAppPath()}/src/renderer/src/assets/characters/`
-    if (process.env.NODE_ENV !== 'development') {
-      overlayPath = `${process.resourcesPath}/overlay/`
-      charactersPath = `${process.resourcesPath}/characters/`
-      switch (process.platform) {
-        case 'win32': {
-          resourcesPath = path.join(process.env.PORTABLE_EXECUTABLE_DIR as string, 'resources')
-          configPath = path.join(process.env.PORTABLE_EXECUTABLE_DIR as string, 'config')
-          break
-        }
-        default: {
-          console.log()
-        }
-      }
-    }
-
-    cp(overlayPath, `${path.join(resourcesPath, 'overlay')}`, {
+    cp(this.overlayRootPath, `${path.join(this.resourcesRootPath, 'overlay')}`, {
       recursive: true
     })
-    cp(charactersPath, `${path.join(resourcesPath, 'characters')}`, {
+    cp(this.charactersRootPath, `${path.join(this.resourcesRootPath, 'characters')}`, {
       recursive: true
     })
-    mkdir(`${path.join(resourcesPath, 'texts', 'commentators')}`, {
+    mkdir(`${path.join(this.resourcesRootPath, 'texts', 'commentators')}`, {
       recursive: true
     })
-    mkdir(`${path.join(resourcesPath, 'texts', 'teams')}`, {
+    mkdir(`${path.join(this.resourcesRootPath, 'texts', 'teams')}`, {
       recursive: true
     })
-    mkdir(configPath, { recursive: true })
+    mkdir(this.configRootPath, { recursive: true })
   }
 }

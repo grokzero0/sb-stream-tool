@@ -7,11 +7,25 @@ export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
 
+export const colorToPort: Record<string, number> = {
+  Red: 1,
+  Blue: 2,
+  Green: 3,
+  Yellow: 4
+}
+
 export const portToColor: Record<number, string> = {
   1: 'Red',
   2: 'Blue',
   3: 'Green',
   4: 'Yellow'
+}
+
+export const borderColorVariants: Record<string, string> = {
+  Blue: 'border-blue-500',
+  Red: 'border-red-500',
+  Green: 'border-green-500',
+  Yellow: 'border-yellow-500'
 }
 
 export const sleep = (ms: number): Promise<unknown> =>

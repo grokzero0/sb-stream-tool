@@ -9,11 +9,27 @@ import Header from './Header'
 import Sets from './Sets'
 import LiveSets from './LiveSets'
 import { useFormContext } from 'react-hook-form'
+import { getTeamState } from '@renderer/lib/form'
 
 function Tournament(): JSX.Element {
   const { handleSubmit } = useFormContext()
   return (
-    <form onSubmit={handleSubmit((e) => console.log(e))}>
+    <form
+      onSubmit={handleSubmit((data) => {
+        console.log(data)
+        const overlayData = {
+          name: data.name,
+          bestOf: data.bestOf,
+          roundFormat: data.roundFormat,
+          customRoundFormat: data.customRoundFormat,
+          roundNumber: data.roundNumber,
+          setFormat: data.setFormat,
+          teams: getTeamState(data.teams),
+          commentators: data.commentators
+        }
+        window.electronAPI.updateOverlay(overlayData)
+      })}
+    >
       <FetchTournament />
       <Header />
       <Tabs defaultValue="players">
