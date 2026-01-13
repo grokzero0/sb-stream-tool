@@ -15,6 +15,7 @@ import { Label } from './ui/label'
 import { Input } from './ui/input'
 import { changeSetFormat, getSetFormat } from '@renderer/lib/utils'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
+import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 
 function Query(): JSX.Element {
   const [setID, setSetID] = useState('')
@@ -24,6 +25,7 @@ function Query(): JSX.Element {
   const [dialogOpen, setDialogOpen] = useState(false)
   const { setValue, getValues } = useFormContext()
   const timeoutId = useRef<NodeJS.Timeout | undefined>(undefined)
+  const apiKey = useSettingsStore((state) => state.apiKey)
 
   const handleClick = async (): Promise<void> => {
     setMessage('')
@@ -74,7 +76,9 @@ function Query(): JSX.Element {
       }}
     >
       <DialogTrigger asChild>
-        <Button className="w-full">Automatically fill in player data from a set</Button>
+        <Button disabled={apiKey === ''} className="w-full">
+          Automatically fill in player data from a set
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

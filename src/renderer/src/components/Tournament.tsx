@@ -10,9 +10,13 @@ import Sets from './Sets'
 import LiveSets from './LiveSets'
 import { useFormContext } from 'react-hook-form'
 import { getTeamState } from '@renderer/lib/form'
+import { useSettingsStore } from '@renderer/lib/zustand-store/store'
+import { Alert, AlertTitle } from './ui/alert'
+import { AlertCircleIcon } from 'lucide-react'
 
 function Tournament(): JSX.Element {
   const { handleSubmit } = useFormContext()
+  const apiKey = useSettingsStore((state) => state.apiKey)
   return (
     <form
       onSubmit={handleSubmit((data) => {
@@ -30,6 +34,15 @@ function Tournament(): JSX.Element {
         window.electronAPI.updateOverlay(overlayData)
       })}
     >
+      {apiKey === '' && (
+        <Alert className="my-2">
+          <AlertCircleIcon />
+          <AlertTitle>
+            You must have a start.gg api key in order to use the automated set fetching tools (go to
+            settings to set it!)
+          </AlertTitle>
+        </Alert>
+      )}
       <FetchTournament />
       <Header />
       <Tabs defaultValue="players">

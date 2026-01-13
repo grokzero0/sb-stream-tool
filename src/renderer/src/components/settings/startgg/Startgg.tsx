@@ -24,7 +24,7 @@ function Startgg(): JSX.Element {
           <Label>Start.gg API key</Label>
           <Input value={apiKey} onChange={(e) => setApiKey(e.currentTarget.value)} />
         </div>
-        <Button>Submit</Button>
+        <Button className="w-full mt-2">Submit</Button>
       </form>
     </div>
   )

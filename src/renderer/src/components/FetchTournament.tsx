@@ -17,11 +17,13 @@ function FetchTournament(): JSX.Element {
   const update = useSettingsStore((state) => state.updateTournamentUrl)
   const [tournamentUrl, setTournamentUrl] = useState(savedTournamentUrl)
   const [dialogOpen, setDialogOpen] = useState(false)
-
+  const apiKey = useSettingsStore((state) => state.apiKey)
   return (
     <Dialog open={dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
       <DialogTrigger asChild>
-        <Button className="w-full mb-1">Set Tournament</Button>
+        <Button disabled={apiKey === ''} className="w-full mb-1">
+          Set Tournament
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

@@ -24,10 +24,10 @@ function Slippi(): JSX.Element {
           }}
           className="flex gap-4"
         >
-          <div className="flex items-center gap-3">
+          {/* <div className="flex items-center gap-3">
             <RadioGroupItem value="direct" id="r1" />
             <Label htmlFor="r1">Connect via direct connection</Label>
-          </div>
+          </div> */}
           <div className="flex items-center gap-3">
             <RadioGroupItem value="folder" id="r2" />
             <Label htmlFor="r2">Connect via folder</Label>
