@@ -57,6 +57,21 @@ export function filterLiveSets(data: StreamQueueOnTournamentQuery): SetEntry[] {
             }
           }
           if (groupInfo.length > 0) {
+            // make sure there is always sets of size 2
+            while (groupInfo.length < 2) {
+              groupInfo.push({
+                name: '',
+                // groupInfo can safely be assumed to be at least size 1
+                players: groupInfo[0].players.map(() => {
+                  return {
+                    teamName: '',
+                    playerTag: '',
+                    pronouns: '',
+                    twitter: ''
+                  }
+                })
+              })
+            }
             filteredSets.push({
               stream: set.stream?.streamName ?? '',
               matchName: set.fullRoundText ?? 'Custom Round Name',
