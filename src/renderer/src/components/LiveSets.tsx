@@ -25,15 +25,11 @@ function LiveSets(): JSX.Element {
   const [getData] = useLazyQuery(StreamQueueOnTournamentDocument)
 
   const data = sets.map((set) => {
-    const stream = set.stream ? set.stream : ''
-    const matchName = set.matchName ? set.matchName : ''
-    const firstGroupName = set.groups.length >= 1 ? set.groups[0].name : ''
-    const secondGroupName = set.groups.length >= 2 ? set.groups[1].name : ''
     return {
-      stream: stream,
-      matchName: matchName,
-      firstGroupName: firstGroupName,
-      secondGroupName: secondGroupName
+      stream: set.stream,
+      matchName: set.matchName,
+      firstGroupName: set.groups[0].name,
+      secondGroupName: set.groups[1].name
     }
   }) as SetTableEntry[]
 
@@ -61,23 +57,12 @@ function LiveSets(): JSX.Element {
     setValue('setFormat', setFormat)
     for (let i = 0; i < getValues('teams').length; i++) {
       for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
-        let players = {}
-        if (sets[selected].groups.length > i && sets[selected].groups[i].players.length > j) {
-          players = {
-            teamName: sets[selected].groups[i].players[j].teamName,
-            playerTag: sets[selected].groups[i].players[j].playerTag,
-            pronouns: sets[selected].groups[i].players[j].pronouns,
-            twitter: sets[selected].groups[i].players[j].twitter
-          }
-        } else {
-          players = {
-            teamName: '',
-            playerTag: '',
-            pronouns: '',
-            twitter: ''
-          }
-        }
-        setValue(`teams.${i}.players.${j}.playerInfo`, players)
+        setValue(`teams.${i}.players.${j}.playerInfo`, {
+          teamName: sets[selected].groups[i].players[j].teamName,
+          playerTag: sets[selected].groups[i].players[j].playerTag,
+          pronouns: sets[selected].groups[i].players[j].pronouns,
+          twitter: sets[selected].groups[i].players[j].twitter
+        })
       }
     }
     setDialogOpen(false)

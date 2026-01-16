@@ -78,14 +78,16 @@ export function filterSets(data: EventSetsQuery): SetEntry[] {
   ) {
     return []
   }
-
+  // iterate through every set
   for (const node of data.event.sets.nodes) {
     if (node?.state && node.slots) {
       const groupInfo = [] as SetEntry['groups']
+      // iterate through every "player entry" in a specific set
       for (const slot of node.slots) {
         if (slot?.entrant?.participants) {
           groupInfo.push({
             name: slot.entrant.name ?? '',
+            // get every actual player in the "player entry"
             players: slot.entrant.participants?.map((participant) => {
               return {
                 teamName: participant?.prefix ?? '',
@@ -97,9 +99,23 @@ export function filterSets(data: EventSetsQuery): SetEntry[] {
           })
         }
       }
-      // no point including a set where there's literally no available information about the players
-      // tbf this is probably redundant because of the null-case handling
+      // no point including a set where there's literally no available information about the players (e.g. winner of AD vs winner of BC like who tf)
       if (groupInfo.length > 0) {
+        // make sure there is always sets of size 2
+        while (groupInfo.length < 2) {
+          groupInfo.push({
+            name: '',
+            // groupInfo can safely be assumed to be at least size 1
+            players: groupInfo[0].players.map(() => {
+              return {
+                teamName: '',
+                playerTag: '',
+                pronouns: '',
+                twitter: ''
+              }
+            })
+          })
+        }
         filteredSets.push({
           stream: node.stream?.streamName ?? '',
           matchName: node.fullRoundText ?? 'Custom Round Name',
