@@ -76,7 +76,7 @@ function Query(): JSX.Element {
       }}
     >
       <DialogTrigger asChild>
-        <Button disabled={apiKey === ''} className="w-full">
+        <Button disabled={!apiKey || apiKey === ''} className="w-full">
           Automatically fill in player data from a set
         </Button>
       </DialogTrigger>

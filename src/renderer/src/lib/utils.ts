@@ -1,7 +1,7 @@
 import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 import { SetEntry, SetFormat } from './types/tournament'
-import { EventSetsQuery, StreamQueueOnTournamentQuery } from './queries.generated'
+import { EventSetsQuery, LiveEventSetsQuery } from './queries.generated'
 import { UseFieldArrayReturn } from 'react-hook-form'
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
@@ -31,60 +31,65 @@ export const borderColorVariants: Record<string, string> = {
 export const sleep = (ms: number): Promise<unknown> =>
   new Promise((resolve) => setTimeout(resolve, ms))
 
-export function filterLiveSets(data: StreamQueueOnTournamentQuery): SetEntry[] {
+export function filterLiveSets(data: LiveEventSetsQuery): SetEntry[] {
   const filteredSets = [] as SetEntry[]
-  if (!data.tournament?.streamQueue) {
+  if (
+    (!data.event?.sets?.nodes && data?.event?.sets?.nodes === null) ||
+    data.event?.sets?.nodes === undefined
+  ) {
     return []
   }
-  for (const stream of data.tournament.streamQueue) {
-    if (stream?.sets) {
-      for (const set of stream.sets) {
-        const groupInfo = [] as SetEntry['groups']
-        if (set?.slots) {
-          for (const slot of set.slots) {
-            if (slot?.entrant?.participants) {
-              groupInfo.push({
-                name: slot.entrant.name ?? '',
-                players: slot.entrant.participants?.map((participant) => {
-                  return {
-                    teamName: participant?.prefix ?? '',
-                    playerTag: participant?.gamerTag ?? '',
-                    pronouns: participant?.user?.genderPronoun ?? '',
-                    twitter: participant?.user?.authorizations?.[0]?.externalUsername ?? ''
-                  }
-                })
-              })
-            }
-          }
-          if (groupInfo.length > 0) {
-            // make sure there is always sets of size 2
-            while (groupInfo.length < 2) {
-              groupInfo.push({
-                name: '',
-                // groupInfo can safely be assumed to be at least size 1
-                players: groupInfo[0].players.map(() => {
-                  return {
-                    teamName: '',
-                    playerTag: '',
-                    pronouns: '',
-                    twitter: ''
-                  }
-                })
-              })
-            }
-            filteredSets.push({
-              stream: set.stream?.streamName ?? '',
-              matchName: set.fullRoundText ?? 'Custom Round Name',
-              status: set.state ?? -1,
-              groups: groupInfo
+  // iterate through every set
+  for (const node of data.event.sets.nodes) {
+    if (node?.state && node.slots) {
+      const groupInfo = [] as SetEntry['groups']
+      // iterate through every "player entry" in a specific set
+      for (const slot of node.slots) {
+        if (slot?.entrant?.participants) {
+          groupInfo.push({
+            name: slot.entrant.name ?? '',
+            // get every actual player in the "player entry"
+            players: slot.entrant.participants?.map((participant) => {
+              return {
+                teamName: participant?.prefix ?? '',
+                playerTag: participant?.gamerTag ?? '',
+                pronouns: participant?.user?.genderPronoun ?? '',
+                twitter: participant?.user?.authorizations?.[0]?.externalUsername ?? ''
+              }
             })
-          }
+          })
         }
+      }
+      // no point including a set where there's literally no available information about the players (e.g. winner of AD vs winner of BC like who tf)
+      if (groupInfo.length > 0) {
+        // make sure there is always sets of size 2
+        while (groupInfo.length < 2) {
+          groupInfo.push({
+            name: '',
+            // groupInfo can safely be assumed to be at least size 1
+            players: groupInfo[0].players.map(() => {
+              return {
+                teamName: '',
+                playerTag: '',
+                pronouns: '',
+                twitter: ''
+              }
+            })
+          })
+        }
+        filteredSets.push({
+          stream: node.stream?.streamName ?? '',
+          matchName: node.fullRoundText ?? 'Custom Round Name',
+          status: node.state,
+          groups: groupInfo
+        })
       }
     }
   }
+
   return filteredSets
 }
+
 export function filterSets(data: EventSetsQuery): SetEntry[] {
   const filteredSets = [] as SetEntry[]
   if (

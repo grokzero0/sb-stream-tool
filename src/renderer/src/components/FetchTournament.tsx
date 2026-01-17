@@ -21,7 +21,7 @@ function FetchTournament(): JSX.Element {
   return (
     <Dialog open={dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
       <DialogTrigger asChild>
-        <Button disabled={apiKey === ''} className="w-full mb-1">
+        <Button disabled={!apiKey || apiKey === ''} className="w-full mb-1">
           Set Tournament
         </Button>
       </DialogTrigger>

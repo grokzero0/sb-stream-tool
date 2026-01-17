@@ -1,8 +1,8 @@
 import { useLazyQuery } from '@apollo/client/react'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
-import { StreamQueueOnTournamentDocument } from '@renderer/lib/queries.generated'
+import { LiveEventSetsDocument } from '@renderer/lib/queries.generated'
 import { SetEntry, SetTableEntry } from '@renderer/lib/types/tournament'
-import { changeSetFormat, filterLiveSets, getSetFormat } from '@renderer/lib/utils'
+import { changeSetFormat, filterLiveSets, getSetFormat, sleep } from '@renderer/lib/utils'
 import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 import { RowSelectionState } from '@tanstack/react-table'
 import { JSX, useState } from 'react'
@@ -19,10 +19,12 @@ function LiveSets(): JSX.Element {
   const [currentTournamentSlug, setCurrentTournamentSlug] = useState('')
   const [dialogOpen, setDialogOpen] = useState(false)
   const [selection, setSelection] = useState<RowSelectionState>({})
+  const [pagesLoaded, setPagesLoaded] = useState(0)
+  const [totalPages, setTotalPages] = useState(0)
   const selectedValue = Object.keys(selection)
   const [sets, setSets] = useState([] as SetEntry[])
   const teams = usePlayerFormFieldArrayContext()
-  const [getData] = useLazyQuery(StreamQueueOnTournamentDocument)
+  const [getData] = useLazyQuery(LiveEventSetsDocument)
 
   const data = sets.map((set) => {
     return {
@@ -34,14 +36,37 @@ function LiveSets(): JSX.Element {
   }) as SetTableEntry[]
 
   const fetchLiveSets = async (): Promise<void> => {
-    const { data } = await getData({
-      variables: {
-        tourneySlug: savedTournamentSlug
-      }
-    })
-    if (data) {
-      setCurrentTournamentSlug(savedTournamentSlug)
-      setSets(filterLiveSets(data))
+    let pages = 1
+    for (let i = 1; i <= pages; i++) {
+      let requestsLimitExceeded = false
+      do {
+        if (requestsLimitExceeded) {
+          await sleep(60000)
+        }
+        const { data, error } = await getData({
+          variables: {
+            eventSlug: savedTournamentSlug,
+            page: i,
+            perPage: 50
+          }
+        })
+        if (!data || error) {
+          requestsLimitExceeded = true
+        } else {
+          requestsLimitExceeded = false
+          setCurrentTournamentSlug(savedTournamentSlug)
+          if (i == 1) {
+            // first page loaded should overwrite previous sets, the first page loaded also should set all information
+            setPagesLoaded(0)
+            pages = data.event!.sets!.pageInfo!.totalPages!
+            setTotalPages(pages)
+            setSets(filterLiveSets(data))
+          } else {
+            setSets((prevSets) => [...prevSets, ...filterLiveSets(data)])
+          }
+          setPagesLoaded((pages) => pages + 1)
+        }
+      } while (requestsLimitExceeded === true)
     }
   }
   const applySet = (): void => {
@@ -99,6 +124,9 @@ function LiveSets(): JSX.Element {
               YOU MUST PUT IN A START.GG API KEY (GO TO SETTINGS FOR TUTORIAL) IN ORDER TO USE THIS
             </h1>
           )}
+          <h1>
+            Pages {pagesLoaded} of {totalPages} loaded
+          </h1>
           <DataTable
             columns={columns}
             data={data}

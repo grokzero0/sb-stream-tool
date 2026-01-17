@@ -66,12 +66,22 @@ export const GET_ENTRANTS_INFO = gql`
 `
 
 export const GET_LIVE_SETS = gql`
-  query StreamQueueOnTournament($tourneySlug: String!) {
-    tournament(slug: $tourneySlug) {
+  query LiveEventSets($eventSlug: String!, $page: Int!, $perPage: Int!) {
+    event(slug: $eventSlug) {
       id
-      streamQueue {
-        sets {
-          id
+      name
+      sets(
+        page: $page
+        perPage: $perPage
+        sortType: STANDARD
+        filters: { state: [1], hideEmpty: true }
+      ) {
+        pageInfo {
+          total
+          totalPages
+        }
+        nodes {
+          # id
           fullRoundText
           state
           stream {
@@ -108,7 +118,7 @@ export const GET_SETS_IN_EVENT = gql`
     event(slug: $eventSlug) {
       id
       name
-      sets(page: $page, perPage: $perPage, sortType: STANDARD) {
+      sets(page: $page, perPage: $perPage, sortType: STANDARD, filters: { hideEmpty: true }) {
         pageInfo {
           total
           totalPages

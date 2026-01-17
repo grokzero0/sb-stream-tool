@@ -1846,6 +1846,8 @@ export type Standing = {
   placement?: Maybe<Scalars['Int']['output']>;
   /** The player(s) tied to this standing's entity */
   player?: Maybe<Player>;
+  /** Entrant's win/loss record for this standing */
+  setRecordWithoutByes?: Maybe<Scalars['JSON']['output']>;
   /** @deprecated The "placement" field is identical and will eventually replace "standing" */
   standing?: Maybe<Scalars['Int']['output']>;
   stats?: Maybe<StandingStats>;
