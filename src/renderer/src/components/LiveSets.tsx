@@ -2,7 +2,13 @@ import { useLazyQuery } from '@apollo/client/react'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 import { LiveEventSetsDocument } from '@renderer/lib/queries.generated'
 import { SetEntry, SetTableEntry } from '@renderer/lib/types/tournament'
-import { changeSetFormat, filterLiveSets, getSetFormat, sleep } from '@renderer/lib/utils'
+import {
+  changeSetFormat,
+  filterLiveSets,
+  getSetFormat,
+  isInPlacementList,
+  sleep
+} from '@renderer/lib/utils'
 import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 import { RowSelectionState } from '@tanstack/react-table'
 import { JSX, useState } from 'react'
@@ -25,6 +31,7 @@ function LiveSets(): JSX.Element {
   const [sets, setSets] = useState([] as SetEntry[])
   const teams = usePlayerFormFieldArrayContext()
   const [getData] = useLazyQuery(LiveEventSetsDocument)
+  const [tournamentName, setTournamentName] = useState('')
 
   const data = sets.map((set) => {
     return {
@@ -61,6 +68,7 @@ function LiveSets(): JSX.Element {
             pages = data.event!.sets!.pageInfo!.totalPages!
             setTotalPages(pages)
             setSets(filterLiveSets(data))
+            setTournamentName(data.event?.tournament?.name ?? '')
           } else {
             setSets((prevSets) => [...prevSets, ...filterLiveSets(data)])
           }
@@ -80,6 +88,25 @@ function LiveSets(): JSX.Element {
     )
     changeSetFormat(setFormat, teams)
     setValue('setFormat', setFormat)
+    setValue('name', tournamentName)
+    const setRoundFormat = sets[selected].matchName
+    const parsedSetRoundFormat = setRoundFormat.split(' ')
+    if (
+      (setRoundFormat.includes('Losers Round') || setRoundFormat.includes('Winners Round')) &&
+      parsedSetRoundFormat.length === 3 // losers round 1, winners round 2, etc
+    ) {
+      setValue('roundFormat', `${parsedSetRoundFormat[0]} ${parsedSetRoundFormat[1]}`)
+      setValue('roundNumber', parseInt(parsedSetRoundFormat[2]) ?? 0)
+    } else {
+      if (isInPlacementList(setRoundFormat)) {
+        setValue('roundFormat', setRoundFormat)
+        setValue('customRoundFormat', undefined)
+      } else {
+        setValue('roundFormat', 'Custom Match')
+        setValue('customRoundFormat', setRoundFormat)
+      }
+      setValue('roundNumber', 0)
+    }
     for (let i = 0; i < getValues('teams').length; i++) {
       for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
         setValue(`teams.${i}.players.${j}.playerInfo`, {

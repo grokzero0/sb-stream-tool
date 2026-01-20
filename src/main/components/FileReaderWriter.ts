@@ -180,7 +180,7 @@ export class FileReaderWriter extends EventStream {
       .then((key) => key)
       .catch((error) => {
         if (error.code === 'ENOENT') {
-          writeFile(`${this.configRootPath}/api_key.txt`, ' ', (err) => {
+          writeFile(`${this.configRootPath}/api_key.txt`, '', (err) => {
             if (err) {
               this.notify(err.message)
             }

@@ -13,7 +13,7 @@ import {
 import { Button } from './ui/button'
 import { Label } from './ui/label'
 import { Input } from './ui/input'
-import { changeSetFormat, getSetFormat } from '@renderer/lib/utils'
+import { changeSetFormat, getSetFormat, isInPlacementList } from '@renderer/lib/utils'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 
@@ -47,7 +47,24 @@ function Query(): JSX.Element {
     )
     changeSetFormat(setFormat, teams)
     setValue('setFormat', setFormat)
-
+    const setRoundFormat = data?.set?.fullRoundText ?? 'Unknown'
+    const parsedSetRoundFormat = setRoundFormat?.split(' ')
+    if (
+      (setRoundFormat.includes('Losers Round') || setRoundFormat.includes('Winners Round')) &&
+      parsedSetRoundFormat.length === 3 // losers round 1, winners round 2, etc
+    ) {
+      setValue('roundFormat', `${parsedSetRoundFormat[0]} ${parsedSetRoundFormat[1]}`)
+      setValue('roundNumber', parseInt(parsedSetRoundFormat[2]) ?? 0)
+    } else {
+      if (isInPlacementList(setRoundFormat)) {
+        setValue('roundFormat', setRoundFormat)
+        setValue('customRoundFormat', undefined)
+      } else {
+        setValue('roundFormat', 'Custom Match')
+        setValue('customRoundFormat', setRoundFormat)
+      }
+      setValue('roundNumber', 0)
+    }
     for (let i = 0; i < getValues('teams').length; i++) {
       for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
         setValue(`teams.${i}.players.${j}.playerInfo`, {

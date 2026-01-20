@@ -3,6 +3,7 @@ export const GET_SET_INFO = gql`
   query SetEntrants($setId: ID!) {
     set(id: $setId) {
       id
+      fullRoundText
       event {
         name
         tournament {
@@ -70,6 +71,9 @@ export const GET_LIVE_SETS = gql`
     event(slug: $eventSlug) {
       id
       name
+      tournament {
+        name
+      }
       sets(
         page: $page
         perPage: $perPage
@@ -118,6 +122,9 @@ export const GET_SETS_IN_EVENT = gql`
     event(slug: $eventSlug) {
       id
       name
+      tournament {
+        name
+      }
       sets(page: $page, perPage: $perPage, sortType: STANDARD, filters: { hideEmpty: true }) {
         pageInfo {
           total

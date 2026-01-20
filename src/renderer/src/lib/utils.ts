@@ -3,6 +3,7 @@ import { twMerge } from 'tailwind-merge'
 import { SetEntry, SetFormat } from './types/tournament'
 import { EventSetsQuery, LiveEventSetsQuery } from './queries.generated'
 import { UseFieldArrayReturn } from 'react-hook-form'
+import placements from '../assets/placements.json'
 export function cn(...inputs: ClassValue[]): string {
   return twMerge(clsx(inputs))
 }
@@ -30,6 +31,15 @@ export const borderColorVariants: Record<string, string> = {
 
 export const sleep = (ms: number): Promise<unknown> =>
   new Promise((resolve) => setTimeout(resolve, ms))
+
+export function isInPlacementList(placement: string): boolean {
+  for (const p of placements) {
+    if (p.placement === placement) {
+      return true
+    }
+  }
+  return false
+}
 
 export function filterLiveSets(data: LiveEventSetsQuery): SetEntry[] {
   const filteredSets = [] as SetEntry[]

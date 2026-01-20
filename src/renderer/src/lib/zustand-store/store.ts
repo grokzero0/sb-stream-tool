@@ -18,5 +18,5 @@ export const useSettingsStore = create<StoreSliceType>()(
 
 // https://github.com/pmndrs/zustand/discussions/676
 window.electronAPI.send('startgg/get-api-key').then((apiKey) => {
-  useSettingsStore.setState({ apiKey: apiKey || '' })
+  useSettingsStore.setState({ apiKey: apiKey ?? '' })
 })
