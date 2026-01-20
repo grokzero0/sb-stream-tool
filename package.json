@@ -1,6 +1,6 @@
 {
   "name": "sb-stream-tool",
-  "version": "0.1.0-beta.2",
+  "version": "0.1.0-beta.3",
   "description": "Stream tool for Super Smash Brothers tournaments",
   "main": "./out/main/index.js",
   "author": {
