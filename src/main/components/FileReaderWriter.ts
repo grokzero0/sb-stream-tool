@@ -1,10 +1,11 @@
 import path from 'node:path'
 import { EventStream } from './observer'
 import { app } from 'electron'
-import { cp, mkdir } from 'node:fs/promises'
+import { mkdir } from 'node:fs/promises'
 import { existsSync, mkdirSync, writeFile } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import { TournamentState } from '../../common/types'
+import fs from 'fs-extra'
 
 export class FileReaderWriter extends EventStream {
   private rootPath: string
@@ -191,11 +192,13 @@ export class FileReaderWriter extends EventStream {
   }
 
   async createDirs(): Promise<void> {
-    cp(this.overlayRootPath, `${path.join(this.resourcesRootPath, 'overlay')}`, {
-      recursive: true
+    fs.copy(this.overlayRootPath, `${path.join(this.resourcesRootPath, 'overlay')}`, {
+      recursive: true,
+      overwrite: false
     })
-    cp(this.charactersRootPath, `${path.join(this.resourcesRootPath, 'characters')}`, {
-      recursive: true
+    fs.copy(this.charactersRootPath, `${path.join(this.resourcesRootPath, 'characters')}`, {
+      recursive: true,
+      overwrite: false
     })
     mkdir(`${path.join(this.resourcesRootPath, 'texts', 'commentators')}`, {
       recursive: true

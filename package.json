@@ -53,6 +53,7 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "electron-updater": "^6.3.9",
+    "fs-extra": "^11.3.3",
     "graphql": "^16.12.0",
     "immer": "^10.2.0",
     "lodash-es": "^4.17.22",
