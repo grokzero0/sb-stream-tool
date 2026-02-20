@@ -121,7 +121,7 @@ function updateOverlay(newData) {
 
   setElementData(
     "right-playername",
-    getPlayerNames(newData.teams[0].players, newData.teams[0].inLosers)
+    getPlayerNames(newData.teams[1].players, newData.teams[1].inLosers)
   );
 
   setElementData("left-score", newData.teams[0].score);
