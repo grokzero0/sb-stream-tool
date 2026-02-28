@@ -44,7 +44,7 @@ export interface TournamentState {
   name: string
   bestOf: number
   roundFormat: string
-  customRoundFormat?: string
+  customRoundFormat: string
   roundNumber?: number
   setFormat: string
   teams: TeamState[]

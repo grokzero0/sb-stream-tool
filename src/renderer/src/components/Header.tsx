@@ -1,6 +1,6 @@
 import { JSX } from 'react'
 import placements from '../assets/placements.json'
-import { useWatch } from 'react-hook-form'
+import { useFormContext, useWatch } from 'react-hook-form'
 import { usePlayerFormFieldArrayContext } from '@renderer/lib/hooks'
 import { FormControl, FormField, FormItem, FormLabel } from './ui/form'
 import { Input } from './ui/input'
@@ -10,7 +10,7 @@ import { changeSetFormat } from '@renderer/lib/utils'
 function Header(): JSX.Element {
   const teams = usePlayerFormFieldArrayContext()
   const watchRoundFormat = useWatch({ name: 'roundFormat' })
-
+  const { setValue } = useFormContext()
   return (
     <>
       <FormField
@@ -51,7 +51,18 @@ function Header(): JSX.Element {
             render={({ field }) => (
               <FormItem>
                 <FormLabel htmlFor="round-format">Round Format</FormLabel>
-                <Select onValueChange={field.onChange} value={field.value}>
+                <Select
+                  onValueChange={(value) => {
+                    if (!value.includes('Round')) {
+                      setValue('roundNumber', undefined)
+                    }
+                    if (value !== 'Custom Match') {
+                      setValue('customRoundFormat', '')
+                    }
+                    field.onChange(value)
+                  }}
+                  value={field.value}
+                >
                   <FormControl>
                     <SelectTrigger id="round-format">
                       <SelectValue placeholder="Click for options"></SelectValue>

@@ -4,8 +4,8 @@ export const TournamentDefaultValues: TournamentState = {
   name: '',
   bestOf: 1,
   roundFormat: 'Friendlies',
-  customRoundFormat: undefined,
-  roundNumber: 0,
+  customRoundFormat: '',
+  roundNumber: undefined,
   setFormat: 'Singles',
   teams: [
     {
