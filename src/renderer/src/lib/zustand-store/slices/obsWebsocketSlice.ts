@@ -1,0 +1,25 @@
+import { StateCreator } from 'zustand'
+import { StoreSliceType } from './slice'
+
+export type ObsWebsocketSlice = {
+  websocketIp: string
+  websocketPort: string
+  websocketPassword: string
+  updateWebsocketSettings: (newIp: string, newPort: string, newPassword: string) => void
+}
+export const createObsWebsocketSlice: StateCreator<
+  StoreSliceType,
+  [['zustand/immer', never]],
+  [],
+  ObsWebsocketSlice
+> = (set) => ({
+  websocketIp: '127.0.0.1',
+  websocketPort: '4455',
+  websocketPassword: '',
+  updateWebsocketSettings: (newIp, newPort, newPassword) =>
+    set((state) => {
+      state.websocketIp = newIp
+      state.websocketPort = newPort
+      state.websocketPassword = newPassword
+    })
+})

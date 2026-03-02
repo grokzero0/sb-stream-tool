@@ -21,6 +21,7 @@ class SceneCollection {
 
   async play(): Promise<void> {
     this.stop()
+    console.log(this.scenes)
     for (const scene of this.scenes) {
       this.sceneTimeoutIds.push(
         setTimeout(() => {
@@ -73,7 +74,7 @@ export class ObsController extends EventStream {
 
     this.socket.on('CurrentProgramSceneChanged', (scene) => {
       console.log(`Scene Changed to ${scene.sceneName}`)
-      this.notify(`OBS Scene Change", "Scene Changed to ${scene.sceneName}`)
+      this.notify('OBS Scene Change', `Scene Changed to ${scene.sceneName}`)
     })
   }
 

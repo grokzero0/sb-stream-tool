@@ -5,13 +5,15 @@ import { createObsScenesSlice } from './slices/obsScenesSlice'
 import { createStartggSlice } from './slices/startggSlice'
 import { StoreSliceType } from './slices/slice'
 import { createSlippiSlice } from './slices/slippiSlice'
+import { createObsWebsocketSlice } from './slices/obsWebsocketSlice'
 
 export const useSettingsStore = create<StoreSliceType>()(
   subscribeWithSelector(
     immer((...a) => ({
       ...createObsScenesSlice(...a),
       ...createStartggSlice(...a),
-      ...createSlippiSlice(...a)
+      ...createSlippiSlice(...a),
+      ...createObsWebsocketSlice(...a)
     }))
   )
 )

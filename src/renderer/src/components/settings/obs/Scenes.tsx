@@ -178,6 +178,7 @@ function Scenes(): JSX.Element {
 
       <Button
         onClick={() => {
+          window.electronAPI.send('obs/update-scenes', gameStartScenes, gameEndScenes, setEndScenes)
           update(gameStartScenes, gameEndScenes, setEndScenes)
         }}
       >

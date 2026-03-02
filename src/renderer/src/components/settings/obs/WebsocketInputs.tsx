@@ -1,16 +1,24 @@
 import { Button } from '@renderer/components/ui/button'
 import { Input } from '@renderer/components/ui/input'
 import { Label } from '@renderer/components/ui/label'
+import { useSettingsStore } from '@renderer/lib/zustand-store/store'
 import { JSX, useState } from 'react'
 
 function WebsocketInputs(): JSX.Element {
-  const [ip, setIp] = useState('127.0.0.1')
-  const [port, setPort] = useState('4455')
-  const [password, setPassword] = useState('')
+  const savedIp = useSettingsStore((state) => state.websocketIp)
+  const savedPort = useSettingsStore((state) => state.websocketPort)
+  const savedPassword = useSettingsStore((state) => state.websocketPassword)
+  const update = useSettingsStore((state) => state.updateWebsocketSettings)
+
+  const [ip, setIp] = useState(savedIp)
+  const [port, setPort] = useState(savedPort)
+  const [password, setPassword] = useState(savedPassword)
+
   return (
     <form
       onSubmit={(e) => {
         e.preventDefault()
+        update(ip, port, password)
         window.electronAPI.send('obs/connect', ip, port, password)
       }}
     >
