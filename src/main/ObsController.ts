@@ -131,5 +131,6 @@ export class ObsController extends EventStream {
     this.gameStartScenes.update(newGameStartScenes)
     this.gameEndScenes.update(newGameEndScenes)
     this.setEndScenes.update(newSetEndScenes)
+    this.notify('OBS scenes', 'OBS scenes added!')
   }
 }
