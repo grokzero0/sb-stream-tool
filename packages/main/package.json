@@ -14,7 +14,12 @@
   "dependencies": {
     "@app/preload": "*",
     "@app/renderer": "*",
-    "electron-updater": "6.8.3"
+    "@slippi/slippi-js": "^9.0.0",
+    "electron-updater": "6.8.3",
+    "fs-extra": "^8.1.0",
+    "obs-websocket-js": "^5.0.7",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@app/electron-versions": "*",
