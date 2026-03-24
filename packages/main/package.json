@@ -12,6 +12,7 @@
     }
   },
   "dependencies": {
+    "@app/common": "*",
     "@app/preload": "*",
     "@app/renderer": "*",
     "electron-updater": "6.8.3"
