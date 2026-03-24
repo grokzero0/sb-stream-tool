@@ -1,0 +1,164 @@
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  /* margin: 0; */ /* never enable this ever buddy */
+}
+
+@font-face {
+  font-family: "Overused Grotesk";
+  src: url("../../../fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
+      format("woff2 supports variations"),
+    url("../../../fonts/OverusedGrotesk/variable/OverusedGrotesk-VF.woff2")
+      format("woff2-variations");
+  font-weight: 300 900;
+}
+
+:root {
+  --background-color: #643a3a;
+  --playername-background-color: rgba(0, 0, 0, 0.5);
+}
+
+body {
+  font-family: "Overused Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI",
+    Roboto, Oxygen, Ubuntu, Cantarell, "Fira Sans", "Droid Sans",
+    "Helvetica Neue", sans-serif;
+  box-sizing: border-box;
+  background-color: var(--background-color);
+  min-height: 100vh;
+  display: flex;
+  justify-content: space-between;
+}
+
+#middle {
+  border-left: 3px solid rgba(255, 255, 255, 0.53);
+  border-right: 3px solid rgba(255, 255, 255, 0.53);
+  width: 100%;
+}
+
+.container {
+  padding: 0.5rem;
+  display: flex;
+  flex-direction: column;
+  min-width: 300px;
+  width: 22%;
+}
+
+.playercam {
+  position: relative;
+  border: 0.5rem solid white;
+  min-height: 500px;
+  height: 15%;
+}
+
+.info {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-container {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: auto;
+}
+
+.playername {
+  background-color: var(--playername-background-color);
+  color: white;
+  font-weight: bold;
+  padding: 0.5rem;
+  font-size: 40px;
+  min-height: 60px;
+  text-wrap: wrap;
+  word-break: break-all;
+}
+
+.playerinfo {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: white;
+  font-weight: 500;
+  padding: 0.5rem;
+  font-size: 23px;
+  min-height: 40px;
+  text-wrap: wrap;
+  word-break: break-all;
+}
+
+.corner {
+  position: absolute;
+  background-color: white;
+  min-height: 60px;
+  min-width: 50px;
+  color: black;
+  text-align: center;
+  font-size: large;
+}
+
+#left-playercam-corner {
+  bottom: 0;
+  left: 0;
+  color: black;
+  text-align: center;
+}
+
+#right-playercam-corner {
+  bottom: 0;
+  right: 0;
+  color: black;
+  text-align: center;
+}
+
+#right-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  font-size: 45px;
+}
+
+#left-score {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  font-size: 45px;
+}
+.winners {
+  background-color: white;
+  font-weight: bold;
+  width: fit-content;
+  min-width: 100px;
+  padding: 0.25rem;
+  font-size: 25px;
+}
+
+.winners-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.winners-nothing-box {
+  background-color: rgba(0, 0, 0, 0.25);
+  min-width: 50px;
+  min-height: 30px;
+}
+
+.gameinfo-container {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  text-wrap: wrap;
+  word-break: break-all;
+}
+
+#right-playername {
+  text-align: end;
+}
+
+.character {
+  display: flex;
+  gap: 0.5rem;
+}

@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="./css/normalize.css" />
+  <link rel="stylesheet" href="./css/overlay.css" />
+  <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"
+    integrity="sha384-mkQ3/7FUtcGyoppY6bz/PORYoGqOl7/aSUMn2ymDOJcapfS6PHqxhRTMh1RR0Q6+" crossorigin="anonymous"
+    defer></script>
+  <script defer src="./socket.js"></script>
+  <title>smah bros</title>
+  <link rel="icon" type="image/x-icon" href="favicon.ico" />
+</head>
+
+<body>
+  <div class="container">
+    <div class="info-container">
+      <div class="info" id="left-info">
+        <div class="winners-container">
+          <div class="winners" id="left-winners"></div>
+          <div class="winners-nothing-box"></div>
+        </div>
+        <div class="playername" id="left-playername"></div>
+        <div class="playerinfo">
+          <div class="pronouns" id="left-pronouns"></div>
+          <div class="gameinfo-container">
+            <div class="port" id="left-port">
+              <img src="./ports/noport.svg" />
+              <img src="./ports/noport.svg" />
+              <img src="./ports/noport.svg" />
+              <img src="./ports/noport.svg" />
+            </div>
+            <div class="character" id="left-character">
+              <img />
+              <img />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="playercam" id="left-playercam">
+        <div class="corner" id="left-playercam-corner">
+          <div id="left-score"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="middle"></div>
+  <div class="container">
+    <div class="info-container">
+      <div class="info" id="right-info">
+        <div class="winners-container">
+          <div class="winners-nothing-box"></div>
+          <div class="winners" id="right-winners"></div>
+        </div>
+        <div class="playername" id="right-playername"></div>
+        <div class="playerinfo">
+          <div class="pronouns" id="right-pronouns"></div>
+          <div class="gameinfo-container">
+            <div class="character" id="right-character">
+              <img />
+              <img />
+            </div>
+            <div class="port" id="right-port">
+              <img src="./ports/noport.svg" />
+              <img src="./ports/noport.svg" />
+              <img src="./ports/noport.svg" />
+              <img src="./ports/noport.svg" />
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="playercam" id="right-playercam">
+        <div class="corner" id="right-playercam-corner">
+          <div id="right-score">2</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+</html>
