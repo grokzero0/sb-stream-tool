@@ -1,13 +1,17 @@
 import type { AppModule } from "../AppModule.js";
 import { ModuleContext } from "../ModuleContext.js";
-import { BrowserWindow } from "electron";
+import { BrowserWindow, Menu } from "electron";
 import type { AppInitConfig } from "../AppInitConfig.js";
 import { join } from "path";
+import { buildMenu } from "../Menu.js";
+import { ObsController } from "../components/ObsController.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
   readonly #renderer: { path: string } | URL;
   readonly #openDevTools;
+
+  private obs: ObsController;
 
   constructor({
     initConfig,
@@ -19,6 +23,8 @@ class WindowManager implements AppModule {
     this.#preload = initConfig.preload;
     this.#renderer = initConfig.renderer;
     this.#openDevTools = openDevTools;
+
+    this.obs = new ObsController();
   }
 
   async enable({ app }: ModuleContext): Promise<void> {
@@ -40,6 +46,9 @@ class WindowManager implements AppModule {
       },
       icon: join(import.meta.dirname, "..", "src", "assets", "icon.ico"),
     });
+
+    const menu = buildMenu(browserWindow, this.obs);
+    Menu.setApplicationMenu(menu);
 
     if (this.#renderer instanceof URL) {
       await browserWindow.loadURL(this.#renderer.href);
