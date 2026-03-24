@@ -1,7 +1,9 @@
+import { Placement } from "./types.js";
+
 export * from "./types.js";
 export * from "./melee.js";
 
-export const placements = [
+export const placements: Placement[] = [
   "Friendlies",
   "Exhibition Match",
   "Money Match",
