@@ -18,6 +18,7 @@
     "chokidar": "^5.0.0",
     "electron-updater": "6.8.3",
     "es-toolkit": "^1.45.1",
+    "fs-extra": "^8.1.0",
     "obs-websocket-js": "^5.0.8",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3"

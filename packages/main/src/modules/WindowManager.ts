@@ -5,6 +5,12 @@ import type { AppInitConfig } from "../AppInitConfig.js";
 import { join } from "path";
 import { buildMenu } from "../Menu.js";
 import { ObsController } from "../components/ObsController.js";
+import { FileReaderWriter } from "src/components/FileReaderWriter.js";
+import { io, Socket } from "socket.io-client";
+import { ClientToServerEvents, ServerToClientEvents } from "src/types.js";
+import { SocketioServer } from "src/components/SocketioServer.js";
+import { ToastMessageCommunicator } from "src/components/ToastMessageCommunication.js";
+import { ipcSetup } from "src/Ipc.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
@@ -12,6 +18,9 @@ class WindowManager implements AppModule {
   readonly #openDevTools;
 
   private obs: ObsController;
+  private dataFileManager: FileReaderWriter;
+  private websocketServer: SocketioServer;
+  private mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>;
 
   constructor({
     initConfig,
@@ -25,10 +34,20 @@ class WindowManager implements AppModule {
     this.#openDevTools = openDevTools;
 
     this.obs = new ObsController();
+    this.dataFileManager = new FileReaderWriter();
+    this.websocketServer = new SocketioServer();
+    this.mainSocket = io("http://localhost:20242");
   }
 
   async enable({ app }: ModuleContext): Promise<void> {
+    await this.dataFileManager.createDirs();
+    this.websocketServer.enable();
+    this.obs.initEvents();
+
     await app.whenReady();
+
+    ipcSetup(this.mainSocket, this.obs, this.dataFileManager);
+
     await this.restoreOrCreateWindow(true);
     app.on("second-instance", () => this.restoreOrCreateWindow(true));
     app.on("activate", () => this.restoreOrCreateWindow(true));
@@ -46,6 +65,10 @@ class WindowManager implements AppModule {
       },
       icon: join(import.meta.dirname, "..", "src", "assets", "icon.ico"),
     });
+
+    const toast = new ToastMessageCommunicator(browserWindow);
+    this.obs.attach(toast);
+    this.dataFileManager.attach(toast);
 
     const menu = buildMenu(browserWindow, this.obs);
     Menu.setApplicationMenu(menu);
