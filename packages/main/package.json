@@ -15,7 +15,12 @@
     "@app/common": "*",
     "@app/preload": "*",
     "@app/renderer": "*",
-    "electron-updater": "6.8.3"
+    "chokidar": "^5.0.0",
+    "electron-updater": "6.8.3",
+    "es-toolkit": "^1.45.1",
+    "obs-websocket-js": "^5.0.8",
+    "socket.io": "^4.8.3",
+    "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@app/electron-versions": "*",
