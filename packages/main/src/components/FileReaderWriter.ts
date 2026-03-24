@@ -5,7 +5,7 @@ import { mkdir } from "node:fs/promises";
 import { existsSync, mkdirSync, writeFile } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { Tournament } from "@app/common";
-import { copy } from "fs-extra";
+import fs from "fs-extra";
 
 export class FileReaderWriter extends EventStream {
   private rootPath: string;
@@ -214,7 +214,7 @@ export class FileReaderWriter extends EventStream {
 
   async createDirs() {
     // console.log(path.join(this.resourcesRootPath, "overlay"));
-    copy(
+    fs.copy(
       this.overlayRootPath,
       `${path.join(this.resourcesRootPath, "overlay")}`,
       {
@@ -222,7 +222,7 @@ export class FileReaderWriter extends EventStream {
         overwrite: false,
       },
     );
-    copy(
+    fs.copy(
       this.charactersRootPath,
       `${path.join(this.resourcesRootPath, "characters")}`,
       {

@@ -5,12 +5,12 @@ import type { AppInitConfig } from "../AppInitConfig.js";
 import { join } from "path";
 import { buildMenu } from "../Menu.js";
 import { ObsController } from "../components/ObsController.js";
-import { FileReaderWriter } from "src/components/FileReaderWriter.js";
+import { FileReaderWriter } from "../components/FileReaderWriter.js";
 import { io, Socket } from "socket.io-client";
-import { ClientToServerEvents, ServerToClientEvents } from "src/types.js";
-import { SocketioServer } from "src/components/SocketioServer.js";
-import { ToastMessageCommunicator } from "src/components/ToastMessageCommunication.js";
-import { ipcSetup } from "src/Ipc.js";
+import { ClientToServerEvents, ServerToClientEvents } from "../types.js";
+import { SocketioServer } from "../components/SocketioServer.js";
+import { ToastMessageCommunicator } from "../components/ToastMessageCommunication.js";
+import { ipcSetup } from "../Ipc.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
