@@ -1,3 +1,5 @@
+export type PortColor = "Red" | "Blue" | "Green" | "Yellow";
+
 export type PlayerInfo = {
   teamName: string;
   playerTag: string;
@@ -8,7 +10,7 @@ export type PlayerInfo = {
 export type GameInfo = {
   character: string;
   altCostume: string;
-  port: "Red" | "Blue" | "Green" | "Yellow";
+  port: PortColor;
 };
 
 export type SlippiPlayer = {

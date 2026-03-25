@@ -1,0 +1,239 @@
+import { placements, PortColor, type SlippiPlayer } from "@app/common";
+import type { EventSetsQuery, LiveEventSetsQuery } from "./queries.generated";
+import type { SetEntry, SetFormat } from "@renderer/types/tournament";
+import type { UseFieldArrayReturn } from "react-hook-form";
+
+export const colorToPort: Record<PortColor, number> = {
+  Red: 1,
+  Blue: 2,
+  Green: 3,
+  Yellow: 4,
+};
+
+export const portToColor: Record<number, PortColor> = {
+  1: "Red",
+  2: "Blue",
+  3: "Green",
+  4: "Yellow",
+};
+
+export const borderColorVariants: Record<PortColor, string> = {
+  Blue: "border-blue-500",
+  Red: "border-red-500",
+  Green: "border-green-500",
+  Yellow: "border-yellow-500",
+};
+
+export const sleep = (ms: number): Promise<unknown> =>
+  new Promise((resolve) => setTimeout(resolve, ms));
+
+export function isInPlacementList(placement: string): boolean {
+  for (const p of placements) {
+    if (p === placement) {
+      return true;
+    }
+  }
+  return false;
+}
+
+export function filterLiveSets(data: LiveEventSetsQuery): SetEntry[] {
+  const filteredSets = [] as SetEntry[];
+  if (
+    (!data.event?.sets?.nodes && data?.event?.sets?.nodes === null) ||
+    data.event?.sets?.nodes === undefined
+  ) {
+    return [];
+  }
+  // iterate through every set
+  for (const node of data.event.sets.nodes) {
+    if (node?.state && node.slots) {
+      const groupInfo = [] as SetEntry["groups"];
+      // iterate through every "player entry" in a specific set
+      for (const slot of node.slots) {
+        if (slot?.entrant?.participants) {
+          groupInfo.push({
+            name: slot.entrant.name ?? "",
+            // get every actual player in the "player entry"
+            players: slot.entrant.participants?.map((participant) => {
+              return {
+                teamName: participant?.prefix ?? "",
+                playerTag: participant?.gamerTag ?? "",
+                pronouns: participant?.user?.genderPronoun ?? "",
+                twitter:
+                  participant?.user?.authorizations?.[0]?.externalUsername ??
+                  "",
+              };
+            }),
+          });
+        }
+      }
+      // no point including a set where there's literally no available information about the players (e.g. winner of AD vs winner of BC like who tf)
+      if (groupInfo.length > 0) {
+        // make sure there is always sets of size 2
+        while (groupInfo.length < 2) {
+          groupInfo.push({
+            name: "",
+            // groupInfo can safely be assumed to be at least size 1
+            players: groupInfo[0].players.map(() => {
+              return {
+                teamName: "",
+                playerTag: "",
+                pronouns: "",
+                twitter: "",
+              };
+            }),
+          });
+        }
+        filteredSets.push({
+          stream: node.stream?.streamName ?? "",
+          matchName: node.fullRoundText ?? "Custom Round Name",
+          status: node.state,
+          groups: groupInfo,
+        });
+      }
+    }
+  }
+
+  return filteredSets;
+}
+
+export function filterSets(data: EventSetsQuery): SetEntry[] {
+  const filteredSets = [] as SetEntry[];
+  if (
+    (!data.event?.sets?.nodes && data?.event?.sets?.nodes === null) ||
+    data.event?.sets?.nodes === undefined
+  ) {
+    return [];
+  }
+  // iterate through every set
+  for (const node of data.event.sets.nodes) {
+    if (node?.state && node.slots) {
+      const groupInfo = [] as SetEntry["groups"];
+      // iterate through every "player entry" in a specific set
+      for (const slot of node.slots) {
+        if (slot?.entrant?.participants) {
+          groupInfo.push({
+            name: slot.entrant.name ?? "",
+            // get every actual player in the "player entry"
+            players: slot.entrant.participants?.map((participant) => {
+              return {
+                teamName: participant?.prefix ?? "",
+                playerTag: participant?.gamerTag ?? "",
+                pronouns: participant?.user?.genderPronoun ?? "",
+                twitter:
+                  participant?.user?.authorizations?.[0]?.externalUsername ??
+                  "",
+              };
+            }),
+          });
+        }
+      }
+      // no point including a set where there's literally no available information about the players (e.g. winner of AD vs winner of BC like who tf)
+      if (groupInfo.length > 0) {
+        // make sure there is always sets of size 2
+        while (groupInfo.length < 2) {
+          groupInfo.push({
+            name: "",
+            // groupInfo can safely be assumed to be at least size 1
+            players: groupInfo[0].players.map(() => {
+              return {
+                teamName: "",
+                playerTag: "",
+                pronouns: "",
+                twitter: "",
+              };
+            }),
+          });
+        }
+        filteredSets.push({
+          stream: node.stream?.streamName ?? "",
+          matchName: node.fullRoundText ?? "Custom Round Name",
+          status: node.state,
+          groups: groupInfo,
+        });
+      }
+    }
+  }
+
+  return filteredSets;
+}
+
+const colors = ["Red", "Blue", "Green", "Yellow"];
+// // updates the player form for doubles or singles
+// export function updatePlayerForm(
+//   setFormat: SetFormat,
+//   currentSetFormat: SetFormat,
+//   teams: UseFieldArrayReturn[]
+// ): void {
+//   if (setFormat !== currentSetFormat) {
+//     changeSetFormat(setFormat, teams)
+//   }
+// }
+
+export function getSetFormat(
+  numPlayersInForm: number | undefined,
+  numPlayersInSet: number | undefined,
+): SetFormat {
+  const numPlayersToSetFormat: Record<number, SetFormat> = {
+    1: "Singles",
+    2: "Doubles",
+  };
+  if (
+    !numPlayersInForm ||
+    !numPlayersInSet ||
+    numPlayersInForm > numPlayersInSet
+  ) {
+    return "Singles";
+  }
+  if (numPlayersInForm === numPlayersInSet) {
+    return numPlayersToSetFormat[numPlayersInSet];
+  }
+  return "Doubles";
+}
+export function changeSetFormat(
+  setFormat: string,
+  teams: UseFieldArrayReturn[],
+): void {
+  switch (setFormat) {
+    case "Singles":
+      for (let i = 0; i < teams.length; i++) {
+        teams[i].remove(1);
+      }
+      break;
+    case "Doubles":
+      for (let i = 0; i < teams.length; i++) {
+        if (teams[i].fields.length < 2) {
+          teams[i].append({
+            playerInfo: {
+              teamName: "",
+              playerTag: "",
+              pronouns: "",
+              twitter: "",
+            },
+            gameInfo: {
+              character: "Random",
+              altCostume: "Default",
+              port: colors[2 + i],
+            },
+          });
+        }
+      }
+      break;
+    default:
+      throw new Error(`Set format ${setFormat} does not exist!`);
+  }
+}
+
+export function findTeamWinner(
+  players: SlippiPlayer[][],
+  winner: number,
+): number {
+  for (let i = 0; i < players.length; i++) {
+    for (const player of players[i]) {
+      if (player.playerId === winner) {
+        return i;
+      }
+    }
+  }
+  return -1;
+}
