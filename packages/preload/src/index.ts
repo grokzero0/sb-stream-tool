@@ -1,6 +1,6 @@
 // import { sha256sum } from "./nodeCrypto.js";
 // import { versions } from "./versions.js";
-import { Tournament } from "@app/common/src/types.js";
+import { Tournament } from "@app/common";
 import { ipcRenderer } from "electron";
 
 function send(channel: string, ...args: any[]) {
@@ -43,13 +43,4 @@ function clearAllListeners(channel: string) {
 //   return ipcRenderer.invoke("slippi:autoStopReadingFolder");
 // }
 
-export {
-  send,
-  updateOverlay,
-  navigation,
-  toastMessage,
-  // onNewSlippiGameData,
-  // onNewSlippiGameEndData,
-  // autoStopSlippiRelay,
-  clearAllListeners,
-};
+export { send, updateOverlay, navigation, toastMessage, clearAllListeners };
