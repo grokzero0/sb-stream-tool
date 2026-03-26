@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Alert, AlertTitle } from "./ui/alert";
 import { AlertCircleIcon } from "lucide-react";
 import FetchEvent from "./FetchEvent";
+import Header from "./Header";
 // import SetQuery from "./SetQuery";
 
 function Match() {
@@ -21,6 +22,7 @@ function Match() {
       )}
       <form className="flex flex-col gap-2">
         <FetchEvent />
+        <Header />
         <Tabs defaultValue="players">
           <TabsList className="w-full">
             <TabsTrigger value="players">Players</TabsTrigger>
