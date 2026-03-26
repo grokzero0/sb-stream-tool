@@ -27,7 +27,7 @@ function Header() {
         name="name"
         render={({ field, fieldState }) => (
           <Field data-invalid={fieldState.invalid}>
-            <FieldLabel htmlFor="tournament-name" className="text-center">
+            <FieldLabel htmlFor="tournament-name" className="flex justify-center text-center">
               Event Name
             </FieldLabel>
             <Input {...field} id="tournament-name" className="text-center" />
