@@ -1,16 +1,19 @@
-import { Button } from "./components/ui/button";
-import { Dialog, DialogContent, DialogHeader, DialogTrigger } from "./components/ui/dialog";
-
+import { Route, Router, Switch } from "wouter";
+import { ThemeProvider } from "./hooks/providers";
+import { useHashLocation } from "wouter/use-hash-location";
+import Tournament from "./components/Tournament";
+import Layout from "./layout";
 function App() {
   return (
-    <>
-      <Button>button</Button>
-      <Dialog>
-        <DialogTrigger>Test</DialogTrigger>
-        <DialogHeader>Test</DialogHeader>
-        <DialogContent>l</DialogContent>
-      </Dialog>
-    </>
+    <ThemeProvider defaultTheme="dark">
+      <Router hook={useHashLocation}>
+        <Layout>
+          <Switch>
+            <Route path="/" component={Tournament}></Route>
+          </Switch>
+        </Layout>
+      </Router>
+    </ThemeProvider>
   );
 }
 
