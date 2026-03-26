@@ -19,7 +19,7 @@ function Match() {
           </AlertTitle>
         </Alert>
       )}
-      <form>
+      <form className="flex flex-col gap-2">
         <FetchEvent />
         <Tabs defaultValue="players">
           <TabsList className="w-full">

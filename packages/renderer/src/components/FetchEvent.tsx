@@ -23,12 +23,12 @@ function FetchEvent() {
     <Sheet>
       <SheetTrigger asChild>
         <Button type="button" className="w-full">
-          Set Event
+          Set Tournament
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom">
         <SheetHeader>
-          <SheetTitle>Set Event URL</SheetTitle>
+          <SheetTitle>Set Tournament</SheetTitle>
           <SheetDescription>
             Type in the start.gg event url (url will have /event after it){" "}
           </SheetDescription>
