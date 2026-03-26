@@ -1,5 +1,7 @@
 import * as React from "react";
 import { Input } from "./input";
+import { Button } from "./button";
+import { Minus, Plus } from "lucide-react";
 
 export interface SpinboxProps extends React.ComponentProps<"input"> {
   numberValue?: number;
@@ -18,7 +20,7 @@ const Spinbox = React.forwardRef<HTMLInputElement, SpinboxProps>(
       numberValue,
       onChangeNumber,
       max,
-      min,
+      min = 0,
       showButtons = true,
       ...props
     },
@@ -70,6 +72,16 @@ const Spinbox = React.forwardRef<HTMLInputElement, SpinboxProps>(
 
     return (
       <div className="flex items-center w-full">
+        {showButtons && (
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => onButtonClick(-1)}
+          >
+            <Minus />
+          </Button>
+        )}
         <Input
           ref={ref}
           // using shadcn's input, so className not needed
@@ -87,22 +99,14 @@ const Spinbox = React.forwardRef<HTMLInputElement, SpinboxProps>(
           min={min}
         />
         {showButtons && (
-          <div className="flex flex-col">
-            <button
-              title="up-button"
-              type="button"
-              onClick={() => onButtonClick(1)}
-            >
-              {/* <ChevronUp></ChevronUp> */}
-            </button>
-            <button
-              title="down-button"
-              type="button"
-              onClick={() => onButtonClick(-1)}
-            >
-              {/* <ChevronDown></ChevronDown> */}
-            </button>
-          </div>
+          <Button
+            type="button"
+            variant="outline"
+            size="icon"
+            onClick={() => onButtonClick(1)}
+          >
+            <Plus />
+          </Button>
         )}
       </div>
     );

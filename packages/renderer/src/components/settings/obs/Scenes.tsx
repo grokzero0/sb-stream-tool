@@ -36,7 +36,7 @@ function Scenes() {
     useState<ObsScene[]>(savedSetEndScenes);
 
   return (
-    <div className="flex flex-col gap-4 pb-1">
+    <div className="flex flex-col gap-2 pb-1">
       <form
         className="flex flex-col gap-4"
         onSubmit={(e) => {
@@ -78,7 +78,6 @@ function Scenes() {
         <div>
           <Label className="pb-1">Scene Name</Label>
           <Input
-            required
             value={newSceneInput.scene}
             onChange={(e) =>
               setNewSceneInput({
