@@ -1,3 +1,4 @@
+import { send } from "@app/preload";
 import { Button } from "@renderer/components/ui/button";
 import { Input } from "@renderer/components/ui/input";
 import { Label } from "@renderer/components/ui/label";
@@ -19,7 +20,7 @@ function Scenes() {
   );
   const savedGameEndScenes = useSettingsStore((state) => state.gameEndScenes);
   const savedSetEndScenes = useSettingsStore((state) => state.setEndScenes);
-  //   const update = useSettingsStore((state) => state.updateScenes);
+  const update = useSettingsStore((state) => state.updateScenes);
 
   const [newSceneInput, setNewSceneInput] = useState({
     scene: "",
@@ -35,9 +36,9 @@ function Scenes() {
     useState<ObsScene[]>(savedSetEndScenes);
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="flex flex-col gap-4 pb-1">
       <form
-        className="flex flex-col gap-2 mb-4"
+        className="flex flex-col gap-4"
         onSubmit={(e) => {
           e.preventDefault();
           switch (newSceneInput.where) {
@@ -75,7 +76,7 @@ function Scenes() {
       >
         <h1 className="text-center font-semibold text-xl">Add Scene</h1>
         <div>
-          <Label className="mb-1">Scene Name</Label>
+          <Label className="pb-1">Scene Name</Label>
           <Input
             required
             value={newSceneInput.scene}
@@ -91,7 +92,7 @@ function Scenes() {
         </div>
         <div className="flex gap-4 w-full items-center">
           <div className="w-full">
-            <Label className="mb-1">Switch to scene in seconds</Label>
+            <Label className="pb-1">Switch to scene in seconds</Label>
             <Spinbox
               value={newSceneInput.start}
               onChangeNumber={(n) =>
@@ -104,7 +105,7 @@ function Scenes() {
             />
           </div>
           <div className="w-full">
-            <Label className="mb-1">Switch to scene when</Label>
+            <Label className="pb-1">Switch to scene when</Label>
             <Select
               value={newSceneInput.where}
               onValueChange={(v) =>
@@ -128,6 +129,111 @@ function Scenes() {
 
         <Button className="w-full">Add Scene</Button>
       </form>
+      <Button
+        type="button"
+        onClick={() => {
+          send(
+            "obs/update-scenes",
+            gameStartScenes,
+            gameEndScenes,
+            setEndScenes,
+          ).catch((reason) => console.log(reason));
+          update(gameStartScenes, gameEndScenes, setEndScenes);
+        }}
+      >
+        Update all scenes
+      </Button>
+      <div className="flex flex-col gap-4">
+        <div className="border-b-2 border-gray-400"></div>
+        <h2 className="text-center">
+          When a game starts, play the following scenes:
+        </h2>
+        <div className="flex flex-col gap-4">
+          {gameStartScenes.map((scene, index) => (
+            <div
+              className="flex justify-between"
+              key={`game-start-scene-${scene.scene}-${scene.start}`}
+            >
+              <h5>
+                In {scene.start} seconds, switch to scene {scene.scene}
+              </h5>
+              <Button
+                className="ml-4"
+                onClick={() =>
+                  setGameStartScenes(
+                    gameStartScenes.filter(
+                      (_, deletionIndex) => index !== deletionIndex,
+                    ),
+                  )
+                }
+              >
+                Delete Scene
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col gap-4">
+        <div className="border-b-2 border-gray-400"></div>
+        <h2 className="text-center">
+          When a game ends, play the following scenes:
+        </h2>
+        <div className="flex flex-col gap-4">
+          {gameEndScenes.map((scene, index) => (
+            <div
+              className="flex justify-between"
+              key={`game-end-scene-${scene.scene}-${scene.start}`}
+            >
+              <h5>
+                In {scene.start} seconds, switch to scene {scene.scene}
+              </h5>
+              <Button
+                className="ml-4"
+                onClick={() =>
+                  setGameEndScenes(
+                    gameEndScenes.filter(
+                      (_, deletionIndex) => index !== deletionIndex,
+                    ),
+                  )
+                }
+              >
+                Delete Scene
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="flex flex-col gap-4">
+        <div className="border-b-2 border-gray-400"></div>
+        <h2 className="text-center">
+          When a set ends, play the following scenes:
+        </h2>
+        <div className="flex flex-col gap-4">
+          {setEndScenes.map((scene, index) => (
+            <div
+              className="flex justify-between"
+              key={`set-end-scene-${scene.scene}-${scene.start}`}
+            >
+              <h5>
+                In {scene.start} seconds, switch to scene {scene.scene}
+              </h5>
+              <Button
+                className="ml-4"
+                onClick={() =>
+                  setSetEndScenes(
+                    setEndScenes.filter(
+                      (_, deletionIndex) => index !== deletionIndex,
+                    ),
+                  )
+                }
+              >
+                Delete Scene
+              </Button>
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="border-b-2 border-gray-400"></div>
     </div>
   );
 }
