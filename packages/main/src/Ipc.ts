@@ -1,4 +1,4 @@
-import { dialog, ipcMain } from "electron";
+import { dialog, ipcMain, shell } from "electron";
 import { ObsController } from "./components/ObsController.js";
 import { Socket } from "socket.io-client";
 import { ClientToServerEvents, ServerToClientEvents } from "./types.js";
@@ -64,6 +64,10 @@ export function ipcSetup(
       return filePaths[0];
     }
   });
+
+  ipcMain.handle("link/open", (_event, link: string) =>
+    shell.openExternal(link),
+  );
 
   //   ipcMain.handle("slippi:readFolder", (_event, listenPath) =>
   //     slippi.setup(listenPath),
