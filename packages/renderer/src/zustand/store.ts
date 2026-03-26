@@ -7,6 +7,7 @@ import { type StoreSliceType } from "./slices/slice";
 import { createSlippiSlice } from "./slices/slippiSlice";
 import { createObsWebsocketSlice } from "./slices/obsWebsocketSlice";
 import { send } from "@app/preload";
+import { createEventSlice } from "./slices/eventSlice";
 
 export const useSettingsStore = create<StoreSliceType>()(
   subscribeWithSelector(
@@ -15,6 +16,7 @@ export const useSettingsStore = create<StoreSliceType>()(
       ...createStartggSlice(...a),
       ...createSlippiSlice(...a),
       ...createObsWebsocketSlice(...a),
+      ...createEventSlice(...a),
     })),
   ),
 );
@@ -24,7 +26,7 @@ send("startgg/get-api-key")
   .then((key) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     useSettingsStore.setState({ apiKey: key ?? "" });
-    console.log(key)
+    console.log(key);
   })
   .catch((reason) => console.log(reason));
 // then((apiKey) => {
