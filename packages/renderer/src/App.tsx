@@ -11,6 +11,7 @@ import { ApolloProvider } from "@apollo/client/react";
 import { FormProvider, useForm } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { TournamentDefaultValues } from "./utils/form";
+import Obs from "./components/settings/obs/Obs";
 
 const client = new ApolloClient({
   link: new HttpLink({
@@ -50,6 +51,8 @@ function App() {
                 <Route path="/settings" nest>
                   <Settings>
                     <Switch>
+                      <Route path="/" component={Obs}></Route>
+                      <Route path="/obs" component={Obs}></Route>
                       <Route path="/startgg" component={Startgg}></Route>
                     </Switch>
                   </Settings>
