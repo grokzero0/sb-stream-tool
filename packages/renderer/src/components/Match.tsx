@@ -3,6 +3,7 @@ import Commentators from "./Commentators";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 import { Alert, AlertTitle } from "./ui/alert";
 import { AlertCircleIcon } from "lucide-react";
+import FetchEvent from "./FetchEvent";
 // import SetQuery from "./SetQuery";
 
 function Match() {
@@ -19,6 +20,7 @@ function Match() {
         </Alert>
       )}
       <form>
+        <FetchEvent />
         <Tabs defaultValue="players">
           <TabsList className="w-full">
             <TabsTrigger value="players">Players</TabsTrigger>

@@ -1,55 +1,55 @@
 import { useState } from "react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
 import { useSettingsStore } from "@renderer/zustand/store";
+import {
+  Sheet,
+  SheetClose,
+  SheetContent,
+  SheetDescription,
+  SheetFooter,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
 
 function FetchEvent() {
   const savedEventUrl = useSettingsStore((state) => state.eventUrl);
   const update = useSettingsStore((state) => state.updateEventUrl);
   const [eventUrl, setEventUrl] = useState(savedEventUrl);
-  const [dialogOpen, setDialogOpen] = useState(false);
-  const apiKey = useSettingsStore((state) => state.apiKey);
+  // const apiKey = useSettingsStore((state) => state.apiKey);
   return (
-    <Dialog open={dialogOpen} onOpenChange={(open) => setDialogOpen(open)}>
-      <DialogTrigger asChild>
-        <Button disabled={apiKey === ""} className="w-full mb-1">
-          Set Tournament
+    <Sheet>
+      <SheetTrigger asChild>
+        <Button type="button" className="w-full">
+          Set Event
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Set Event URL</DialogTitle>
-          <DialogDescription>
-            Type in the Start.gg event url (has the /event/ after it)
-          </DialogDescription>
-        </DialogHeader>
-        <div>
+      </SheetTrigger>
+      <SheetContent side="bottom">
+        <SheetHeader>
+          <SheetTitle>Set Event URL</SheetTitle>
+          <SheetDescription>
+            Type in the start.gg event url (url will have /event after it){" "}
+          </SheetDescription>
+        </SheetHeader>
+        <div className="px-4">
           <Label>Event URL</Label>
           <Input
             value={eventUrl}
             onChange={(e) => setEventUrl(e.currentTarget.value)}
-          />
+          ></Input>
         </div>
-        <Button
-          type="button"
-          onClick={() => {
-            update(eventUrl);
-            setDialogOpen(false);
-          }}
-        >
-          Update
-        </Button>
-      </DialogContent>
-    </Dialog>
+        <SheetFooter>
+          <Button type="button" onClick={() => update(eventUrl)}>
+            Update URL
+          </Button>
+          <SheetClose asChild>
+            <Button variant="outline">Close</Button>
+          </SheetClose>
+        </SheetFooter>
+      </SheetContent>
+    </Sheet>
   );
 }
 
