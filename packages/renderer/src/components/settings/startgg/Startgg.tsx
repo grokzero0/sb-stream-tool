@@ -15,10 +15,11 @@ function Startgg() {
       <h1 className="text-center font-semibold text-xl">
         Connect to Start.gg API
       </h1>
-      <h2>
-        Confused? See{" "}
+      <h2 className="text-center">
+        Confused? See:{" "}
         <Button
           variant="link"
+          className="text-md"
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={() =>
             send("link/open", "https://developer.start.gg/docs/authentication/")

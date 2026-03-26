@@ -16,15 +16,15 @@ import { useState } from "react";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { SetEntrantsDocument } from "@renderer/utils/queries.generated";
 import { useLazyQuery } from "@apollo/client/react";
-import { useFormContext } from "react-hook-form";
-import { Tournament } from "@app/common";
+// import { useFormContext } from "react-hook-form";
+// import { Tournament } from "@app/common";
 function SetQuery() {
   const [setId, setSetId] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
   const [getData, { loading, error }] = useLazyQuery(SetEntrantsDocument);
   const apiKey = useSettingsStore((state) => state.apiKey);
-  const { setValue } = useFormContext<Tournament>();
+  // const { setValue } = useFormContext<Tournament>();
   const handleClick = async () => {
     setStatusMessage("");
     if (setId === "") {
@@ -40,7 +40,7 @@ function SetQuery() {
     }
 
     setStatusMessage(`Set ${setId} found! Applying information...`);
-    setValue("name", data.set?.event?.tournament?.name ?? "")
+    // setValue("name", data.set?.event?.tournament?.name ?? "")
   };
   //   const teams = usePlayerFormFieldArrayContext();
   return (
