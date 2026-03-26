@@ -39,7 +39,7 @@ export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
     //   ],
     // },
     {
-      label: "File",
+      label: "App",
       submenu: [
         {
           label: "Settings",
