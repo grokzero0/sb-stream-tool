@@ -28,7 +28,9 @@ function SetQuery() {
   const [setId, setSetId] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [getData, { loading, error }] = useLazyQuery(SetEntrantsDocument);
+  const [getData, { loading, error }] = useLazyQuery(SetEntrantsDocument, {
+    fetchPolicy: "network-only",
+  });
   const apiKey = useSettingsStore((state) => state.apiKey);
   const { setValue, getValues } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
