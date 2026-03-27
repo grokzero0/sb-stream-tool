@@ -1,5 +1,5 @@
 import { useLazyQuery } from "@apollo/client/react";
-import { sleep } from "@renderer/utils/helpers";
+import { filterSets, sleep } from "@renderer/utils/helpers";
 import { EventSetsDocument } from "@renderer/utils/queries.generated";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { useRef, useState } from "react";
@@ -14,6 +14,10 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { Button } from "./ui/button";
+import { SetEntry, SetTableEntry } from "@renderer/types/tournament";
+import { DataTable } from "./ui/data-table";
+import { columns } from "@renderer/types/columns";
+import { RowSelectionState } from "@tanstack/react-table";
 
 function EventSetsQuery() {
   const savedApiKey = useSettingsStore((state) => state.startggApiKey);
@@ -27,6 +31,17 @@ function EventSetsQuery() {
   const [getData] = useLazyQuery(EventSetsDocument, {
     fetchPolicy: "network-only",
   });
+  const [setsLoaded, setSetsLoaded] = useState<SetEntry[]>([]);
+  const [selection, setSelection] = useState<RowSelectionState>({});
+  const selectedValue = Object.keys(selection);
+  const data = setsLoaded.map((set) => {
+    return {
+      stream: set.stream,
+      matchName: set.matchName,
+      firstGroupName: set.groups[0].name,
+      secondGroupName: set.groups[1].name,
+    };
+  }) as SetTableEntry[];
 
   const fetchSets = async () => {
     console.log(requestsLimitExceeded.current);
@@ -51,6 +66,12 @@ function EventSetsQuery() {
             setTotalPagesState(data.event?.sets?.pageInfo?.totalPages ?? 0);
             totalPages.current = data.event?.sets?.pageInfo?.totalPages ?? 0;
             setEventName(data.event?.tournament?.name ?? "");
+            setSetsLoaded(filterSets(data));
+          } else {
+            setSetsLoaded((prevSetsLoaded) => [
+              ...prevSetsLoaded,
+              ...filterSets(data),
+            ]);
           }
           setPagesLoaded((pages) => pages + 1);
         }
@@ -73,7 +94,7 @@ function EventSetsQuery() {
           Get all sets in {savedEventSlug === "" ? "event" : savedEventSlug}
         </Button>
       </SheetTrigger>
-      <SheetContent>
+      <SheetContent side="bottom">
         <SheetHeader>
           <SheetTitle>
             All sets in {eventName === "" ? "unknown event" : eventName}
@@ -82,6 +103,15 @@ function EventSetsQuery() {
             Pages {pagesLoaded} of {totalPagesState} loaded
           </SheetDescription>
         </SheetHeader>
+        <div>
+          <DataTable
+            columns={columns}
+            data={data}
+            setSelection={setSelection}
+            multiRows={false}
+          />
+          {selectedValue}
+        </div>
         <SheetFooter>
           <SheetClose asChild>
             <Button variant="outline">Close</Button>
