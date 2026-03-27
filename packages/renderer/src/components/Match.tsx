@@ -6,10 +6,14 @@ import { AlertCircleIcon } from "lucide-react";
 import FetchEvent from "./FetchEvent";
 import Header from "./Header";
 import Teams from "./Teams";
+import { useFormContext } from "react-hook-form";
+import { Tournament } from "@app/common";
+import { Button } from "./ui/button";
 // import SetQuery from "./SetQuery";
 
 function Match() {
   const apiKey = useSettingsStore((state) => state.apiKey);
+  const { handleSubmit } = useFormContext<Tournament>();
   return (
     <div className="flex flex-col gap-2">
       {apiKey === "" && (
@@ -21,7 +25,11 @@ function Match() {
           </AlertTitle>
         </Alert>
       )}
-      <form className="flex flex-col gap-2">
+      <form
+        className="flex flex-col gap-2"
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onSubmit={handleSubmit((data) => console.log(data))}
+      >
         <FetchEvent />
         <Header />
         <Tabs defaultValue="players">
@@ -36,6 +44,9 @@ function Match() {
             <Commentators />
           </TabsContent>
         </Tabs>
+        <div className="flex flex-col gap-2 my-2">
+          <Button>UPDATE</Button>
+        </div>
       </form>
     </div>
   );
