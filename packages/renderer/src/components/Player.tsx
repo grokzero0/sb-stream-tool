@@ -62,9 +62,9 @@ function Player({
 
   return (
     <div
-      className={`rounded-md border-2 ${borderColorVariants[port]} py-2 px-2`}
+      className={`rounded-md border-2 ${borderColorVariants[port]} py-2 px-2 w-full`}
     >
-      <div>
+      <div className="w-full">
         <h6 className="text-center">Player {playerNum + 1}</h6>
         <div className="px-16 my-2">
           <Button
@@ -98,7 +98,7 @@ function Player({
             render={({ field, fieldState }) => (
               <Field
                 data-invalid={fieldState.invalid}
-                className="col-start-1 col-end-4"
+                className="grid col-start-1 col-end-4"
               >
                 <FieldLabel htmlFor={`${teamNum}-${playerNum}-teamName`}>
                   Team Name
@@ -116,7 +116,7 @@ function Player({
             render={({ field, fieldState }) => (
               <Field
                 data-invalid={fieldState.invalid}
-                className="col-start-4 col-end-9"
+                className="grid col-start-4 col-end-9"
               >
                 <FieldLabel htmlFor={`${teamNum}-${playerNum}-playerTag`}>
                   Player Tag
@@ -130,7 +130,7 @@ function Player({
             render={({ field, fieldState }) => (
               <Field
                 data-invalid={fieldState.invalid}
-                className="col-start-1 col-end-5"
+                className="grid col-start-1 col-end-5"
               >
                 <FieldLabel htmlFor={`${teamNum}-${playerNum}-pronouns`}>
                   Pronouns
@@ -145,7 +145,7 @@ function Player({
               <Field
                 orientation="responsive"
                 data-invalid={fieldState.invalid}
-                className="col-start-5 col-end-9"
+                className="grid col-start-5 col-end-9"
               >
                 <FieldLabel htmlFor={`${teamNum}-${playerNum}-port`}>
                   Port
@@ -187,7 +187,7 @@ function Player({
             render={({ field, fieldState }) => (
               <Field
                 data-invalid={fieldState.invalid}
-                className="col-start-1 col-end-9"
+                className="grid col-start-1 col-end-9"
               >
                 <FieldLabel htmlFor={`${teamNum}-${playerNum}-twitter`}>
                   Twitter
@@ -200,7 +200,7 @@ function Player({
             name={`teams.${teamNum}.players.${playerNum}.gameInfo.character`}
             render={({ field, fieldState }) => (
               <Field
-                className="col-start-1 col-end-9"
+                className="grid col-start-1 col-end-9"
                 data-invalid={fieldState.invalid}
               >
                 <FieldLabel htmlFor={`${teamNum}-${playerNum}-character`}>
@@ -257,7 +257,7 @@ function Player({
             name={`teams.${teamNum}.players.${playerNum}.gameInfo.altCostume`}
             render={({ field, fieldState }) => (
               <Field
-                className="col-start-1 col-end-9"
+                className="grid col-start-1 col-end-9"
                 data-invalid={fieldState.invalid}
               >
                 <FieldLabel htmlFor={`${teamNum}-${playerNum}-altCostume`}>

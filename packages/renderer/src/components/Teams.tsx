@@ -43,14 +43,18 @@ function Teams() {
       </div>
       <div className="flex gap-1">
         {fields.map((team, teamNum) => (
-          <div key={team.id} className="p-1">
-            <h5 className="text-center font-semibold text-lg">Team {teamNum + 1}</h5>
+          <div key={team.id} className="p-1 w-full">
+            <h5 className="text-center font-semibold text-lg">
+              Team {teamNum + 1}
+            </h5>
             <div className="flex items-end justify-evenly gap-2 pb-2">
               <Controller
                 name={`teams.${teamNum}.score`}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid} className="w-fit">
-                    <FieldLabel className="text-center flex justify-center">Score</FieldLabel>
+                    <FieldLabel className="text-center flex justify-center">
+                      Score
+                    </FieldLabel>
                     <Spinbox
                       numberValue={field.value as number}
                       onChangeNumber={field.onChange}
@@ -86,7 +90,7 @@ function Teams() {
                 )}
               ></Controller>
             </div>
-            <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-4 w-full">
               {players[teamNum].fields.map((player, playerNum) => (
                 <Player
                   key={player.id}
