@@ -29,7 +29,7 @@ useSettingsStore.subscribe((state) =>
     new HttpLink({
       uri: "https://api.start.gg/gql/alpha",
       headers: {
-        Authorization: `Bearer ${state.apiKey}`, // initiated upon the store being created
+        Authorization: `Bearer ${state.startggApiKey}`, // initiated upon the store being created
         "Content-Type": "application/json",
       },
     }),

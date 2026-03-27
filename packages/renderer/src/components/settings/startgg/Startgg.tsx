@@ -6,8 +6,8 @@ import { useSettingsStore } from "@renderer/zustand/store";
 import { useState } from "react";
 
 function Startgg() {
-  const savedApiKey = useSettingsStore((state) => state.apiKey);
-  const update = useSettingsStore((state) => state.updateKey);
+  const savedApiKey = useSettingsStore((state) => state.startggApiKey);
+  const update = useSettingsStore((state) => state.updateStartggApiKey);
   const [apiKey, setApiKey] = useState(savedApiKey);
 
   return (

@@ -31,7 +31,7 @@ function SetQuery() {
   const [getData, { loading, error }] = useLazyQuery(SetEntrantsDocument, {
     fetchPolicy: "network-only",
   });
-  const apiKey = useSettingsStore((state) => state.apiKey);
+  const apiKey = useSettingsStore((state) => state.startggApiKey);
   const { setValue, getValues } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
   const timeoutId = useRef<NodeJS.Timeout>(undefined);

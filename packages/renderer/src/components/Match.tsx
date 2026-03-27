@@ -10,10 +10,11 @@ import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { Button } from "./ui/button";
 import SetQuery from "./SetQuery";
+import EventSetsQuery from "./EventSetsQuery";
 // import SetQuery from "./SetQuery";
 
 function Match() {
-  const apiKey = useSettingsStore((state) => state.apiKey);
+  const apiKey = useSettingsStore((state) => state.startggApiKey);
   const { handleSubmit } = useFormContext<Tournament>();
   return (
     <div className="flex flex-col gap-2">
@@ -48,6 +49,7 @@ function Match() {
         <div className="flex flex-col gap-2 my-2">
           <Button>UPDATE</Button>
           <SetQuery />
+          <EventSetsQuery />
         </div>
       </form>
     </div>
