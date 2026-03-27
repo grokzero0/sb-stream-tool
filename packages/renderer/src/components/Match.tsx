@@ -5,6 +5,7 @@ import { Alert, AlertTitle } from "./ui/alert";
 import { AlertCircleIcon } from "lucide-react";
 import FetchEvent from "./FetchEvent";
 import Header from "./Header";
+import Teams from "./Teams";
 // import SetQuery from "./SetQuery";
 
 function Match() {
@@ -29,7 +30,7 @@ function Match() {
             <TabsTrigger value="commentators">Commentators</TabsTrigger>
           </TabsList>
           <TabsContent value="players">
-            <>player</>
+            <Teams />
           </TabsContent>
           <TabsContent value="commentators">
             <Commentators />

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 // import { autoStopSlippiRelay } from "@app/preload";
 import { useState } from "react";
 import { Controller, useFormContext, useWatch } from "react-hook-form";
@@ -153,7 +152,7 @@ function Player({
                 </FieldLabel>
                 <Select
                   name={field.name}
-                  value={field.value}
+                  value={field.value as string}
                   onValueChange={field.onChange}
                 >
                   <SelectTrigger
@@ -161,7 +160,7 @@ function Player({
                     className="w-full"
                     aria-invalid={fieldState.invalid}
                   >
-                    <SelectValue aria-label={field.value}>
+                    <SelectValue aria-label={field.value as string}>
                       {colorToPort[field.value as PortColor]}
                     </SelectValue>
                   </SelectTrigger>
@@ -274,7 +273,7 @@ function Player({
                     stopRelay();
                     field.onChange(e);
                   }}
-                  value={field.value}
+                  value={field.value as string}
                   name={field.name}
                 >
                   <SelectTrigger
