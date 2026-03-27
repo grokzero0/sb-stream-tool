@@ -92,7 +92,7 @@ function Player({
       </div>
 
       <div className="flex gap-2">
-        <FieldGroup className="w-full grid grid-cols-8 gap-x-2 gap-y-3">
+        <FieldGroup className="w-full grid grid-cols-8 gap-x-2 gap-y-2">
           <Controller
             name={`teams.${teamNum}.players.${playerNum}.playerInfo.teamName`}
             render={({ field, fieldState }) => (

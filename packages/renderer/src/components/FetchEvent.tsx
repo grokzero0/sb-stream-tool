@@ -34,7 +34,7 @@ function FetchEvent() {
           </SheetDescription>
         </SheetHeader>
         <div className="px-4">
-          <Label>Event URL</Label>
+          <Label className="pb-1">Event URL</Label>
           <Input
             value={eventUrl}
             onChange={(e) => setEventUrl(e.currentTarget.value)}
