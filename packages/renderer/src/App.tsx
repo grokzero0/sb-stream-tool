@@ -1,3 +1,7 @@
+/* eslint-disable @typescript-eslint/no-unsafe-return */
+/* eslint-disable @typescript-eslint/no-unsafe-argument */
+/* eslint-disable @typescript-eslint/no-unsafe-member-access */
+/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Route, Router, Switch } from "wouter";
 import { PlayerFormFieldArrayProvider, ThemeProvider } from "./hooks/providers";
 import { useHashLocation } from "wouter/use-hash-location";
@@ -21,7 +25,34 @@ const client = new ApolloClient({
       "Content-Type": "application/json",
     },
   }),
-  cache: new InMemoryCache(),
+  cache: new InMemoryCache({
+    typePolicies: {
+      Event: {
+        fields: {
+          sets: {
+            keyArgs: ["id"],
+            merge(existing, incoming) {
+              // 1. Initialize the structure if it's the first page
+              const mergedNodes = existing ? [...existing.nodes] : [];
+
+              // 2. Append new nodes
+              if (incoming.nodes) {
+                // Note: You might want to add a duplicate check here
+                // based on ID if Start.gg data overlaps
+                mergedNodes.push(...incoming.nodes);
+              }
+
+              // 3. Return the structure the API expects
+              return {
+                ...incoming,
+                nodes: mergedNodes,
+              };
+            },
+          },
+        },
+      },
+    },
+  }),
 });
 
 useSettingsStore.subscribe((state) =>

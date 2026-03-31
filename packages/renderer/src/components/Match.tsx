@@ -10,7 +10,7 @@ import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { Button } from "./ui/button";
 import SetQuery from "./SetQuery";
-import EventSetsQuery from "./EventSetsQuery";
+import EventSets from "./EventSets";
 // import SetQuery from "./SetQuery";
 
 function Match() {
@@ -49,7 +49,7 @@ function Match() {
         <div className="flex flex-col gap-2 my-2">
           <Button>UPDATE</Button>
           <SetQuery />
-          <EventSetsQuery />
+          <EventSets />
         </div>
       </form>
     </div>
