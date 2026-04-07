@@ -1,9 +1,6 @@
 import { useLazyQuery } from "@apollo/client/react";
 import { filterSets, sleep } from "@renderer/utils/helpers";
-import {
-  EventSetsDocument,
-  EventSetsQuery,
-} from "@renderer/utils/queries.generated";
+import { EventSetsDocument } from "@renderer/utils/queries.generated";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { useRef, useState } from "react";
 import {
@@ -17,7 +14,7 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { Button } from "./ui/button";
-import { SetTableEntry } from "@renderer/types/tournament";
+import { SetEntry, SetTableEntry } from "@renderer/types/tournament";
 import { DataTable } from "./ui/data-table";
 import { columns } from "@renderer/types/columns";
 import { RowSelectionState } from "@tanstack/react-table";
@@ -30,15 +27,15 @@ function EventSets() {
   const totalPages = useRef(1);
   const [pagesLoaded, setPagesLoaded] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [getData, { data, fetchMore, error }] = useLazyQuery(
-    EventSetsDocument,
-    {
-      fetchPolicy: "network-only",
-    },
-  );
+  const [getData, { fetchMore, error }] = useLazyQuery(EventSetsDocument, {
+    fetchPolicy: "network-only",
+  });
+  const [setsFetched, setSetsFetched] = useState<SetEntry[]>([]);
+  const [tournamentName, setTournamentName] = useState("unknown event");
+  const [totalPagesState, setTotalPagesState] = useState(0);
   const [selection, setSelection] = useState<RowSelectionState>({});
   const selectedValue = Object.keys(selection);
-  const filteredData = filterSets(data ?? ({} as EventSetsQuery)).map((set) => {
+  const filteredData = setsFetched.map((set) => {
     return {
       stream: set.stream,
       matchName: set.matchName,
@@ -46,9 +43,10 @@ function EventSets() {
       secondGroupName: set.groups[1].name,
     };
   }) as SetTableEntry[];
+  console.log(filteredData);
 
   const fetchSets = async () => {
-    console.log(requestsLimitExceeded.current);
+    // console.log(requestsLimitExceeded.current);
     for (let i = 1; i <= totalPages.current; i++) {
       console.log(i);
       do {
@@ -68,8 +66,13 @@ function EventSets() {
             },
           });
           totalPages.current = data?.event?.sets?.pageInfo?.totalPages ?? 0;
+          setTotalPagesState(data?.event?.sets?.pageInfo?.totalPages ?? 0);
+          setTournamentName(data?.event?.tournament?.name ?? "unknown event");
+          setSetsFetched(filterSets(data));
         } else {
-          await fetchMore({ variables: { page: i } });
+          const { data } = await fetchMore({ variables: { page: i } });
+          const filteredSets = filterSets(data);
+          setSetsFetched((prevSets) => [...prevSets, ...filteredSets]);
         }
         setPagesLoaded((pages) => pages + 1);
       } while (requestsLimitExceeded.current);
@@ -98,12 +101,9 @@ function EventSets() {
       </SheetTrigger>
       <SheetContent side="bottom">
         <SheetHeader>
-          <SheetTitle>
-            All sets in {data?.event?.tournament?.name ?? "unknown event"}
-          </SheetTitle>
+          <SheetTitle>All sets in {tournamentName}</SheetTitle>
           <SheetDescription>
-            Pages {pagesLoaded} of{" "}
-            {data?.event?.sets?.pageInfo?.totalPages ?? 0} loaded
+            Pages {pagesLoaded} of {totalPagesState} loaded
           </SheetDescription>
         </SheetHeader>
         <div>

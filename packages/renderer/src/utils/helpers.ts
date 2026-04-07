@@ -97,11 +97,11 @@ export function filterLiveSets(data: LiveEventSetsQuery): SetEntry[] {
   return filteredSets;
 }
 
-export function filterSets(data: EventSetsQuery): SetEntry[] {
+export function filterSets(data: EventSetsQuery | undefined): SetEntry[] {
   const filteredSets = [] as SetEntry[];
   if (
-    (!data.event?.sets?.nodes && data?.event?.sets?.nodes === null) ||
-    data.event?.sets?.nodes === undefined
+    (!data?.event?.sets?.nodes && data?.event?.sets?.nodes === null) ||
+    data?.event?.sets?.nodes === undefined
   ) {
     return [];
   }
