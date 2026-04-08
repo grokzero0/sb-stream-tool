@@ -143,10 +143,7 @@ export function DataTable<TData, TValue>({
             {table.getRowModel().rows?.length ? (
               rowVirtualizer.getVirtualItems().map((virtualRow) => {
                 const row = rows[virtualRow.index];
-                console.log(row);
-                if (row === undefined) {
-                  return;
-                } else {
+                if (row !== undefined) {
                   return (
                     <TableRow
                       data-index={virtualRow.index}
@@ -166,22 +163,6 @@ export function DataTable<TData, TValue>({
                 }
               })
             ) : (
-              // table.getRowModel().rows.map((row) => (
-              //   <TableRow
-              //     key={row.id}
-              //     data-state={row.getIsSelected() && "selected"}
-              //     className="break-all"
-              //   >
-              //     {row.getVisibleCells().map((cell) => (
-              //       <TableCell key={cell.id} className="break-all">
-              //         {flexRender(
-              //           cell.column.columnDef.cell,
-              //           cell.getContext(),
-              //         )}
-              //       </TableCell>
-              //     ))}
-              //   </TableRow>
-              // ))
               <TableRow>
                 <TableCell
                   colSpan={columns.length}

@@ -22,9 +22,9 @@ import { RowSelectionState } from "@tanstack/react-table";
 function EventSets() {
   const savedApiKey = useSettingsStore((state) => state.startggApiKey);
   const savedEventSlug = useSettingsStore((state) => state.eventSlug);
-  const [currentEventSlug, setCurrentEventSlug] = useState("");
+  const currentEventSlug = useRef("");
   const requestsLimitExceeded = useRef(false);
-  const totalPages = useRef(1);
+  const totalPagesRef = useRef(1); // for the for loop
   const [pagesLoaded, setPagesLoaded] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [getData, { fetchMore, error }] = useLazyQuery(EventSetsDocument, {
@@ -32,9 +32,9 @@ function EventSets() {
   });
   const [setsFetched, setSetsFetched] = useState<SetEntry[]>([]);
   const [tournamentName, setTournamentName] = useState("unknown event");
-  const [totalPagesState, setTotalPagesState] = useState(0);
-  const [selection, setSelection] = useState<RowSelectionState>({});
-  const selectedValue = Object.keys(selection);
+  const [totalPagesState, setTotalPagesState] = useState(0); // for ui rendering
+  const [selectedRow, setSelectedRow] = useState<RowSelectionState>({});
+  const selectedValue = Object.keys(selectedRow);
   const filteredData = setsFetched.map((set) => {
     return {
       stream: set.stream,
@@ -47,8 +47,7 @@ function EventSets() {
 
   const fetchSets = async () => {
     // console.log(requestsLimitExceeded.current);
-    for (let i = 1; i <= totalPages.current; i++) {
-      console.log(i);
+    for (let i = 1; i <= totalPagesRef.current; i++) {
       do {
         if (error && !requestsLimitExceeded.current) {
           console.log("Error found");
@@ -60,18 +59,18 @@ function EventSets() {
         if (i == 1) {
           const { data } = await getData({
             variables: {
-              eventSlug: savedEventSlug,
+              eventSlug: currentEventSlug.current,
               page: i,
               perPage: 50,
             },
           });
-          totalPages.current = data?.event?.sets?.pageInfo?.totalPages ?? 0;
+          totalPagesRef.current = data?.event?.sets?.pageInfo?.totalPages ?? 0;
           setTotalPagesState(data?.event?.sets?.pageInfo?.totalPages ?? 0);
           setTournamentName(data?.event?.tournament?.name ?? "unknown event");
-          setSetsFetched(filterSets(data));
+          setSetsFetched(filterSets(data?.event?.sets?.nodes));
         } else {
           const { data } = await fetchMore({ variables: { page: i } });
-          const filteredSets = filterSets(data);
+          const filteredSets = filterSets(data?.event?.sets?.nodes);
           setSetsFetched((prevSets) => [...prevSets, ...filteredSets]);
         }
         setPagesLoaded((pages) => pages + 1);
@@ -86,11 +85,12 @@ function EventSets() {
         if (
           open == false ||
           savedEventSlug === "" ||
-          currentEventSlug === savedEventSlug // ensure that you dont fetch the same set again while its loading
+          currentEventSlug.current === savedEventSlug // ensure that you dont fetch the same set again while its loading
         ) {
           return;
         }
-        setCurrentEventSlug(savedEventSlug);
+
+        currentEventSlug.current = savedEventSlug;
         fetchSets().catch((reason) => console.log(reason));
       }}
     >
@@ -110,7 +110,7 @@ function EventSets() {
           <DataTable
             columns={columns}
             data={filteredData}
-            setSelection={setSelection}
+            setSelection={setSelectedRow}
             multiRows={false}
           />
           {selectedValue}

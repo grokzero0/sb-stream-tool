@@ -36,16 +36,15 @@ export function isInPlacementList(placement: string): boolean {
   return false;
 }
 
-export function filterLiveSets(data: LiveEventSetsQuery): SetEntry[] {
+export function filterLiveSets(
+  data: NonNullable<NonNullable<LiveEventSetsQuery["event"]>["sets"]>["nodes"],
+): SetEntry[] {
   const filteredSets = [] as SetEntry[];
-  if (
-    (!data.event?.sets?.nodes && data?.event?.sets?.nodes === null) ||
-    data.event?.sets?.nodes === undefined
-  ) {
+  if (!data || data === null || data === undefined) {
     return [];
   }
   // iterate through every set
-  for (const node of data.event.sets.nodes) {
+  for (const node of data) {
     if (node?.state && node.slots) {
       const groupInfo = [] as SetEntry["groups"];
       // iterate through every "player entry" in a specific set
@@ -97,16 +96,17 @@ export function filterLiveSets(data: LiveEventSetsQuery): SetEntry[] {
   return filteredSets;
 }
 
-export function filterSets(data: EventSetsQuery | undefined): SetEntry[] {
+export function filterSets(
+  data:
+    | NonNullable<NonNullable<EventSetsQuery["event"]>["sets"]>["nodes"]
+    | undefined,
+): SetEntry[] {
   const filteredSets = [] as SetEntry[];
-  if (
-    (!data?.event?.sets?.nodes && data?.event?.sets?.nodes === null) ||
-    data?.event?.sets?.nodes === undefined
-  ) {
+  if (!data || data === null || data === undefined) {
     return [];
   }
   // iterate through every set
-  for (const node of data.event.sets.nodes) {
+  for (const node of data) {
     if (node?.state && node.slots) {
       const groupInfo = [] as SetEntry["groups"];
       // iterate through every "player entry" in a specific set
