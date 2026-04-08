@@ -43,10 +43,8 @@ function EventSets() {
       secondGroupName: set.groups[1].name,
     };
   }) as SetTableEntry[];
-  console.log(filteredData);
 
   const fetchSets = async () => {
-    // console.log(requestsLimitExceeded.current);
     for (let i = 1; i <= totalPagesRef.current; i++) {
       do {
         if (error && !requestsLimitExceeded.current) {

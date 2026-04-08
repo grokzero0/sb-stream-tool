@@ -26,9 +26,5 @@ send("startgg/get-api-key")
   .then((key) => {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
     useSettingsStore.setState({ startggApiKey: key ?? "" });
-    console.log(key);
   })
   .catch((reason) => console.log(reason));
-// then((apiKey) => {
-//   useSettingsStore.setState({ apiKey: apiKey ?? '' })
-// }
