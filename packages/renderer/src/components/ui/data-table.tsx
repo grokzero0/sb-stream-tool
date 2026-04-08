@@ -7,11 +7,13 @@ import {
   flexRender,
   getCoreRowModel,
   getFilteredRowModel,
-  getPaginationRowModel,
+  // getPaginationRowModel,
   useReactTable,
   ColumnFiltersState,
 } from "@tanstack/react-table";
-import { useState } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
+
+import { useRef, useState } from "react";
 import { Input } from "./input";
 import {
   Table,
@@ -52,6 +54,7 @@ export function DataTable<TData, TValue>({
   pagination = false,
   className,
 }: DataTableProps<TData, TValue>) {
+  const tableContainerRef = useRef<HTMLDivElement>(null);
   const [rowSelection, setRowSelection] = useState({});
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
   const [globalFilter, setGlobalFilter] = useState<any>([]);
@@ -71,7 +74,7 @@ export function DataTable<TData, TValue>({
       }
     },
     onColumnFiltersChange: setColumnFilters,
-    getPaginationRowModel: getPaginationRowModel(),
+    // getPaginationRowModel: getPaginationRowModel(),
     onGlobalFilterChange: setGlobalFilter,
 
     getFilteredRowModel: getFilteredRowModel(),
@@ -81,13 +84,21 @@ export function DataTable<TData, TValue>({
       globalFilter,
       columnFilters,
     },
-    initialState: {
-      pagination: {
-        pageIndex: 0,
-        pageSize: 100,
-      },
-    },
+    // initialState: {
+    //   pagination: {
+    //     pageIndex: 0,
+    //     pageSize: 100,
+    //   },
+    // },
   });
+
+  const rowVirtualizer = useVirtualizer({
+    count: data.length,
+    estimateSize: () => 10,
+    getScrollElement: () => tableContainerRef.current,
+  });
+
+  const { rows } = table.getRowModel();
 
   return (
     <div>
@@ -105,7 +116,10 @@ export function DataTable<TData, TValue>({
           <Label htmlFor="live-sets">Only live sets</Label>
         </div> */}
       </div>
-      <div className={cn("overflow-auto rounded-md border max-h-96", className)}>
+      <div
+        ref={tableContainerRef}
+        className={cn("overflow-auto rounded-md border max-h-96", className)}
+      >
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
@@ -127,23 +141,47 @@ export function DataTable<TData, TValue>({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                  className="break-all"
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id} className="break-all">
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
-                </TableRow>
-              ))
+              rowVirtualizer.getVirtualItems().map((virtualRow) => {
+                const row = rows[virtualRow.index];
+                console.log(row);
+                if (row === undefined) {
+                  return;
+                } else {
+                  return (
+                    <TableRow
+                      data-index={virtualRow.index}
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <TableCell key={cell.id} className="break-all">
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </TableCell>
+                      ))}
+                    </TableRow>
+                  );
+                }
+              })
             ) : (
+              // table.getRowModel().rows.map((row) => (
+              //   <TableRow
+              //     key={row.id}
+              //     data-state={row.getIsSelected() && "selected"}
+              //     className="break-all"
+              //   >
+              //     {row.getVisibleCells().map((cell) => (
+              //       <TableCell key={cell.id} className="break-all">
+              //         {flexRender(
+              //           cell.column.columnDef.cell,
+              //           cell.getContext(),
+              //         )}
+              //       </TableCell>
+              //     ))}
+              //   </TableRow>
+              // ))
               <TableRow>
                 <TableCell
                   colSpan={columns.length}
