@@ -18,7 +18,7 @@
     "chokidar": "^5.0.0",
     "electron-updater": "6.8.3",
     "es-toolkit": "^1.45.1",
-    "fs-extra": "^8.1.0",
+    "fs-extra": "^11.3.4",
     "obs-websocket-js": "^5.0.8",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3"
@@ -27,6 +27,6 @@
     "@app/electron-versions": "*",
     "electron-devtools-installer": "4.0.0",
     "typescript": "6.0.2",
-    "vite": "8.0.2"
+    "vite": "8.0.8"
   }
 }
