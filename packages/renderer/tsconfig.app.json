@@ -25,8 +25,8 @@
     "noUncheckedSideEffectImports": true,
 
     "paths": {
-      "*": ["./*"],
-      "@renderer/*": ["./src/*"]
+      "@renderer/*": ["./src/*"],
+      "*": ["./*"]
     }
   },
   "include": ["src"]

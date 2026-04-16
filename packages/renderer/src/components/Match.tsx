@@ -13,16 +13,19 @@ import SetQuery from "./SetQuery";
 import EventSets from "./EventSets";
 import LiveEventSets from "./LiveEventSets";
 import { useHotkey } from "@tanstack/react-hotkeys";
-// import SetQuery from "./SetQuery";
+import { sendToastMessage } from "./ui/toast";
 
 function Match() {
   const apiKey = useSettingsStore((state) => state.startggApiKey);
   const { handleSubmit } = useFormContext<Tournament>();
+  const onSubmit = (data: Tournament) => {
+    console.log(data);
+    sendToastMessage("Set Update", "Set information successfully updated!");
+  };
   useHotkey("Enter", () => {
-    handleSubmit((data) => console.log(data))().catch((error) =>
-      console.log(error),
-    );
+    handleSubmit(onSubmit)().catch((error) => console.log(error));
   });
+
   return (
     <div className="flex flex-col gap-2">
       {apiKey === "" && (
@@ -37,7 +40,7 @@ function Match() {
       <form
         className="flex flex-col gap-2"
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onSubmit={handleSubmit((data) => console.log(data))}
+        onSubmit={handleSubmit(onSubmit)}
       >
         <FetchEvent />
         <Header />
