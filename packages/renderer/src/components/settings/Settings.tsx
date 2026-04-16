@@ -4,10 +4,14 @@ import SettingsSidebar from "./SettingsSidebar";
 import { Button } from "../ui/button";
 import { X } from "lucide-react";
 import { ReactNode } from "react";
+import { useHotkey } from "@tanstack/react-hotkeys";
 
 function Settings({ children }: { children: ReactNode }) {
   const [location, navigate] = useLocation();
   console.log(location);
+
+  useHotkey("Escape", () => navigate("~"));
+
   return (
     <SidebarProvider defaultOpen={false}>
       <div className="flex gap-2 w-full">

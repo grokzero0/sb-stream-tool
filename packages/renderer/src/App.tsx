@@ -1,7 +1,3 @@
-/* eslint-disable @typescript-eslint/no-unsafe-return */
-/* eslint-disable @typescript-eslint/no-unsafe-argument */
-/* eslint-disable @typescript-eslint/no-unsafe-member-access */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
 import { Route, Router, Switch } from "wouter";
 import { PlayerFormFieldArrayProvider, ThemeProvider } from "./hooks/providers";
 import { useHashLocation } from "wouter/use-hash-location";

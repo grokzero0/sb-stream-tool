@@ -12,11 +12,17 @@ import { Button } from "./ui/button";
 import SetQuery from "./SetQuery";
 import EventSets from "./EventSets";
 import LiveEventSets from "./LiveEventSets";
+import { useHotkey } from "@tanstack/react-hotkeys";
 // import SetQuery from "./SetQuery";
 
 function Match() {
   const apiKey = useSettingsStore((state) => state.startggApiKey);
   const { handleSubmit } = useFormContext<Tournament>();
+  useHotkey("Enter", () => {
+    handleSubmit((data) => console.log(data))().catch((error) =>
+      console.log(error),
+    );
+  });
   return (
     <div className="flex flex-col gap-2">
       {apiKey === "" && (
