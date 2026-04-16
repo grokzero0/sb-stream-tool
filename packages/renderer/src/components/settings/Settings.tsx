@@ -5,12 +5,16 @@ import { Button } from "../ui/button";
 import { X } from "lucide-react";
 import { ReactNode } from "react";
 import { useHotkey } from "@tanstack/react-hotkeys";
+import { useSettingsStore } from "@renderer/zustand/store";
 
 function Settings({ children }: { children: ReactNode }) {
   const [location, navigate] = useLocation();
+  const homeHotkey = useSettingsStore(
+    (state) => state.keybinds.get("home") ?? "Escape",
+  );
   console.log(location);
 
-  useHotkey("Escape", () => navigate("~"));
+  useHotkey(homeHotkey, () => navigate("~"));
 
   return (
     <SidebarProvider defaultOpen={false}>
