@@ -7,7 +7,6 @@
   "compilerOptions": {
     "paths": {
       "@renderer/*": ["./src/*"],
-      "*": ["./*"]
     }
   }
 }
