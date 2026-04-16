@@ -5,32 +5,50 @@ import {
   ServerToClientEvents,
   SocketData,
 } from "../types.js";
+import { EventStream } from "./observer.js";
 
-export class SocketioServer {
+export class SocketioServer extends EventStream {
   private server: Server<
     ClientToServerEvents,
     ServerToClientEvents,
     InterServerEvents,
     SocketData
   >;
+  private sockets: Map<string, number>;
 
   constructor() {
+    super();
     this.server = new Server<
       ClientToServerEvents,
       ServerToClientEvents,
       InterServerEvents,
       SocketData
     >(20242, { cors: { origin: "*" } });
+    this.sockets = new Map();
   }
 
   async enable(): Promise<void> {
     this.server.on("connection", (socket) => {
       console.log(`User ${socket.id} connected`);
+      this.sockets.set(socket.id, this.sockets.size + 1);
+
       socket.on("sendDataToServer", (data) => {
-        console.log(`User ${socket.id} sending data to scoreboard`);
+        this.notify("Sending data to overlays");
         socket.broadcast.emit("sendDataToClients", data);
       });
+
+      socket.on("overlayUpdateSuccess", () => {
+        this.notify(
+          `Overlay ${this.sockets.get(socket.id)} updated set information successfully!`,
+        );
+      });
+
       socket.on("disconnect", () => {
+        this.sockets.delete(socket.id);
+        this.notify(
+          "Disconnect",
+          `Overlay ${this.sockets.get(socket.id)} disconnected`,
+        );
         console.log(`User ${socket.id} disconnected, goodby`);
       });
     });

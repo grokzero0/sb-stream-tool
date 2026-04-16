@@ -114,6 +114,7 @@ function getTeams(team) {
 
 function updateOverlay(newData) {
   console.log("updating overlay");
+  console.log(newData)
   setElementData(
     "left-playername",
     getPlayerNames(newData.teams[0].players, newData.teams[0].inLosers)
@@ -158,7 +159,7 @@ function updateOverlay(newData) {
   );
 }
 
-socket.on("newData", (newData) => {
-  console.log(newData);
+socket.on("sendDataToClients", (newData) => {
   updateOverlay(newData);
+  socket.broadcast.emit("overlayUpdateSuccess")
 });

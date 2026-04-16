@@ -69,6 +69,7 @@ class WindowManager implements AppModule {
     const toast = new ToastMessageCommunicator(browserWindow);
     this.obs.attach(toast);
     this.dataFileManager.attach(toast);
+    this.websocketServer.attach(toast);
 
     const menu = buildMenu(browserWindow, this.obs);
     Menu.setApplicationMenu(menu);

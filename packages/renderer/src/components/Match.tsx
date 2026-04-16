@@ -13,15 +13,18 @@ import SetQuery from "./SetQuery";
 import EventSets from "./EventSets";
 import LiveEventSets from "./LiveEventSets";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { sendToastMessage } from "./ui/toast";
+import { updateOverlay } from "@app/preload";
+// import { sendToastMessage } from "./ui/toast";
 
 function Match() {
   const apiKey = useSettingsStore((state) => state.startggApiKey);
   const { handleSubmit } = useFormContext<Tournament>();
+
   const onSubmit = (data: Tournament) => {
     console.log(data);
-    sendToastMessage("Set Update", "Set information successfully updated!");
+    updateOverlay(data).catch((error) => console.log(error));
   };
+
   useHotkey("Enter", () => {
     handleSubmit(onSubmit)().catch((error) => console.log(error));
   });
