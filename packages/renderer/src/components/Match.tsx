@@ -11,6 +11,7 @@ import { Tournament } from "@app/common";
 import { Button } from "./ui/button";
 import SetQuery from "./SetQuery";
 import EventSets from "./EventSets";
+import LiveEventSets from "./LiveEventSets";
 // import SetQuery from "./SetQuery";
 
 function Match() {
@@ -50,6 +51,7 @@ function Match() {
           <Button>UPDATE</Button>
           <SetQuery />
           <EventSets />
+          <LiveEventSets />
         </div>
       </form>
     </div>

@@ -1,12 +1,12 @@
 import { useLazyQuery } from "@apollo/client/react";
 import {
   changeSetFormat,
-  filterSets,
+  filterLiveSets,
   getSetFormat,
   isInPlacementList,
   sleep,
 } from "@renderer/utils/helpers";
-import { EventSetsDocument } from "@renderer/utils/queries.generated";
+import { LiveEventSetsDocument } from "@renderer/utils/queries.generated";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { useRef, useState } from "react";
 import {
@@ -28,7 +28,7 @@ import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "../hooks/use-player-form-field-array-context";
 
-function EventSets() {
+function LiveEventSets() {
   const savedApiKey = useSettingsStore((state) => state.startggApiKey);
   const savedEventSlug = useSettingsStore((state) => state.eventSlug);
   const currentEventSlug = useRef("");
@@ -36,7 +36,7 @@ function EventSets() {
   const totalPagesRef = useRef(1); // for the for loop
   const [pagesLoaded, setPagesLoaded] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [getData, { fetchMore, error }] = useLazyQuery(EventSetsDocument, {
+  const [getData, { fetchMore, error }] = useLazyQuery(LiveEventSetsDocument, {
     fetchPolicy: "network-only",
   });
   const [setsFetched, setSetsFetched] = useState<SetEntry[]>([]);
@@ -129,10 +129,10 @@ function EventSets() {
           totalPagesRef.current = data?.event?.sets?.pageInfo?.totalPages ?? 0;
           setTotalPagesState(data?.event?.sets?.pageInfo?.totalPages ?? 0);
           setTournamentName(data?.event?.tournament?.name ?? "unknown event");
-          setSetsFetched(filterSets(data?.event?.sets?.nodes));
+          setSetsFetched(filterLiveSets(data?.event?.sets?.nodes));
         } else {
           const { data } = await fetchMore({ variables: { page: i } });
-          const filteredSets = filterSets(data?.event?.sets?.nodes);
+          const filteredSets = filterLiveSets(data?.event?.sets?.nodes);
           setSetsFetched((prevSets) => [...prevSets, ...filteredSets]);
         }
         setPagesLoaded((pages) => pages + 1);
@@ -158,12 +158,12 @@ function EventSets() {
     >
       <SheetTrigger asChild>
         <Button disabled={savedApiKey === "" || savedEventSlug === ""}>
-          Get all sets in {savedEventSlug === "" ? "event" : savedEventSlug}
+          Get all live sets in {savedEventSlug === "" ? "event" : savedEventSlug}
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom">
         <SheetHeader>
-          <SheetTitle>All sets in {tournamentName}</SheetTitle>
+          <SheetTitle>All live sets in {tournamentName}</SheetTitle>
           <SheetDescription>
             Pages {pagesLoaded} of {totalPagesState} loaded
           </SheetDescription>
@@ -190,4 +190,4 @@ function EventSets() {
   );
 }
 
-export default EventSets;
+export default LiveEventSets;

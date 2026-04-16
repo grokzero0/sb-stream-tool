@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
 import { Input } from "./ui/input";
@@ -18,9 +18,12 @@ function FetchEvent() {
   const savedEventUrl = useSettingsStore((state) => state.eventUrl);
   const update = useSettingsStore((state) => state.updateEventUrl);
   const [eventUrl, setEventUrl] = useState(savedEventUrl);
+  const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
+  const [statusMessage, setStatusMessage] = useState("");
+  const [sheetOpen, setSheetOpen] = useState(false);
   // const apiKey = useSettingsStore((state) => state.apiKey);
   return (
-    <Sheet>
+    <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
       <SheetTrigger asChild>
         <Button type="button" className="w-full">
           Set Tournament
@@ -41,7 +44,19 @@ function FetchEvent() {
           ></Input>
         </div>
         <SheetFooter>
-          <Button type="button" onClick={() => update(eventUrl)}>
+          {statusMessage}
+          <Button
+            type="button"
+            onClick={() => {
+              setStatusMessage(`Applying event ${eventUrl}...`);
+              update(eventUrl);
+              clearTimeout(timeoutRef.current);
+              timeoutRef.current = setTimeout(() => {
+                setStatusMessage("");
+                setSheetOpen(false);
+              }, 2000);
+            }}
+          >
             Update URL
           </Button>
           <SheetClose asChild>

@@ -37,7 +37,9 @@ export function isInPlacementList(placement: string): boolean {
 }
 
 export function filterLiveSets(
-  data: NonNullable<NonNullable<LiveEventSetsQuery["event"]>["sets"]>["nodes"],
+  data:
+    | NonNullable<NonNullable<LiveEventSetsQuery["event"]>["sets"]>["nodes"]
+    | undefined,
 ): SetEntry[] {
   const filteredSets = [] as SetEntry[];
   if (!data || data === null || data === undefined) {
