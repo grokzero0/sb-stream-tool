@@ -15,6 +15,7 @@
     "@app/common": "*",
     "@app/preload": "*",
     "@app/renderer": "*",
+    "@slippi/slippi-js": "^9.0.0",
     "chokidar": "^5.0.0",
     "electron-updater": "6.8.3",
     "es-toolkit": "^1.45.1",
