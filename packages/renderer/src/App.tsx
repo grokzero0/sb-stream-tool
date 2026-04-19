@@ -12,6 +12,7 @@ import { FormProvider, useForm } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { TournamentDefaultValues } from "./utils/form";
 import Obs from "./components/settings/obs/Obs";
+import Slippi from "./components/slippi/Slippi";
 
 const client = new ApolloClient({
   link: new HttpLink({
@@ -55,6 +56,7 @@ function App() {
                         <Route path="/" component={Obs}></Route>
                         <Route path="/obs" component={Obs}></Route>
                         <Route path="/startgg" component={Startgg}></Route>
+                        <Route path="/slippi" component={Slippi}></Route>
                       </Switch>
                     </Settings>
                   </Route>

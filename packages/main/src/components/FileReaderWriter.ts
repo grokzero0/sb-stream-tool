@@ -1,12 +1,12 @@
 import path from "node:path";
 import { EventStream } from "./observer.js";
 import { app } from "electron";
-import { mkdir } from "node:fs/promises";
-import { existsSync, mkdirSync, writeFile } from "node:fs";
-import { readFile } from "node:fs/promises";
+import { readFile, mkdir } from "node:fs/promises";
 import { Tournament } from "@app/common";
-import fs from "fs-extra";
+import fs, { outputFile } from "fs-extra";
+import { isPlainObject } from "es-toolkit";
 
+// make this less cluttered right now
 export class FileReaderWriter extends EventStream {
   private rootPath: string;
   private configRootPath: string;
@@ -31,176 +31,122 @@ export class FileReaderWriter extends EventStream {
     }
   }
 
+  async serialize(data: any) {
+    if (data === null || data === undefined) {
+      return "";
+    } else if (Array.isArray(data) || isPlainObject(data)) {
+      return JSON.stringify(data);
+    } else if (Buffer.isBuffer(data)) {
+      return data;
+    } else {
+      return String(data);
+    }
+  }
+
+  async write(location: string, data: any) {
+    const serializedData = await this.serialize(data);
+    return outputFile(location, serializedData)
+      .then(() => undefined)
+      .catch((error: Error) => error);
+  }
+
   // writes data to text files
-  writeData(data: Tournament) {
+  async writeData(data: Tournament) {
     const dataPath = path.join(this.resourcesRootPath, "texts");
-    const errors = [] as NodeJS.ErrnoException[];
-    writeFile(`${dataPath}/tournament-name.txt`, data.name, (err) => {
-      if (err) errors.push(err);
-    });
+    const errors = [] as Error[];
 
-    writeFile(`${dataPath}/best-of.txt`, data.bestOf.toString(), (err) => {
-      if (err) errors.push(err);
-    });
-
-    writeFile(`${dataPath}/round-format.txt`, data.roundFormat, (err) => {
-      if (err) errors.push(err);
-    });
-
-    writeFile(
-      `${dataPath}/custom-round-format.txt`,
-      data.customRoundFormat || " ",
-      (err) => {
-        if (err) errors.push(err);
-      },
-    );
-
-    writeFile(
-      `${dataPath}/round-number.txt`,
-      data.roundNumber?.toString() || " ",
-      (err) => {
-        if (err) errors.push(err);
-      },
-    );
+    const setPotentialErrors = await Promise.all([
+      this.write(`${dataPath}/tournament-name.txt`, data.name),
+      this.write(`${dataPath}/best-of.txt`, data.bestOf.toString()),
+      this.write(`${dataPath}/round-format.txt`, data.roundFormat),
+      this.write(`${dataPath}/custom-round-format.txt`, data.customRoundFormat),
+      this.write(`${dataPath}/round-number.txt`, data.roundNumber),
+    ]);
+    errors.push(...setPotentialErrors.filter((e) => e !== undefined));
 
     for (let i = 0; i < data.commentators.length; i++) {
       const commentatorsRootPath = `${dataPath}/commentators/${i + 1}`;
-      if (!existsSync(commentatorsRootPath)) {
-        mkdirSync(commentatorsRootPath, { recursive: true });
-      }
-      writeFile(
-        `${commentatorsRootPath}/name.txt`,
-        data.commentators[i].name,
-        (err) => {
-          if (err) {
-            errors.push(err);
-          }
-        },
-      );
-      writeFile(
-        `${commentatorsRootPath}/twitter.txt`,
-        data.commentators[i].twitter,
-        (err) => {
-          if (err) {
-            errors.push(err);
-          }
-        },
-      );
-      writeFile(
-        `${commentatorsRootPath}/pronouns.txt`,
-        data.commentators[i].pronouns,
-        (err) => {
-          if (err) {
-            errors.push(err);
-          }
-        },
+      const commentatorsPotentialErrors = await Promise.all([
+        this.write(
+          `${commentatorsRootPath}/name.txt`,
+          data.commentators[i].name,
+        ),
+        this.write(
+          `${commentatorsRootPath}/twitter.txt`,
+          data.commentators[i].twitter,
+        ),
+        this.write(
+          `${commentatorsRootPath}/pronouns.txt`,
+          data.commentators[i].pronouns,
+        ),
+      ]);
+      errors.push(
+        ...commentatorsPotentialErrors.filter((e) => e !== undefined),
       );
     }
 
     for (let i = 0; i < data.teams.length; i++) {
       for (let j = 0; j < data.teams[i].players.length; j++) {
         const playerRootPath = `${dataPath}/teams/${i + 1}/players/${j + 1}`;
-        if (!existsSync(playerRootPath)) {
-          mkdirSync(playerRootPath, { recursive: true });
-        }
-        writeFile(
-          `${playerRootPath}/team-name.txt`,
-          data.teams[i].players[j].playerInfo.teamName,
-          (err) => {
-            if (err) {
-              errors.push(err);
-            }
-          },
-        );
-        writeFile(
-          `${playerRootPath}/player-tag.txt`,
-          data.teams[i].players[j].playerInfo.playerTag,
-          (err) => {
-            if (err) {
-              errors.push(err);
-            }
-          },
-        );
-        writeFile(
-          `${playerRootPath}/pronouns.txt`,
-          data.teams[i].players[j].playerInfo.pronouns,
-          (err) => {
-            if (err) {
-              errors.push(err);
-            }
-          },
-        );
-        writeFile(
-          `${playerRootPath}/twitter.txt`,
-          data.teams[i].players[j].playerInfo.twitter,
-          (err) => {
-            if (err) {
-              errors.push(err);
-            }
-          },
-        );
-        writeFile(
-          `${playerRootPath}/character.txt`,
-          data.teams[i].players[j].gameInfo.character,
-          (err) => {
-            if (err) {
-              errors.push(err);
-            }
-          },
-        );
-        writeFile(
-          `${playerRootPath}/alt-costume.txt`,
-          data.teams[i].players[j].gameInfo.altCostume,
-          (err) => {
-            if (err) {
-              errors.push(err);
-            }
-          },
-        );
+        const playerPotentialErrors = await Promise.all([
+          this.write(
+            `${playerRootPath}/team-name.txt`,
+            data.teams[i].players[j].playerInfo.teamName,
+          ),
+          this.write(
+            `${playerRootPath}/player-tag.txt`,
+            data.teams[i].players[j].playerInfo.playerTag,
+          ),
+          this.write(
+            `${playerRootPath}/pronouns.txt`,
+            data.teams[i].players[j].playerInfo.pronouns,
+          ),
+          this.write(
+            `${playerRootPath}/twitter.txt`,
+            data.teams[i].players[j].playerInfo.twitter,
+          ),
+          this.write(
+            `${playerRootPath}/character.txt`,
+            data.teams[i].players[j].gameInfo.character,
+          ),
+          this.write(
+            `${playerRootPath}/alt-costume.txt`,
+            data.teams[i].players[j].gameInfo.altCostume,
+          ),
+        ]);
+        errors.push(...playerPotentialErrors.filter((e) => e !== undefined));
       }
-      const teamRootPath = `${dataPath}/teams/${i + 1}`;
-      writeFile(`${teamRootPath}/name.txt`, data.teams[i].name, (err) => {
-        if (err) {
-          errors.push(err);
-        }
-      });
-      writeFile(
-        `${teamRootPath}/score.txt`,
-        data.teams[i].score.toString(),
-        (err) => {
-          if (err) {
-            errors.push(err);
-          }
-        },
-      );
-      writeFile(
-        `${teamRootPath}/in-losers.txt`,
-        data.teams[i].inLosers ? "[L]" : "",
-        (err) => {
-          if (err) {
-            errors.push(err);
-          }
-        },
-      );
 
-      if (errors.length > 0) {
-        for (const error of errors) {
-          this.notify(error.message);
-        }
-        this.notify(`${errors.length} errors found`);
-      } else {
-        this.notify("Data successfully saved to files!");
+      const teamRootPath = `${dataPath}/teams/${i + 1}`;
+      const teamPotentialErrors = await Promise.all([
+        this.write(`${teamRootPath}/name.txt`, data.teams[i].name),
+        this.write(`${teamRootPath}/score.txt`, data.teams[i].score),
+        this.write(
+          `${teamRootPath}/in-losers.txt`,
+          data.teams[i].inLosers ? "[L]" : "",
+        ),
+      ]);
+      errors.push(...teamPotentialErrors.filter((e) => e !== undefined));
+    }
+
+    if (errors.length > 0) {
+      for (const error of errors) {
+        this.notify(error.message);
       }
+      this.notify(`${errors.length} errors found`);
+    } else {
+      this.notify("Data successfully saved to files!");
     }
   }
 
   async writeApiKey(newApiKey: string) {
-    writeFile(`${this.configRootPath}/api_key.txt`, newApiKey, (err) => {
-      if (err) {
-        this.notify(err.message);
-        return;
-      }
-    });
+    const error = await this.write(
+      `${this.configRootPath}/api_key.txt`,
+      newApiKey,
+    );
+    if (error !== undefined) {
+      return this.notify(error.message);
+    }
     this.notify("Successfully saved API key!");
   }
 
