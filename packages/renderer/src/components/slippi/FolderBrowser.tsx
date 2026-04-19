@@ -1,13 +1,15 @@
 import { useSettingsStore } from "@renderer/zustand/store";
 import { Button } from "../ui/button";
 import { send } from "@app/preload";
+import { useState } from "react";
 
 function FolderBrowser({ disabled }: { disabled: boolean }) {
   const savedDirectory = useSettingsStore((state) => state.directory);
   const update = useSettingsStore((state) => state.updateDirectory);
+  const [directory, setDirectory] = useState(savedDirectory);
 
   return (
-    <div className="flex items-center flex-col gap-4  border-2 border-cyan-200 rounded-sm p-4 w-full">
+    <div className="flex items-center flex-col gap-4 border-t-2 p-4 w-full">
       <div className="flex flex-col gap-2">
         <h1 className="text-center font-semibold text-xl">
           Connect to relay manually
@@ -26,17 +28,13 @@ function FolderBrowser({ disabled }: { disabled: boolean }) {
               disabled={disabled}
               onClick={() => {
                 send("file:openDialog")
-                  .then((directory) => update(directory))
+                  .then((directory) => setDirectory(directory))
                   .catch((reason) => console.log(reason));
               }}
             >
               Browse
             </Button>
-            <h1>
-              {savedDirectory === ""
-                ? "No directory selected."
-                : savedDirectory}
-            </h1>
+            <h1>{directory === "" ? "No directory selected." : directory}</h1>
           </div>
         </div>
         <div className="flex gap-2 w-full justify-center">
@@ -44,11 +42,12 @@ function FolderBrowser({ disabled }: { disabled: boolean }) {
             disabled={disabled}
             type="button"
             // className="w-full"
-            onClick={() =>
+            onClick={() => {
+              update(directory);
               send("slippi:readFolder", savedDirectory).catch((reason) =>
                 console.log(reason),
-              )
-            }
+              );
+            }}
           >
             Save and start reading
           </Button>

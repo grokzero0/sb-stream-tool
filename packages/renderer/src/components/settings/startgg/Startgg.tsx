@@ -41,7 +41,16 @@ function Startgg() {
             onChange={(e) => setApiKey(e.currentTarget.value)}
           />
         </div>
-        <Button className="w-full mt-2">Submit</Button>
+        <div className="flex flex-col gap-1">
+          <Button className="w-full mt-2">Submit</Button>
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => setApiKey("")}
+          >
+            Clear
+          </Button>
+        </div>
       </form>
     </div>
   );
