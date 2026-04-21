@@ -115,7 +115,7 @@ export class SlippiRelayHandler extends EventStream {
     if (settings.isTeams) {
       const teamStocks = playerResults.reduce(
         (acc: Record<number, number>, currentPlayer) => {
-          if (!currentPlayer.teamId) {
+          if (currentPlayer.teamId === undefined) {
             return acc;
           }
           acc[currentPlayer.teamId] =
@@ -128,7 +128,15 @@ export class SlippiRelayHandler extends EventStream {
         (a: string, b: string) =>
           teamStocks[Number(a)] > teamStocks[Number(b)] ? a : b,
       );
-      return { isTeams: true, winner: parseInt(teamWinnerId) ?? -1 };
+      return {
+        isTeams: true,
+        winners: playerResults.reduce((acc: number[], curr) => {
+          if (curr.teamId === (parseInt(teamWinnerId) ?? -1)) {
+            acc.push(curr.playerIndex);
+          }
+          return acc;
+        }, []),
+      };
     }
 
     const playerWinnerId = playerResults.sort((a, b) => {
@@ -136,7 +144,7 @@ export class SlippiRelayHandler extends EventStream {
       return a.percent - b.percent;
     })[0].playerIndex;
 
-    return { isTeams: false, winner: playerWinnerId };
+    return { isTeams: false, winners: [playerWinnerId] };
   }
   private getStartGameData(settings: GameStartType): SlippiGameData {
     const playerData = [] as SlippiPlayer[][];
@@ -160,10 +168,11 @@ export class SlippiRelayHandler extends EventStream {
       }
     } else {
       const teamIdsToArrayIndex = new Map<number, number>(); // map each team id to the array index for easy setting
+      // console.log(settings.players);
       for (const player of settings.players) {
-        if (player.teamId) {
-          if (!teamIdsToArrayIndex.get(player.teamId)) {
-            teamIdsToArrayIndex.set(player.teamId, playerData.length - 1);
+        if (player.teamId !== undefined) {
+          if (teamIdsToArrayIndex.get(player.teamId) === undefined) {
+            teamIdsToArrayIndex.set(player.teamId, playerData.length);
             playerData.push([
               {
                 character: characterUtils.getCharacterName(
@@ -180,7 +189,7 @@ export class SlippiRelayHandler extends EventStream {
             ]);
           } else {
             let index = teamIdsToArrayIndex.get(player.teamId);
-            if (index && index < playerData.length) {
+            if (index !== undefined && index < playerData.length) {
               playerData[index].push({
                 character: characterUtils.getCharacterName(
                   player.characterId as number,
@@ -198,6 +207,7 @@ export class SlippiRelayHandler extends EventStream {
         }
       }
     }
+    // console.log(`end = ${playerData}`);
     return { isTeams: isTeams ?? false, players: playerData };
   }
 
@@ -231,7 +241,7 @@ export class SlippiRelayHandler extends EventStream {
       if (!gameState?.settings && settings) {
         // a new game has ACTUALLY started, since the settings portion didn't exist before and there are new settings
         const newData = this.getStartGameData(settings);
-        console.log(settings);
+        // console.log(settings);
         this.browserWindow?.webContents.send(
           "slippi:new-game-start-data",
           newData,
@@ -243,26 +253,33 @@ export class SlippiRelayHandler extends EventStream {
         this.games.set(path, game);
       }
       if (gameEnd) {
-        if (
-          this.isActualGame(
+        console.log(
+          `gameEnd, ${this.isActualGame(
             metadata,
             gameEnd,
             game?.gameDataController.getStats(),
-          )
-        ) {
-          const winner = this.getWinner(
-            settings,
-            game?.gameDataController.getLatestFrame(),
-            gameEnd,
+          )}`,
+        );
+        // if (
+        //   this.isActualGame(
+        //     metadata,
+        //     gameEnd,
+        //     game?.gameDataController.getStats(),
+        //   )
+        // ) {
+        const winner = this.getWinner(
+          settings,
+          game?.gameDataController.getLatestFrame(),
+          gameEnd,
+        );
+        if (winner) {
+          this.browserWindow?.webContents.send(
+            "slippi:new-game-end-data",
+            winner,
           );
-          if (winner) {
-            this.browserWindow?.webContents.send(
-              "slippi:new-game-end-data",
-              winner,
-            );
-          }
-          console.log(winner);
         }
+        console.log(winner);
+        // }
       }
     });
   }

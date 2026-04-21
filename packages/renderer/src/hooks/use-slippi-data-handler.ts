@@ -1,8 +1,8 @@
 import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "./use-player-form-field-array-context";
-import { useSettingsStore } from "@renderer/zustand/store";
-import { useEffect, useRef } from "react";
+// import { useSettingsStore } from "@renderer/zustand/store";
+import { useEffect } from "react";
 import {
   clearAllListeners,
   onNewSlippiGameData,
@@ -18,11 +18,13 @@ import {
 export function useSlippiDataHandler() {
   const { setValue, getValues } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
-  const slippiPlayers = useSettingsStore((state) => state.players);
-  const setSlippiPlayers = useSettingsStore((state) => state.setPlayers);
+  // const slippiPlayers = useSettingsStore((state) => state.players);
+  // const setSlippiPlayers = useSettingsStore((state) => state.setPlayers);
   useEffect(() => {
     onNewSlippiGameData((data) => {
-      setSlippiPlayers(data.players);
+      console.log("onNewSlippiData");
+      // setSlippiPlayers(data.players);
+      console.log(data.players);
       if (data.isTeams) {
         changeSetFormat("Doubles", teams);
         setValue("setFormat", "Doubles");
@@ -44,15 +46,33 @@ export function useSlippiDataHandler() {
       );
     });
     return () => clearAllListeners("slippi:new-game-start-data");
-  }, []);
+  }, [getValues, setValue, teams]);
 
   useEffect(() => {
     onNewSlippiGameEndData((winner) => {
+      console.log("onEndData");
       const winnerIndex = findSlippiWinner(
-        slippiPlayers,
-        winner.isTeams,
-        winner.winner,
+        winner.winners as number[],
+        getValues,
       );
+      console.log(`winnerIndex = ${winnerIndex}, winners = ${winner.winners}`);
+      const bestOf = getValues("bestOf");
+      const scoreToBeat =
+        bestOf % 2 === 0 ? bestOf / 2 + 1 : Math.ceil(bestOf / 2);
+      if (winnerIndex !== undefined) {
+        const newScore = getValues(`teams.${winnerIndex}.score`) + 1;
+        setValue(`teams.${winnerIndex}.score`, newScore);
+        if (newScore >= scoreToBeat) {
+          send("obs/play-set-end-scenes").catch((reason) =>
+            console.log(reason),
+          );
+        } else {
+          send("obs/play-game-end-scenes").catch((reason) =>
+            console.log(reason),
+          );
+        }
+      }
     });
-  });
+    return () => clearAllListeners("slippi:new-game-end-data");
+  }, [getValues, setValue]);
 }

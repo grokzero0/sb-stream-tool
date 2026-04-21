@@ -28,7 +28,7 @@ export type SlippiGameData = {
 
 export type SlippiGameEndData = {
   isTeams: boolean;
-  winner: number; // if teams, output team winner number, otherwise player winner number
+  winners: number[]; // all the winners' playerindexes
 };
 
 export type Player = {

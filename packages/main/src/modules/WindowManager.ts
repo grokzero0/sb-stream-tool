@@ -69,6 +69,8 @@ class WindowManager implements AppModule {
       icon: join(import.meta.dirname, "..", "src", "assets", "icon.ico"),
     });
 
+    this.slippi.setBrowserWindow(browserWindow);
+
     const toast = new ToastMessageCommunicator(browserWindow);
     this.obs.attach(toast);
     this.dataFileManager.attach(toast);
