@@ -11,6 +11,7 @@ import { ClientToServerEvents, ServerToClientEvents } from "../types.js";
 import { SocketioServer } from "../components/SocketioServer.js";
 import { ToastMessageCommunicator } from "../components/ToastMessageCommunication.js";
 import { ipcSetup } from "../Ipc.js";
+import { SlippiRelayHandler } from "../components/SlippiRelayHandler.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
@@ -21,6 +22,7 @@ class WindowManager implements AppModule {
   private dataFileManager: FileReaderWriter;
   private websocketServer: SocketioServer;
   private mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>;
+  private slippi: SlippiRelayHandler;
 
   constructor({
     initConfig,
@@ -37,6 +39,7 @@ class WindowManager implements AppModule {
     this.dataFileManager = new FileReaderWriter();
     this.websocketServer = new SocketioServer();
     this.mainSocket = io("http://localhost:20242");
+    this.slippi = new SlippiRelayHandler();
   }
 
   async enable({ app }: ModuleContext): Promise<void> {
@@ -46,7 +49,7 @@ class WindowManager implements AppModule {
 
     await app.whenReady();
 
-    ipcSetup(this.mainSocket, this.obs, this.dataFileManager);
+    ipcSetup(this.mainSocket, this.obs, this.dataFileManager, this.slippi);
 
     await this.restoreOrCreateWindow(true);
     app.on("second-instance", () => this.restoreOrCreateWindow(true));
@@ -70,6 +73,7 @@ class WindowManager implements AppModule {
     this.obs.attach(toast);
     this.dataFileManager.attach(toast);
     this.websocketServer.attach(toast);
+    this.slippi.attach(toast);
 
     const menu = buildMenu(browserWindow, this.obs);
     Menu.setApplicationMenu(menu);

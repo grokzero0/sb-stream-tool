@@ -44,7 +44,7 @@ function FolderBrowser({ disabled }: { disabled: boolean }) {
             // className="w-full"
             onClick={() => {
               update(directory);
-              send("slippi:readFolder", savedDirectory).catch((reason) =>
+              send("slippi:readFolder", directory).catch((reason) =>
                 console.log(reason),
               );
             }}

@@ -1,4 +1,13 @@
 import { Tournament } from "@app/common";
+import { GameStartType, SlippiGame } from "@slippi/slippi-js/node";
+
+export type SlippiSettingsData = {
+  gameDataController: SlippiGame;
+  state: {
+    // perhaps extended upon in the future to include punishes, for example, etc
+    settings: GameStartType | undefined;
+  };
+};
 
 export type ObsScene = {
   scene: string;

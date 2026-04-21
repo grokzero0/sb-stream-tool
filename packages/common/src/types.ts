@@ -25,6 +25,11 @@ export type SlippiGameData = {
   players: SlippiPlayer[][];
 };
 
+export type SlippiGameEndData = {
+  isTeams: boolean;
+  winner: number;
+};
+
 export type Player = {
   playerInfo: PlayerInfo;
   gameInfo: GameInfo;

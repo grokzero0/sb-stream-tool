@@ -28,6 +28,9 @@ export default /**
   plugins: [
     handleHotReload(),
   ],
+  ssr: {
+    noExternal: ['@slippi/slippi-js']
+  }
 });
 
 
