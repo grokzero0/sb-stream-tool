@@ -30,7 +30,15 @@ export function useSlippiDataHandler() {
         setValue("setFormat", "Singles");
       }
       for (let i = 0; i < getValues("teams").length; i++) {
-        for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
+        for (
+          let j = 0;
+          j <
+          Math.min(
+            getValues(`teams.${i}.players`).length,
+            data.players[i].length, // you can have 1 player on one team and 3 players on another, can't handle that right now in frontend, will do in a future update
+          );
+          j++
+        ) {
           setValue(`teams.${i}.players.${j}.gameInfo`, {
             character: data.players[i][j].character,
             altCostume: data.players[i][j].color,
@@ -47,10 +55,7 @@ export function useSlippiDataHandler() {
 
   useEffect(() => {
     onNewSlippiGameEndData((winner) => {
-      const winnerIndex = findSlippiWinner(
-        winner.winners as number[],
-        getValues,
-      );
+      const winnerIndex = findSlippiWinner(winner.winners, getValues);
       const bestOf = getValues("bestOf");
       const scoreToBeat =
         bestOf % 2 === 0 ? bestOf / 2 + 1 : Math.ceil(bestOf / 2);

@@ -72,7 +72,6 @@ export class SlippiRelayHandler extends EventStream {
     });
 
     this.read();
-    console.log(listenPath);
     this.notify("Slippi Relay", "Started Relay");
   }
 
@@ -87,7 +86,6 @@ export class SlippiRelayHandler extends EventStream {
 
     const allDamageDealt = stats.overall.map((s) => s.totalDamage);
     const totalDamage = allDamageDealt.reduce((a, b) => a + b, 0);
-
     if (totalDamage > 100) return true;
 
     // lras = LT + RT + A + START
@@ -188,7 +186,11 @@ export class SlippiRelayHandler extends EventStream {
             ]);
           } else {
             let index = teamIdsToArrayIndex.get(player.teamId);
-            if (index !== undefined && index < playerData.length) {
+            if (
+              index !== undefined &&
+              index < playerData.length &&
+              playerData[index].length <= 2 // <=2 because you can have 1 player on one team and 3 players on another, can't handle that right now in frontend, will do in a future update
+            ) {
               playerData[index].push({
                 character: characterUtils.getCharacterName(
                   player.characterId as number,
@@ -214,7 +216,7 @@ export class SlippiRelayHandler extends EventStream {
       let gameState: SlippiSettingsData["state"] | undefined,
         settings: GameStartType | undefined,
         gameEnd: GameEndType | undefined,
-        metadata: MetadataType | undefined,
+        // metadata: MetadataType | undefined,
         game: SlippiSettingsData | undefined;
       try {
         if (!this.games.get(path)?.gameDataController) {
@@ -251,7 +253,7 @@ export class SlippiRelayHandler extends EventStream {
       if (gameEnd !== undefined) {
         if (
           this.isActualGame(
-            metadata,
+            game?.gameDataController.getMetadata(),
             gameEnd,
             game?.gameDataController.getStats(),
           )
