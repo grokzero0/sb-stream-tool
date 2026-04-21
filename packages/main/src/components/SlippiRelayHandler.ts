@@ -230,10 +230,12 @@ export class SlippiRelayHandler extends EventStream {
         // a new game has ACTUALLY started, since the settings portion didn't exist before and there are new settings
         newData = this.getStartGameData(settings);
         console.log(settings);
-        this.browserWindow?.webContents.send(
-          "slippi:new-game-start-data",
-          newData,
-        );
+        if (newData) {
+          this.browserWindow?.webContents.send(
+            "slippi:new-game-start-data",
+            newData,
+          );
+        }
       }
       game = this.games.get(path);
       if (game?.state) {
