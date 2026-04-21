@@ -225,17 +225,14 @@ export class SlippiRelayHandler extends EventStream {
         this.notify("Slippi Relay Error");
         return;
       }
-      let newData: SlippiGameData | undefined;
       if (!gameState?.settings && settings) {
         // a new game has ACTUALLY started, since the settings portion didn't exist before and there are new settings
-        newData = this.getStartGameData(settings);
+        const newData = this.getStartGameData(settings);
         console.log(settings);
-        if (newData) {
-          this.browserWindow?.webContents.send(
-            "slippi:new-game-start-data",
-            newData,
-          );
-        }
+        this.browserWindow?.webContents.send(
+          "slippi:new-game-start-data",
+          newData,
+        );
       }
       game = this.games.get(path);
       if (game?.state) {
