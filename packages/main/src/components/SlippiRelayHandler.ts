@@ -154,6 +154,7 @@ export class SlippiRelayHandler extends EventStream {
             ),
             playerId: player.playerIndex,
             port: player.port,
+            teamId: player.teamId as number,
           },
         ]);
       }
@@ -174,6 +175,7 @@ export class SlippiRelayHandler extends EventStream {
                 ),
                 playerId: player.playerIndex,
                 port: player.port,
+                teamId: player.teamId,
               },
             ]);
           } else {
@@ -189,6 +191,7 @@ export class SlippiRelayHandler extends EventStream {
                 ),
                 playerId: player.playerIndex,
                 port: player.port,
+                teamId: player.teamId,
               });
             }
           }

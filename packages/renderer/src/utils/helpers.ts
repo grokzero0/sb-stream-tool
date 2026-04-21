@@ -239,3 +239,19 @@ export function findTeamWinner(
   }
   return -1;
 }
+
+export function findSlippiWinner(
+  teams: SlippiPlayer[][], // always guaranteed to be of at least size 1 per array index, but still handled in the method just in case
+  isTeams: boolean,
+  winner: number,
+) {
+  for (let i = 0; i < teams.length; i++) {
+    if (isTeams && teams[i].length > 0 && teams[i][0].playerId === winner) {
+      return i;
+    }
+    if (!isTeams && teams[i].length > 0 && teams[i][0].teamId === winner) {
+      return i;
+    }
+  }
+  return -1; // theoretically not possible
+}

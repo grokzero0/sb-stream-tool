@@ -18,6 +18,7 @@ export type SlippiPlayer = {
   color: string;
   playerId: number;
   port: number;
+  teamId: number;
 };
 
 export type SlippiGameData = {
