@@ -1,30 +1,39 @@
 import pkg from './package.json' with {type: 'json'};
 import mapWorkspaces from '@npmcli/map-workspaces';
-import {join} from 'node:path';
-import {pathToFileURL} from 'node:url';
+import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 export default /** @type import('electron-builder').Configuration */
-({
-  directories: {
-    output: 'dist',
-    buildResources: 'buildResources',
-  },
-  generateUpdatesFilesForAllChannels: true,
-  linux: {
-    target: ['deb'],
-  },
-  /**
-   * It is recommended to avoid using non-standard characters such as spaces in artifact names,
-   * as they can unpredictably change during deployment, making them impossible to locate and download for update.
-   */
-  artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
-  files: [
-    'LICENSE*',
-    pkg.main,
-    '!node_modules/@app/**',
-    ...await getListOfFilesFromEachWorkspace(),
-  ],
-});
+  ({
+    directories: {
+      output: 'dist',
+      buildResources: 'buildResources',
+    },
+    generateUpdatesFilesForAllChannels: true,
+    linux: {
+      target: ['AppImage', 'tar.xz'],
+    },
+    win: {
+      executableName: "sb-stream-tool",
+      target: ['portable', 'tar.xz']
+    },
+    extraResources: [
+      { from: './assets/characters', to: './characters' },
+      { from: './assets/overlay', to: './overlay' }
+    ],
+    publish: ['github'],
+    /**
+     * It is recommended to avoid using non-standard characters such as spaces in artifact names,
+     * as they can unpredictably change during deployment, making them impossible to locate and download for update.
+     */
+    artifactName: '${productName}-${version}-${os}-${arch}.${ext}',
+    files: [
+      'LICENSE*',
+      pkg.main,
+      '!node_modules/@app/**',
+      ...await getListOfFilesFromEachWorkspace(),
+    ],
+  });
 
 /**
  * By default, electron-builder copies each package into the output compilation entirety,
@@ -98,7 +107,7 @@ async function getListOfFilesFromEachWorkspace() {
 
   for (const [name, path] of workspaces) {
     const pkgPath = join(path, 'package.json');
-    const {default: workspacePkg} = await import(pathToFileURL(pkgPath), {with: {type: 'json'}});
+    const { default: workspacePkg } = await import(pathToFileURL(pkgPath), { with: { type: 'json' } });
 
     let patterns = workspacePkg.files || ['dist/**', 'package.json'];
 
