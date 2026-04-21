@@ -269,12 +269,9 @@ export function findSlippiWinner(
   if (winners.length > 0) {
     for (let i = 0; i < getValues("teams").length; i++) {
       for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
-        console.log(
-          `${colorToPort[getValues(`teams.${i}.players.${j}.gameInfo.port`)]}, ${winners[0] + 1}`,
-        );
         if (
           colorToPort[getValues(`teams.${i}.players.${j}.gameInfo.port`)] ===
-          winners[0] + 1 // always gonna have at least 1 winner, so why not compare it with the first one?
+          winners[0] + 1 // always gonna have at least 1 winner, so why not compare it with the first winner player index since its always guaranteed to exist?
         ) {
           return i;
         }

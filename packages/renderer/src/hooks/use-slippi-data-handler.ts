@@ -22,9 +22,6 @@ export function useSlippiDataHandler() {
   // const setSlippiPlayers = useSettingsStore((state) => state.setPlayers);
   useEffect(() => {
     onNewSlippiGameData((data) => {
-      console.log("onNewSlippiData");
-      // setSlippiPlayers(data.players);
-      console.log(data.players);
       if (data.isTeams) {
         changeSetFormat("Doubles", teams);
         setValue("setFormat", "Doubles");
@@ -50,12 +47,10 @@ export function useSlippiDataHandler() {
 
   useEffect(() => {
     onNewSlippiGameEndData((winner) => {
-      console.log("onEndData");
       const winnerIndex = findSlippiWinner(
         winner.winners as number[],
         getValues,
       );
-      console.log(`winnerIndex = ${winnerIndex}, winners = ${winner.winners}`);
       const bestOf = getValues("bestOf");
       const scoreToBeat =
         bestOf % 2 === 0 ? bestOf / 2 + 1 : Math.ceil(bestOf / 2);

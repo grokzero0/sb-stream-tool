@@ -167,8 +167,7 @@ export class SlippiRelayHandler extends EventStream {
         ]);
       }
     } else {
-      const teamIdsToArrayIndex = new Map<number, number>(); // map each team id to the array index for easy setting
-      // console.log(settings.players);
+      const teamIdsToArrayIndex = new Map<number, number>(); // map each team id to the array index for easy lookups
       for (const player of settings.players) {
         if (player.teamId !== undefined) {
           if (teamIdsToArrayIndex.get(player.teamId) === undefined) {
@@ -207,7 +206,6 @@ export class SlippiRelayHandler extends EventStream {
         }
       }
     }
-    // console.log(`end = ${playerData}`);
     return { isTeams: isTeams ?? false, players: playerData };
   }
 
@@ -220,7 +218,6 @@ export class SlippiRelayHandler extends EventStream {
         game: SlippiSettingsData | undefined;
       try {
         if (!this.games.get(path)?.gameDataController) {
-          console.log("path");
           // new file detected, but this doesn't necessarily mean a new game has started (possibly could be a delay between actual game starting and the file being created)
           this.games.set(path, {
             gameDataController: new SlippiGame(path, { processOnTheFly: true }),
@@ -241,7 +238,6 @@ export class SlippiRelayHandler extends EventStream {
       if (!gameState?.settings && settings) {
         // a new game has ACTUALLY started, since the settings portion didn't exist before and there are new settings
         const newData = this.getStartGameData(settings);
-        // console.log(settings);
         this.browserWindow?.webContents.send(
           "slippi:new-game-start-data",
           newData,
@@ -252,34 +248,29 @@ export class SlippiRelayHandler extends EventStream {
         game.state.settings = settings;
         this.games.set(path, game);
       }
-      if (gameEnd) {
-        console.log(
-          `gameEnd, ${this.isActualGame(
+      if (gameEnd !== undefined) {
+        if (
+          this.isActualGame(
             metadata,
             gameEnd,
             game?.gameDataController.getStats(),
-          )}`,
-        );
-        // if (
-        //   this.isActualGame(
-        //     metadata,
-        //     gameEnd,
-        //     game?.gameDataController.getStats(),
-        //   )
-        // ) {
-        const winner = this.getWinner(
-          settings,
-          game?.gameDataController.getLatestFrame(),
-          gameEnd,
-        );
-        if (winner) {
-          this.browserWindow?.webContents.send(
-            "slippi:new-game-end-data",
-            winner,
+          )
+        ) {
+          const winner = this.getWinner(
+            settings,
+            game?.gameDataController.getLatestFrame(),
+            gameEnd,
           );
+          if (winner !== undefined) {
+            this.browserWindow?.webContents.send(
+              "slippi:new-game-end-data",
+              winner,
+            );
+            console.log(
+              `winners = ${winner.winners}, isTeam = ${winner.isTeams}`,
+            );
+          }
         }
-        console.log(winner);
-        // }
       }
     });
   }
