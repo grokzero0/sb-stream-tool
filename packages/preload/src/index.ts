@@ -1,6 +1,6 @@
 // import { sha256sum } from "./nodeCrypto.js";
 // import { versions } from "./versions.js";
-import { SlippiGameData, Tournament } from "@app/common";
+import { SlippiGameData, SlippiGameEndData, Tournament } from "@app/common";
 import { ipcRenderer } from "electron";
 
 function send(channel: string, ...args: any[]) {
@@ -33,9 +33,7 @@ function onNewSlippiGameData(callback: (data: SlippiGameData) => void) {
   );
 }
 
-function onNewSlippiGameEndData(
-  callback: (winner: { isTeams: boolean; winner: number }) => void,
-) {
+function onNewSlippiGameEndData(callback: (winner: SlippiGameEndData) => void) {
   ipcRenderer.on("slippi:new-game-end-data", (_event, winner) =>
     callback(winner),
   );
