@@ -18,7 +18,7 @@
   },
   "scripts": {
     "build": "npm run build -ws --if-present",
-    "publish": "npm run compile && electron-builder --publish --config electron-builder.mjs",
+    "publish": "npm run compile && electron-builder --publish onTagOrDraft --config electron-builder.mjs",
     "compile": "npm run build && electron-builder build --config electron-builder.mjs",
     "test": "npx playwright test ./tests/e2e.spec.ts",
     "start": "node packages/dev-mode.js",
