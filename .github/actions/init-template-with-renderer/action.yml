@@ -1,11 +1,11 @@
 name: Setup boilerplate
 inputs:
   renderer-template:
-    description: Define what vite template should be used to create renderer in case if renderer package doesn't exist
+    description: "Define what vite template should be used to create renderer in case if renderer package doesn't exist"
     required: false
     default: ''
 
-
+description: "Define what vite template should be used to create renderer in case if renderer package doesn't exist"
 runs:
   using: "composite"
   steps:
