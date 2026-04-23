@@ -9,7 +9,7 @@ export const TournamentDefaultValues: Tournament = {
   setFormat: "Singles",
   teams: [
     {
-      name: "",
+      name: "Team 1",
       score: 0,
       inLosers: false,
       players: [
@@ -29,7 +29,7 @@ export const TournamentDefaultValues: Tournament = {
       ],
     },
     {
-      name: "",
+      name: "Team 2",
       score: 0,
       inLosers: false,
       players: [

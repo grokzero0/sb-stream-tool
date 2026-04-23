@@ -9,6 +9,8 @@ import { Spinbox } from "./ui/spinbox";
 import { Toggle } from "./ui/toggle";
 import { Badge } from "lucide-react";
 import Player from "./Player";
+import { Input } from "./ui/input";
+// import { useRef } from "react";
 
 function Teams() {
   const { setValue } = useFormContext<Tournament>();
@@ -16,6 +18,7 @@ function Teams() {
   const { fields, swap } = useFieldArray<Tournament>({ name: "teams" });
   const swapCharacters = useSettingsStore((state) => state.swap);
   const players = usePlayerFormFieldArrayContext();
+  // const teamPanelRefs = useRef<HTMLDivElement[]>([]);
 
   return (
     <>
@@ -44,9 +47,20 @@ function Teams() {
       <div className="flex gap-1">
         {fields.map((team, teamNum) => (
           <div key={team.id} className="p-1 w-full">
-            <h5 className="text-center font-semibold text-lg">
-              Team {teamNum + 1}
-            </h5>
+            <Controller
+              name={`teams.${teamNum}.name`}
+              render={({ field, fieldState }) => (
+                <Field data-invalid={fieldState.invalid} className="w-full py-2">
+                  <Input
+                    className="text-center"
+                    {...field}
+                    aria-invalid={fieldState.invalid}
+                    id={`${teamNum}-name`}
+                  />
+                </Field>
+              )}
+            />
+
             <div className="flex items-end justify-evenly gap-2 pb-2">
               <Controller
                 name={`teams.${teamNum}.score`}
