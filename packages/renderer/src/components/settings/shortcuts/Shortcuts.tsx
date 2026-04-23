@@ -69,7 +69,7 @@ function Shortcuts() {
       <Button
         type="button"
         onClick={() => {
-          setKeybinds(savedShortcuts);
+          setKeybinds(new Map(savedShortcuts));
           sendToastMessage(
             "Keybinds",
             "Keybinds successfully reset to default!",
