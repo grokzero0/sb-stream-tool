@@ -158,6 +158,30 @@ export class FileReaderWriter extends EventStream {
       });
   }
 
+  async getSlippiSettings() {
+    return readFile(`${this.configRootPath}/slippi.json`, "utf-8")
+      .then((data) => JSON.parse(data))
+      .catch(() => {
+        return undefined;
+      });
+  }
+
+  async getShortcuts() {
+    return readFile(`${this.configRootPath}/shortcuts.json`, "utf-8")
+      .then((data) => JSON.parse(data))
+      .catch(() => {
+        return undefined;
+      });
+  }
+
+  async getObsSettings() {
+    return readFile(`${this.configRootPath}/obs.json`, "utf-8")
+      .then((data) => JSON.parse(data))
+      .catch(() => {
+        return undefined;
+      });
+  }
+
   async createDirs() {
     // console.log(path.join(this.resourcesRootPath, "overlay"));
     fs.copy(
