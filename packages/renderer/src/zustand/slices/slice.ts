@@ -1,5 +1,5 @@
-import { EventSlice } from "./eventSlice";
-import { KeybindsSlice } from "./keybindsSlice";
+import { type EventSlice } from "./eventSlice";
+import { type ShortcutsSlice } from "./shortcutsSlice";
 import { type ObsScenesSlice } from "./obsScenesSlice";
 import { type ObsWebsocketSlice } from "./obsWebsocketSlice";
 import { type SlippiSlice } from "./slippiSlice";
@@ -10,4 +10,4 @@ export type StoreSliceType = ObsScenesSlice &
   SlippiSlice &
   ObsWebsocketSlice &
   EventSlice &
-  KeybindsSlice;
+  ShortcutsSlice;

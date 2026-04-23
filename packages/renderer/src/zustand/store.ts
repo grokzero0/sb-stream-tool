@@ -8,7 +8,10 @@ import { createSlippiSlice } from "./slices/slippiSlice";
 import { createObsWebsocketSlice } from "./slices/obsWebsocketSlice";
 import { send } from "@app/preload";
 import { createEventSlice } from "./slices/eventSlice";
-import { createKeybindsSlice } from "./slices/keybindsSlice";
+import { createShortcutsSlice } from "./slices/shortcutsSlice";
+import { enableMapSet } from "immer";
+
+enableMapSet();
 
 export const useSettingsStore = create<StoreSliceType>()(
   subscribeWithSelector(
@@ -18,7 +21,7 @@ export const useSettingsStore = create<StoreSliceType>()(
       ...createSlippiSlice(...a),
       ...createObsWebsocketSlice(...a),
       ...createEventSlice(...a),
-      ...createKeybindsSlice(...a),
+      ...createShortcutsSlice(...a),
     })),
   ),
 );

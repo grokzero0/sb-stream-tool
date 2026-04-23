@@ -22,10 +22,10 @@ function Team({ teamNum }: { teamNum: number }) {
   const teamPanelRef = useRef<HTMLDivElement>(null);
 
   const scoreIncreaseHotkey = useSettingsStore(
-    (state) => state.keybinds.get("score-up") ?? "ArrowUp",
+    (state) => state.shortcuts.get("score-up") ?? "ArrowUp",
   );
   const scoreDecreaseHotkey = useSettingsStore(
-    (state) => state.keybinds.get("score-down") ?? "ArrowDown",
+    (state) => state.shortcuts.get("score-down") ?? "ArrowDown",
   );
 
   useHotkey(

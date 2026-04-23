@@ -10,8 +10,9 @@ import { useSettingsStore } from "@renderer/zustand/store";
 function Settings({ children }: { children: ReactNode }) {
   const [location, navigate] = useLocation();
   const homeHotkey = useSettingsStore(
-    (state) => state.keybinds.get("home") ?? "Escape",
+    (state) => state.shortcuts.get("home") ?? "Escape",
   );
+  console.log("homeHotkey: " + homeHotkey);
   console.log(location);
 
   useHotkey(homeHotkey, () => navigate("~"));

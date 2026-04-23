@@ -1,4 +1,4 @@
-import { Gamepad2, Video, Webhook } from "lucide-react";
+import { Gamepad2, Keyboard, Video, Webhook } from "lucide-react";
 import {
   Sidebar,
   SidebarContent,
@@ -31,6 +31,7 @@ function SettingsSidebar() {
       url: "/slippi",
       icon: Gamepad2,
     },
+    { title: "Keybinds", url: "/shortcuts", icon: Keyboard },
   ];
   return (
     <Sidebar collapsible="icon">

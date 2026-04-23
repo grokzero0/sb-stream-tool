@@ -7,6 +7,7 @@ import {
 import type { EventSetsQuery, LiveEventSetsQuery } from "./queries.generated";
 import type { SetEntry, SetFormat } from "@renderer/types/tournament";
 import { UseFormGetValues, type UseFieldArrayReturn } from "react-hook-form";
+import { Action } from "@renderer/zustand/slices/shortcutsSlice";
 
 export const getValueWithinRange = (
   value: number,
@@ -24,6 +25,13 @@ export const getValueWithinRange = (
     return min;
   }
   return value;
+};
+
+export const ActionToName: Record<Action, string> = {
+  home: "Home",
+  submit: "Submit to overlay",
+  "score-up": "Increase team score by 1",
+  "score-down": "Decrease team score by 1",
 };
 
 export const colorToPort: Record<PortColor, number> = {

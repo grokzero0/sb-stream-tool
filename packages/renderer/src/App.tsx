@@ -13,6 +13,7 @@ import { Tournament } from "@app/common";
 import { TournamentDefaultValues } from "./utils/form";
 import Obs from "./components/settings/obs/Obs";
 import Slippi from "./components/slippi/Slippi";
+import Shortcuts from "./components/settings/shortcuts/Shortcuts";
 
 const client = new ApolloClient({
   link: new HttpLink({
@@ -57,6 +58,7 @@ function App() {
                         <Route path="/obs" component={Obs}></Route>
                         <Route path="/startgg" component={Startgg}></Route>
                         <Route path="/slippi" component={Slippi}></Route>
+                        <Route path="/shortcuts" component={Shortcuts}></Route>
                       </Switch>
                     </Settings>
                   </Route>

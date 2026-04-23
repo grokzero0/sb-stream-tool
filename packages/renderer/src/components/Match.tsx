@@ -19,15 +19,15 @@ import { updateOverlay } from "@app/preload";
 function Match() {
   const apiKey = useSettingsStore((state) => state.startggApiKey);
   const { handleSubmit } = useFormContext<Tournament>();
-  const submitKey = useSettingsStore(
-    (state) => state.keybinds.get("submit") ?? "Enter",
+  const submitHotkey = useSettingsStore(
+    (state) => state.shortcuts.get("submit") ?? "Enter",
   );
   const onSubmit = (data: Tournament) => {
     console.log(data);
     updateOverlay(data).catch((error) => console.log(error));
   };
 
-  useHotkey(submitKey, () => {
+  useHotkey(submitHotkey, () => {
     handleSubmit(onSubmit)().catch((error) => console.log(error));
   });
 
