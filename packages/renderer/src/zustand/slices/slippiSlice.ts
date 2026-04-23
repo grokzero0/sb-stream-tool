@@ -10,7 +10,7 @@ export type SlippiSlice = {
   consoleConnection: boolean;
   players: SlippiPlayer[][];
   setPlayers: (newData: SlippiPlayer[][]) => void;
-  swap: (firstIndex: number, secondIndex: number) => void;
+  swapCharacters: (firstIndex: number, secondIndex: number) => void;
   updateRelayStatus: (newRelayStatus: "disabled" | "folder" | "direct") => void;
   updateDirectory: (newDirectory: string) => void;
   updateConsoleConnection: (enabled: boolean) => void;
@@ -32,7 +32,7 @@ export const createSlippiSlice: StateCreator<
     set((state) => {
       state.players = newData;
     }),
-  swap: (firstIndex, secondIndex) =>
+  swapCharacters: (firstIndex, secondIndex) =>
     set((state) => {
       if (
         firstIndex >= state.players.length ||

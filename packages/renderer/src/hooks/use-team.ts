@@ -4,7 +4,7 @@ import { useFormContext } from "react-hook-form";
 export function useTeam() {
   const { setValue, getValues } = useFormContext<Tournament>();
 
-  const swapTeamData = (firstIndex: number, secondIndex: number): void => {
+  const swapTeamInfo = (firstIndex: number, secondIndex: number): void => {
     const arr = [
       getValues([
         `teams.${firstIndex}.name`,
@@ -29,7 +29,7 @@ export function useTeam() {
     setValue(`teams.${secondIndex}.inLosers`, arr[1][2]);
   };
 
-  const swapGameData = (firstIndex: number, secondIndex: number): void => {
+  const swapGameInfo = (firstIndex: number, secondIndex: number): void => {
     if (
       getValues(`teams.${firstIndex}.players`).length !==
       getValues(`teams.${secondIndex}.players`).length
@@ -50,5 +50,5 @@ export function useTeam() {
     }
   };
 
-  return { swapTeamData, swapGameData };
+  return { swapTeamInfo, swapGameInfo };
 }

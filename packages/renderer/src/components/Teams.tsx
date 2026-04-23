@@ -7,9 +7,9 @@ import Team from "./Team";
 
 function Teams() {
   // const { setValue } = useFormContext<Tournament>();
-  const { swapGameData } = useTeam(); // react-hook-form's form state
+  const { swapGameInfo } = useTeam(); // react-hook-form's gameInfo state
   const { fields, swap } = useFieldArray<Tournament>({ name: "teams" });
-  const swapCharacters = useSettingsStore((state) => state.swap); // zustands character state
+  const swapCharacters = useSettingsStore((state) => state.swapCharacters); // zustands character state, gathered from slippi (may not be needed soon)
   // const players = usePlayerFormFieldArrayContext();
   return (
     <>
@@ -19,7 +19,7 @@ function Teams() {
           className="w-2/5"
           onClick={() => {
             swap(0, 1);
-            swapCharacters(0, 1);
+            swapCharacters(0, 1); // since it's not synced with react-hook-form, it needs to be called
           }}
         >
           Swap Teams
@@ -28,8 +28,8 @@ function Teams() {
           type="button"
           className="w-2/5"
           onClick={() => {
-            swapGameData(0, 1);
-            swapCharacters(0, 1);
+            swapGameInfo(0, 1);
+            swapCharacters(0, 1); // since it's not synced with react-hook-form, it needs to be called
           }}
         >
           Swap characters
