@@ -13,6 +13,7 @@ import { ToastMessageCommunicator } from "../components/ToastMessageCommunicatio
 import { ipcSetup } from "../Ipc.js";
 import { SlippiRelayHandler } from "../components/SlippiRelayHandler.js";
 
+// todo: implement restoration of settings on launch
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
   readonly #renderer: { path: string } | URL;
@@ -56,6 +57,14 @@ class WindowManager implements AppModule {
     app.on("activate", () => this.restoreOrCreateWindow(true));
   }
 
+  async attachAllObservers(browserWindow: BrowserWindow) {
+    const toast = new ToastMessageCommunicator(browserWindow);
+    this.obs.attach(toast);
+    this.dataFileManager.attach(toast);
+    this.websocketServer.attach(toast);
+    this.slippi.attach(toast);
+  }
+
   async createWindow(): Promise<BrowserWindow> {
     const browserWindow = new BrowserWindow({
       show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
@@ -71,11 +80,7 @@ class WindowManager implements AppModule {
 
     this.slippi.setBrowserWindow(browserWindow);
 
-    const toast = new ToastMessageCommunicator(browserWindow);
-    this.obs.attach(toast);
-    this.dataFileManager.attach(toast);
-    this.websocketServer.attach(toast);
-    this.slippi.attach(toast);
+    this.attachAllObservers(browserWindow);
 
     const menu = buildMenu(browserWindow, this.obs);
     Menu.setApplicationMenu(menu);
