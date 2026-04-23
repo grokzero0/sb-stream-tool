@@ -8,6 +8,24 @@ import type { EventSetsQuery, LiveEventSetsQuery } from "./queries.generated";
 import type { SetEntry, SetFormat } from "@renderer/types/tournament";
 import { UseFormGetValues, type UseFieldArrayReturn } from "react-hook-form";
 
+export const getValueWithinRange = (
+  value: number,
+  max: number,
+  min: number,
+) => {
+  // getNum does the same thing in spinbox, but since that's a ui component, it would feel wrong to import this function there, rather than just declaring it in that ui component
+  if (Number.isNaN(value)) {
+    return NaN;
+  }
+  if (value > max) {
+    return max;
+  }
+  if (value < min) {
+    return min;
+  }
+  return value;
+};
+
 export const colorToPort: Record<PortColor, number> = {
   Red: 1,
   Blue: 2,

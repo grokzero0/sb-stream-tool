@@ -32,7 +32,7 @@ const Spinbox = React.forwardRef<HTMLInputElement, SpinboxProps>(
       props.defaultValue ?? numberValue ?? 0,
     );
 
-    const getNum = (num: number): number => {
+    const getValueWithinRange = (num: number): number => {
       const maxNum = max ?? Number.MAX_SAFE_INTEGER;
       const minNum = min ?? Number.MIN_SAFE_INTEGER;
       if (Number.isNaN(num)) {
@@ -48,7 +48,7 @@ const Spinbox = React.forwardRef<HTMLInputElement, SpinboxProps>(
     };
 
     const onChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-      const num = getNum(e.currentTarget.valueAsNumber);
+      const num = getValueWithinRange(e.currentTarget.valueAsNumber);
       if (onChangeNumber) {
         onChangeNumber(num);
       }
@@ -56,7 +56,9 @@ const Spinbox = React.forwardRef<HTMLInputElement, SpinboxProps>(
     };
 
     const onButtonClick = (valueToChangeBy: number): void => {
-      let num = getNum((numberValue ?? spinboxValue) + valueToChangeBy);
+      let num = getValueWithinRange(
+        (numberValue ?? spinboxValue) + valueToChangeBy,
+      );
       if (Number.isNaN(num)) {
         if (valueToChangeBy < 0) {
           num = max ?? Number.MAX_SAFE_INTEGER;

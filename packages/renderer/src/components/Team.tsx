@@ -8,12 +8,48 @@ import { Toggle } from "./ui/toggle";
 import { Badge } from "lucide-react";
 import Player from "./Player";
 import { Tournament } from "@app/common";
+import { useRef } from "react";
+import { useHotkey } from "@tanstack/react-hotkeys";
+import { useSettingsStore } from "@renderer/zustand/store";
+import { getValueWithinRange } from "@renderer/utils/helpers";
 
 function Team({ teamNum }: { teamNum: number }) {
+  const max = 100;
+  const min = 0;
   const players = usePlayerFormFieldArrayContext();
-  const { setValue } = useFormContext<Tournament>();
+  const { setValue, getValues } = useFormContext<Tournament>();
+
+  const teamPanelRef = useRef<HTMLDivElement>(null);
+
+  const scoreIncreaseHotkey = useSettingsStore(
+    (state) => state.keybinds.get("score-up") ?? "ArrowUp",
+  );
+  const scoreDecreaseHotkey = useSettingsStore(
+    (state) => state.keybinds.get("score-down") ?? "ArrowDown",
+  );
+
+  useHotkey(
+    scoreDecreaseHotkey,
+    () =>
+      setValue(
+        `teams.${teamNum}.score`,
+        getValueWithinRange(getValues(`teams.${teamNum}.score`) - 1, max, min),
+      ),
+    { target: teamPanelRef },
+  );
+
+  useHotkey(
+    scoreIncreaseHotkey,
+    () =>
+      setValue(
+        `teams.${teamNum}.score`,
+        getValueWithinRange(getValues(`teams.${teamNum}.score`) + 1, max, min),
+      ),
+    { target: teamPanelRef },
+  );
+
   return (
-    <div className="p-1 w-full">
+    <div tabIndex={-1} ref={teamPanelRef} className="p-1 w-full">
       <Controller
         name={`teams.${teamNum}.name`}
         render={({ field, fieldState }) => (

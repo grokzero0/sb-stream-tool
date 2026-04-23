@@ -11,18 +11,20 @@ export type KeybindsSlice = {
   updateKeys: (keysToUpdate: { bind: Bind; key: Hotkey }[]) => void;
 };
 
+const defaultKeybinds = new Map<Bind, Hotkey>([
+  ["home", "Escape"],
+  ["submit", "Enter"],
+  ["score-up", "ArrowUp"],
+  ["score-down", "ArrowDown"],
+]);
+
 export const createKeybindsSlice: StateCreator<
   StoreSliceType,
   [["zustand/immer", never]],
   [],
   KeybindsSlice
 > = (set) => ({
-  keybinds: new Map<Bind, Hotkey>([
-    ["home", "Escape"],
-    ["submit", "Enter"],
-    ["score-up", "ArrowUp"],
-    ["score-down", "ArrowDown"],
-  ]),
+  keybinds: defaultKeybinds,
   updateKeys: (keysToUpdate) =>
     set((state) => {
       for (const key of keysToUpdate) {
