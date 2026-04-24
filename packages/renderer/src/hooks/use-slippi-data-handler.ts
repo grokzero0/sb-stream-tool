@@ -52,7 +52,6 @@ export function useSlippiDataHandler() {
       send("obs/play-game-start-scenes").catch((reason) =>
         console.log(`game-start-scenes-error: ${reason}`),
       );
-
       if (slippiRelayStatus !== "disabled") {
         handleSubmit(onSubmit)().catch((error) => console.log(error));
       }
