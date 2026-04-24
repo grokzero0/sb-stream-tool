@@ -1,7 +1,6 @@
 import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "./use-player-form-field-array-context";
-// import { useSettingsStore } from "@renderer/zustand/store";
 import { useEffect } from "react";
 import {
   clearAllListeners,
@@ -12,12 +11,15 @@ import {
 import {
   changeSetFormat,
   findSlippiWinner,
+  onSubmit,
   portToColor,
 } from "@renderer/utils/helpers";
+import { useSettingsStore } from "@renderer/zustand/store";
 
 export function useSlippiDataHandler() {
-  const { setValue, getValues } = useFormContext<Tournament>();
+  const { setValue, getValues, handleSubmit } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
+  const slippiRelayStatus = useSettingsStore((state) => state.relayStatus);
   // const slippiPlayers = useSettingsStore((state) => state.players);
   // const setSlippiPlayers = useSettingsStore((state) => state.setPlayers);
   useEffect(() => {
@@ -46,12 +48,17 @@ export function useSlippiDataHandler() {
           });
         }
       }
+
       send("obs/play-game-start-scenes").catch((reason) =>
         console.log(`game-start-scenes-error: ${reason}`),
       );
+
+      if (slippiRelayStatus !== "disabled") {
+        handleSubmit(onSubmit)().catch((error) => console.log(error));
+      }
     });
     return () => clearAllListeners("slippi:new-game-start-data");
-  }, [getValues, setValue, teams]);
+  }, [getValues, handleSubmit, setValue, slippiRelayStatus, teams]);
 
   useEffect(() => {
     onNewSlippiGameEndData((winner) => {
@@ -71,8 +78,12 @@ export function useSlippiDataHandler() {
             console.log(reason),
           );
         }
+
+        if (slippiRelayStatus !== "disabled") {
+          handleSubmit(onSubmit)().catch((error) => console.log(error));
+        }
       }
     });
     return () => clearAllListeners("slippi:new-game-end-data");
-  }, [getValues, setValue]);
+  }, [getValues, handleSubmit, setValue, slippiRelayStatus]);
 }

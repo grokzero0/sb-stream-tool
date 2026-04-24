@@ -13,7 +13,7 @@ import SetQuery from "./SetQuery";
 import EventSets from "./EventSets";
 import LiveEventSets from "./LiveEventSets";
 import { useHotkey } from "@tanstack/react-hotkeys";
-import { updateOverlay } from "@app/preload";
+import { onSubmit } from "@renderer/utils/helpers";
 // import { sendToastMessage } from "./ui/toast";
 
 function Match() {
@@ -22,10 +22,6 @@ function Match() {
   const submitHotkey = useSettingsStore(
     (state) => state.shortcuts.get("submit") ?? "Enter",
   );
-  const onSubmit = (data: Tournament) => {
-    console.log(data);
-    updateOverlay(data).catch((error) => console.log(error));
-  };
 
   useHotkey(submitHotkey, () => {
     handleSubmit(onSubmit)().catch((error) => console.log(error));
