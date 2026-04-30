@@ -8,26 +8,32 @@ import {
 import { EventStream } from "./observer.js";
 
 export class SocketioServer extends EventStream {
-  private server: Server<
+  private static server: Server<
     ClientToServerEvents,
     ServerToClientEvents,
     InterServerEvents,
     SocketData
-  >;
-  private sockets: Map<string, number>;
+  > = new Server<
+    ClientToServerEvents,
+    ServerToClientEvents,
+    InterServerEvents,
+    SocketData
+  >(20242, { cors: { origin: "*" } });
 
-  constructor() {
-    super();
-    this.server = new Server<
-      ClientToServerEvents,
-      ServerToClientEvents,
-      InterServerEvents,
-      SocketData
-    >(20242, { cors: { origin: "*" } });
-    this.sockets = new Map();
-  }
+  private static sockets: Map<string, number> = new Map();
 
-  async enable(): Promise<void> {
+  // constructor() {
+  //   super();
+  //   this.server = new Server<
+  //     ClientToServerEvents,
+  //     ServerToClientEvents,
+  //     InterServerEvents,
+  //     SocketData
+  //   >(20242, { cors: { origin: "*" } });
+  //   this.sockets = new Map();
+  // }
+
+  static async enable(): Promise<void> {
     this.server.on("connection", (socket) => {
       console.log(`User ${socket.id} connected`);
       this.sockets.set(socket.id, this.sockets.size + 1);

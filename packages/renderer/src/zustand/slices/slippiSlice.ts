@@ -1,33 +1,39 @@
 import { type StateCreator } from "zustand";
 import { type StoreSliceType } from "./slice";
-import type { SlippiPlayer } from "@app/common";
+import type {
+  SlippiPlayer,
+  SlippiRelayStatus,
+  SlippiRelaySettings,
+} from "@app/common";
+import { send } from "@app/preload";
 
-export type SlippiSlice = {
-  relayStatus: "disabled" | "folder" | "direct";
-  directory: string;
-  ip: string;
-  port: string;
-  consoleConnection: boolean;
+export type SlippiRelaySlice = {
+  slippiRelayStatus: SlippiRelayStatus;
+  slippiRelayDirectory: string;
+  slippiRelayIp: string;
+  slippiRelayPort: string;
   players: SlippiPlayer[][];
+  slippiRelayAutoupload: boolean;
   setPlayers: (newData: SlippiPlayer[][]) => void;
   swapCharacters: (firstIndex: number, secondIndex: number) => void;
-  updateRelayStatus: (newRelayStatus: "disabled" | "folder" | "direct") => void;
-  updateDirectory: (newDirectory: string) => void;
-  updateConsoleConnection: (enabled: boolean) => void;
+  updateSlippiRelayStatus: (newRelayStatus: SlippiRelayStatus) => void;
+  updateSlippiRelayDirectory: (newDirectory: string) => void;
 };
+
 // https://github.com/pmndrs/zustand/discussions/676
 export const createSlippiSlice: StateCreator<
   StoreSliceType,
   [["zustand/immer", never]],
   [],
-  SlippiSlice
-> = (set) => ({
-  relayStatus: "disabled",
-  directory: "",
-  ip: "",
-  port: "",
-  consoleConnection: false,
+  SlippiRelaySlice
+> = (set, get) => ({
+  slippiRelayStatus: "disabled",
+  slippiRelayDirectory: "",
+  slippiRelayIp: "",
+  slippiRelayPort: "",
+  // consoleConnection: false,
   players: [] as SlippiPlayer[][],
+  slippiRelayAutoupload: false,
   setPlayers: (newData) =>
     set((state) => {
       state.players = newData;
@@ -46,16 +52,32 @@ export const createSlippiSlice: StateCreator<
       state.players[firstIndex] = state.players[secondIndex];
       state.players[secondIndex] = first;
     }),
-  updateDirectory: (newDirectory: string) =>
+  updateSlippiRelayDirectory: (newDirectory: string) => {
     set((state) => {
-      state.directory = newDirectory;
-    }),
-  updateRelayStatus: (newRelayStatus: "disabled" | "folder" | "direct") =>
+      state.slippiRelayDirectory = newDirectory;
+    });
+    send("slippi-relay/save-settings", {
+      relayStatus: get().slippiRelayStatus,
+      directory: newDirectory,
+      ip: get().slippiRelayIp,
+      port: get().slippiRelayPort,
+    } as SlippiRelaySettings).catch((error) => console.log(error));
+  },
+  updateSlippiRelayStatus: (newRelayStatus: SlippiRelayStatus) => {
     set((state) => {
-      state.relayStatus = newRelayStatus;
-    }),
-  updateConsoleConnection: (enabled: boolean) =>
+      state.slippiRelayStatus = newRelayStatus;
+    });
+    if (newRelayStatus === "disabled") {
+      send("slippi-relay/save-settings", {
+        relayStatus: newRelayStatus,
+        directory: get().slippiRelayDirectory,
+        ip: get().slippiRelayIp,
+        port: get().slippiRelayPort,
+      } as SlippiRelaySettings).catch((error) => console.log(error));
+    }
+  },
+  updateSlippiRelayAutoupload: (enabled: boolean) =>
     set((state) => {
-      state.consoleConnection = enabled;
+      state.slippiRelayAutoupload = enabled;
     }),
 });

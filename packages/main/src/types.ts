@@ -9,11 +9,6 @@ export type SlippiSettingsData = {
   };
 };
 
-export type ObsScene = {
-  scene: string;
-  start: number;
-};
-
 export type ServerToClientEvents = {
   //   noArg: () => void;
   //   withAck: (data: unknown, callback: (param?: unknown) => void) => void;

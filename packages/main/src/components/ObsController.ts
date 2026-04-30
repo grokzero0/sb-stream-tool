@@ -1,6 +1,6 @@
 import { OBSWebSocket } from "obs-websocket-js";
 import { EventStream } from "./observer.js";
-import { ObsScene } from "../types.js";
+import { ObsScene, ObsSceneType } from "@app/common";
 
 class SceneCollection {
   private scenes: ObsScene[];
@@ -44,21 +44,25 @@ class SceneCollection {
 }
 
 export class ObsController extends EventStream {
-  private socket: OBSWebSocket;
-  private gameStartScenes: SceneCollection;
-  private gameEndScenes: SceneCollection;
-  private setEndScenes: SceneCollection;
+  private static socket: OBSWebSocket = new OBSWebSocket();
+  private static gameStartScenes: SceneCollection = new SceneCollection(
+    this.socket,
+  );
+  private static gameEndScenes: SceneCollection = new SceneCollection(
+    this.socket,
+  );
+  private static setEndScenes: SceneCollection = new SceneCollection(
+    this.socket,
+  );
 
-  constructor() {
-    super();
-    this.socket = new OBSWebSocket();
-    this.gameStartScenes = new SceneCollection(this.socket);
-    this.setEndScenes = new SceneCollection(this.socket);
-    this.gameEndScenes = new SceneCollection(this.socket);
-  }
-
-  // while you could put this in the constructor, i personally don't like it, just a design choice
-  async initEvents() {
+  // constructor() {
+  //   super();
+  //   this.socket = new OBSWebSocket();
+  //   this.gameStartScenes = new SceneCollection(this.socket);
+  //   this.setEndScenes = new SceneCollection(this.socket);
+  //   this.gameEndScenes = new SceneCollection(this.socket);
+  // }
+  static async initEvents() {
     this.socket.on("ConnectionError", (error) => {
       console.log("Connection Error");
       this.notify("OBS Connection Error", `Connection Error: ${error}`);
@@ -75,7 +79,12 @@ export class ObsController extends EventStream {
     });
   }
 
-  async connect(protocol: string, url: string, port: string, password: string) {
+  static async connect(
+    protocol: string,
+    url: string,
+    port: string,
+    password: string,
+  ) {
     this.notify(
       "OBS Websocket connection",
       `Connecting to ${protocol}${url}:${port}`,
@@ -83,22 +92,16 @@ export class ObsController extends EventStream {
     await this.socket
       .connect(`${protocol}${url}:${port}`, password)
       .then(() => {
-        // this.notify(
-        //   "OBS Websocket connection",
-        //   `Connected to ${protocol}${url}:${port}`,
-        // );
+        this.notify(
+          "OBS Websocket connection",
+          `Connected to ${protocol}${url}:${port}`,
+        );
         console.log("Connected");
       })
-      .catch((reason) => {
-        // this.notify(
-        //   "OBS Websocket connection",
-        //   `Error connecting to ${protocol}${url}:${port}: ${reason}`,
-        // );
-        console.log(`Error: ${reason}`);
-      });
+      .catch((reason) => console.log(`Error: ${reason}`));
   }
 
-  async playScenes(sceneCollection: "game-start" | "game-end" | "set-end") {
+  static async playScenes(sceneCollection: ObsSceneType) {
     switch (sceneCollection) {
       case "game-start":
         this.gameStartScenes.play();
@@ -114,7 +117,7 @@ export class ObsController extends EventStream {
     }
   }
 
-  async stopScenes(sceneCollection: "game-start" | "game-end" | "set-end") {
+  static async stopScenes(sceneCollection: ObsSceneType) {
     switch (sceneCollection) {
       case "game-start":
         this.gameStartScenes.stop();
@@ -130,7 +133,7 @@ export class ObsController extends EventStream {
     }
   }
 
-  async updateScenes(
+  static async updateScenes(
     newGameStartScenes: ObsScene[],
     newGameEndScenes: ObsScene[],
     newSetEndScenes: ObsScene[],

@@ -17,7 +17,7 @@ const highlights = [
   "https://clips.twitch.tv/DelightfulCaringNigiriPlanking-y5U74CH5MP9uv3Nn",
 ];
 
-export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
+export function buildMenu(browserWindow: BrowserWindow) {
   const menu = Menu.buildFromTemplate([
     // {
     //   label: "Game (Not implemented yet lol)",
@@ -56,17 +56,17 @@ export function buildMenu(browserWindow: BrowserWindow, obs: ObsController) {
       submenu: [
         {
           label: "Play game start scenes",
-          click: () => obs.playScenes("game-start"),
+          click: () => ObsController.playScenes("game-start"),
           accelerator: "Control+F1",
         },
         {
           label: "Play game end scenes",
-          click: () => obs.playScenes("game-end"),
+          click: () => ObsController.playScenes("game-end"),
           accelerator: "Control+F2",
         },
         {
           label: "Play set end scenes",
-          click: () => obs.playScenes("set-end"),
+          click: () => ObsController.playScenes("set-end"),
           accelerator: "Control+F3",
         },
       ],

@@ -4,9 +4,9 @@ import { Label } from "../ui/label";
 import FolderBrowser from "./FolderBrowser";
 
 function Slippi() {
-  const relayStatus = useSettingsStore((state) => state.relayStatus);
+  const relayStatus = useSettingsStore((state) => state.slippiRelayStatus);
   const updateRelayStatus = useSettingsStore(
-    (state) => state.updateRelayStatus,
+    (state) => state.updateSlippiRelayStatus,
   );
 
   return (

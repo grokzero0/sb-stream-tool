@@ -14,54 +14,56 @@ import {
 import { SlippiSettingsData } from "../types.js";
 
 export class SlippiRelayHandler extends EventStream {
-  private browserWindow?: BrowserWindow | null;
-  private watcher?: FSWatcher | null;
-  private listenPath: string | null;
-  private ip: string | null;
-  private port: string | null;
-  private players: SlippiGameData | null;
+  private static browserWindow?: BrowserWindow | null = null;
+  private static watcher?: FSWatcher | null = null;
+  private static listenPath: string = "";
+  private static ip: string = "";
+  private static port: string = "";
+  private static players: SlippiGameData | null = null;
+  private static bestOf: number = 0;
+  // private static previousPlayers:
   // settings field is used to detect if game started or not, see line 97-100 of https://github.com/project-slippi/slippi-js/blob/master/src/common/SlippiGameBase.ts
   // possibly delete all handwarmers games tbh
-  private games: Map<string, SlippiSettingsData>;
-  constructor() {
-    super();
-    this.browserWindow = null;
-    this.watcher = null;
-    this.listenPath = null;
-    this.ip = null;
-    this.port = null;
-    this.players = null;
-    this.games = new Map<string, SlippiSettingsData>();
-  }
+  private static games: Map<string, SlippiSettingsData> = new Map();
+  // constructor() {
+  //   super();
+  //   this.browserWindow = null;
+  //   this.watcher = null;
+  //   this.listenPath = null;
+  //   this.ip = null;
+  //   this.port = null;
+  //   this.players = null;
+  //   this.games = new Map<string, SlippiSettingsData>();
+  // }
 
-  async getPlayers() {
+  static async getPlayers() {
     return this.players;
   }
 
-  async setBrowserWindow(browserWindow: BrowserWindow) {
+  static async setBrowserWindow(browserWindow: BrowserWindow) {
     this.browserWindow = browserWindow;
   }
 
-  async setWiiPort(port: string) {
+  static async setWiiPort(port: string) {
     this.port = port;
   }
 
-  async setWiiIp(ip: string) {
+  static async setWiiIp(ip: string) {
     this.ip = ip;
   }
 
-  async stop(quiet: boolean) {
+  static async stop(quiet: boolean) {
     if (this.listenPath) {
       this.watcher?.unwatch(this.listenPath);
       this.watcher?.close();
-      this.listenPath = null;
+      this.listenPath = "";
     }
     if (!quiet) {
       this.notify("Slippi Relay", "Stopped Relay");
     }
   }
 
-  async setup(listenPath: string) {
+  static async setup(listenPath: string) {
     this.listenPath = listenPath;
     this.watcher = chokidar.watch(listenPath, {
       ignored: "!*.slp", // TODO: This doesn't work. Use regex?
@@ -75,7 +77,7 @@ export class SlippiRelayHandler extends EventStream {
     this.notify("Slippi Relay", "Started Relay");
   }
 
-  private isActualGame(
+  private static isActualGame(
     metadata: MetadataType | undefined,
     gameEnd: GameEndType | undefined,
     stats: StatsType | undefined,
@@ -94,7 +96,7 @@ export class SlippiRelayHandler extends EventStream {
     return (lras && totalDamage > 100) || (!lras && totalDamage > 100); // this could be better tbh ill figure it out later
   }
 
-  private getWinner(
+  private static getWinner(
     settings: GameStartType | undefined,
     lastFrame: FrameEntryType | undefined,
     gameEnd: GameEndType | undefined,
@@ -144,7 +146,7 @@ export class SlippiRelayHandler extends EventStream {
 
     return { isTeams: false, winners: [playerWinnerId] };
   }
-  private getStartGameData(settings: GameStartType): SlippiGameData {
+  private static getStartGameData(settings: GameStartType): SlippiGameData {
     const playerData = [] as SlippiPlayer[][];
     let isTeams = settings.isTeams;
     if (!isTeams) {
@@ -211,7 +213,7 @@ export class SlippiRelayHandler extends EventStream {
     return { isTeams: isTeams ?? false, players: playerData };
   }
 
-  async read() {
+  static async read() {
     this.watcher?.on("change", (path) => {
       let gameState: SlippiSettingsData["state"] | undefined,
         settings: GameStartType | undefined,

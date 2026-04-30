@@ -1,8 +1,8 @@
 import { Hotkey } from "@tanstack/react-hotkeys";
 import { StoreSliceType } from "./slice";
 import { StateCreator } from "zustand";
-
-export type Action = "submit" | "home" | "score-up" | "score-down";
+import { Action } from "@app/common";
+import { send } from "@app/preload";
 
 type Shortcuts = Map<Action, Hotkey>;
 
@@ -28,12 +28,16 @@ export const createShortcutsSlice: StateCreator<
   ShortcutsSlice
 > = (set) => ({
   shortcuts: defaultShortcuts,
-  updateKeys: (keysToUpdate) =>
+  updateKeys: (keysToUpdate) => {
     set((state) => {
       for (const key of keysToUpdate) {
         state.shortcuts.set(key.action, key.hotkey);
       }
-    }),
+    });
+    send("shortcuts/save-shortcuts", keysToUpdate).catch((error) =>
+      console.log(error),
+    );
+  },
   resetShortcutsToDefault: () =>
     set((state) => (state.shortcuts = defaultShortcuts)),
 });

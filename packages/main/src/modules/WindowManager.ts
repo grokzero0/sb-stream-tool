@@ -5,7 +5,7 @@ import type { AppInitConfig } from "../AppInitConfig.js";
 import { join } from "path";
 import { buildMenu } from "../Menu.js";
 import { ObsController } from "../components/ObsController.js";
-import { FileReaderWriter } from "../components/FileReaderWriter.js";
+import { FileHandler } from "../components/FileHandler.js";
 import { io, Socket } from "socket.io-client";
 import { ClientToServerEvents, ServerToClientEvents } from "../types.js";
 import { SocketioServer } from "../components/SocketioServer.js";
@@ -19,11 +19,11 @@ class WindowManager implements AppModule {
   readonly #renderer: { path: string } | URL;
   readonly #openDevTools;
 
-  private obs: ObsController;
-  private dataFileManager: FileReaderWriter;
-  private websocketServer: SocketioServer;
+  // private obs: ObsController;
+  // private dataFileManager: FileReaderWriter;
+  // private websocketServer: SocketioServer;
   private mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>;
-  private slippi: SlippiRelayHandler;
+  // private slippi: SlippiRelayHandler;
 
   constructor({
     initConfig,
@@ -36,21 +36,21 @@ class WindowManager implements AppModule {
     this.#renderer = initConfig.renderer;
     this.#openDevTools = openDevTools;
 
-    this.obs = new ObsController();
-    this.dataFileManager = new FileReaderWriter();
-    this.websocketServer = new SocketioServer();
+    // this.obs = new ObsController();
+    // this.dataFileManager = new FileReaderWriter();
+    // this.websocketServer = new SocketioServer();
     this.mainSocket = io("http://localhost:20242");
-    this.slippi = new SlippiRelayHandler();
+    // this.slippi = new SlippiRelayHandler();
   }
 
   async enable({ app }: ModuleContext): Promise<void> {
-    await this.dataFileManager.createDirs();
-    this.websocketServer.enable();
-    this.obs.initEvents();
+    FileHandler.createDirs();
+    SocketioServer.enable();
+    ObsController.initEvents();
 
     await app.whenReady();
 
-    ipcSetup(this.mainSocket, this.obs, this.dataFileManager, this.slippi);
+    ipcSetup(this.mainSocket);
 
     await this.restoreOrCreateWindow(true);
     app.on("second-instance", () => this.restoreOrCreateWindow(true));
@@ -59,10 +59,10 @@ class WindowManager implements AppModule {
 
   async attachAllObservers(browserWindow: BrowserWindow) {
     const toast = new ToastMessageCommunicator(browserWindow);
-    this.obs.attach(toast);
-    this.dataFileManager.attach(toast);
-    this.websocketServer.attach(toast);
-    this.slippi.attach(toast);
+    ObsController.attach(toast);
+    FileHandler.attach(toast);
+    SocketioServer.attach(toast);
+    SlippiRelayHandler.attach(toast);
   }
 
   async createWindow(): Promise<BrowserWindow> {
@@ -78,11 +78,11 @@ class WindowManager implements AppModule {
       icon: join(import.meta.dirname, "..", "src", "assets", "icon.ico"),
     });
 
-    this.slippi.setBrowserWindow(browserWindow);
+    SlippiRelayHandler.setBrowserWindow(browserWindow);
 
     this.attachAllObservers(browserWindow);
 
-    const menu = buildMenu(browserWindow, this.obs);
+    const menu = buildMenu(browserWindow);
     Menu.setApplicationMenu(menu);
 
     if (this.#renderer instanceof URL) {

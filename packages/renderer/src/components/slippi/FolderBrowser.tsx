@@ -4,8 +4,10 @@ import { send } from "@app/preload";
 import { useState } from "react";
 
 function FolderBrowser({ disabled }: { disabled: boolean }) {
-  const savedDirectory = useSettingsStore((state) => state.directory);
-  const update = useSettingsStore((state) => state.updateDirectory);
+  const savedDirectory = useSettingsStore(
+    (state) => state.slippiRelayDirectory,
+  );
+  const update = useSettingsStore((state) => state.updateSlippiRelayDirectory);
   const [directory, setDirectory] = useState(savedDirectory);
 
   return (
@@ -28,7 +30,7 @@ function FolderBrowser({ disabled }: { disabled: boolean }) {
               disabled={disabled}
               onClick={() => {
                 send("file:openDialog")
-                  .then((directory) => setDirectory(directory))
+                  .then((directory) => setDirectory(directory as string))
                   .catch((reason) => console.log(reason));
               }}
             >
@@ -44,7 +46,7 @@ function FolderBrowser({ disabled }: { disabled: boolean }) {
             // className="w-full"
             onClick={() => {
               update(directory);
-              send("slippi:readFolder", directory).catch((reason) =>
+              send("slippi-relay/read-folder", directory).catch((reason) =>
                 console.log(reason),
               );
             }}
@@ -53,11 +55,11 @@ function FolderBrowser({ disabled }: { disabled: boolean }) {
           </Button>
           <Button
             type="button"
-            onClick={() =>
-              send("slippi:stopReadingFolder").catch((reason) =>
-                console.log(reason),
-              )
-            }
+            onClick={() => {
+              send("slippi-relay/stop-reading-folder").catch((error) =>
+                console.log(error),
+              );
+            }}
             disabled={disabled}
           >
             Stop

@@ -1,7 +1,8 @@
 import { Button } from "@renderer/components/ui/button";
 import { sendToastMessage } from "@renderer/components/ui/toast";
 import { ActionToName } from "@renderer/utils/helpers";
-import { Action, Shortcut } from "@renderer/zustand/slices/shortcutsSlice";
+import { Shortcut } from "@renderer/zustand/slices/shortcutsSlice";
+import { Action } from "@app/common";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { formatForDisplay, useHotkeyRecorder } from "@tanstack/react-hotkeys";
 import { useState } from "react";
@@ -12,11 +13,6 @@ function Shortcuts() {
   const [keybinds, setKeybinds] = useState(new Map(savedShortcuts));
   const [editedShortcuts, setEditedShortcuts] = useState<Shortcut[]>([]);
   const [editingAction, setEditingAction] = useState<Action | null>(null);
-  console.log("savedShortcuts:");
-  console.log(savedShortcuts);
-
-  console.log("shortcuts");
-  console.log(keybinds);
   const recorder = useHotkeyRecorder({
     onRecord: (hotkey) => {
       if (editingAction) {

@@ -19,7 +19,9 @@ import { useSettingsStore } from "@renderer/zustand/store";
 export function useSlippiDataHandler() {
   const { setValue, getValues, handleSubmit } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
-  const slippiRelayStatus = useSettingsStore((state) => state.relayStatus);
+  const slippiRelayStatus = useSettingsStore(
+    (state) => state.slippiRelayStatus,
+  );
   // const slippiPlayers = useSettingsStore((state) => state.players);
   // const setSlippiPlayers = useSettingsStore((state) => state.setPlayers);
   useEffect(() => {

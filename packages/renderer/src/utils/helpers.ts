@@ -1,4 +1,5 @@
 import {
+  Action,
   placements,
   PortColor,
   Tournament,
@@ -7,7 +8,6 @@ import {
 import type { EventSetsQuery, LiveEventSetsQuery } from "./queries.generated";
 import type { SetEntry, SetFormat } from "@renderer/types/tournament";
 import { UseFormGetValues, type UseFieldArrayReturn } from "react-hook-form";
-import { Action } from "@renderer/zustand/slices/shortcutsSlice";
 import { updateOverlay } from "@app/preload";
 
 export const getValueWithinRange = (

@@ -2,36 +2,85 @@ import path from "node:path";
 import { EventStream } from "./observer.js";
 import { app } from "electron";
 import { readFile, mkdir } from "node:fs/promises";
-import { Tournament } from "@app/common";
+import {
+  ObsSceneSettings,
+  ObsWebsocketSettings,
+  ShortcutSettings,
+  SlippiRelaySettings,
+  Tournament,
+} from "@app/common";
 import fs, { outputFile } from "fs-extra";
 import { isPlainObject } from "es-toolkit";
 
-// make this less cluttered right now
-export class FileReaderWriter extends EventStream {
-  private rootPath: string;
-  private configRootPath: string;
-  private resourcesRootPath: string;
-  private overlayRootPath: string;
-  private charactersRootPath: string;
-  constructor() {
-    super();
-    this.rootPath = app.getAppPath();
-    this.resourcesRootPath = path.join(this.rootPath, "..", "resources");
-    this.configRootPath = path.join(this.rootPath, "..", "config");
-    this.overlayRootPath = `${this.rootPath}/assets/overlay/`;
-    this.charactersRootPath = `${this.rootPath}/assets/characters/`;
-    if (process.env.NODE_ENV !== "development") {
-      this.overlayRootPath = `${process.resourcesPath}/overlay/`;
-      this.charactersRootPath = `${process.resourcesPath}/characters/`;
-      if (process.platform == "win32") {
-        this.rootPath = process.env.PORTABLE_EXECUTABLE_DIR ?? "undefined";
-        this.resourcesRootPath = path.join(this.rootPath, "resources");
-        this.configRootPath = path.join(this.rootPath, "config");
-      }
-    }
+const getRootPath = () => {
+  let rootPath = app.getAppPath();
+  if (process.env.NODE_ENV !== "development" && process.platform == "win32") {
+    rootPath = process.env.PORTABLE_EXECUTABLE_DIR ?? "undefined";
   }
+  return rootPath;
+};
 
-  async serialize(data: any) {
+const getConfigRootPath = (rootPath: string) => {
+  let configRootPath = path.join(rootPath, "..", "config");
+  if (process.env.NODE_ENV !== "development" && process.platform == "win32") {
+    configRootPath = path.join(rootPath, "config");
+  }
+  return configRootPath;
+};
+
+const getResourcesRootPath = (rootPath: string) => {
+  let resourcesRootPath = path.join(rootPath, "..", "resources");
+  if (process.env.NODE_ENV !== "development" && process.platform == "win32") {
+    resourcesRootPath = path.join(rootPath, "resources");
+  }
+  return resourcesRootPath;
+};
+
+const getOverlayRootPath = (rootPath: string) => {
+  let overlayRootPath = path.join(rootPath, "assets", "overlay");
+  if (process.env.NODE_ENV !== "development") {
+    overlayRootPath = path.join(process.resourcesPath, "overlay");
+  }
+  return overlayRootPath;
+};
+
+const getCharactersRootPath = (rootPath: string) => {
+  let charactersRootPath = path.join(rootPath, "assets", "characters");
+  if (process.env.NODE_ENV !== "development") {
+    charactersRootPath = path.join(process.resourcesPath, "characters");
+  }
+  return charactersRootPath;
+};
+// make this less cluttered right now
+export class FileHandler extends EventStream {
+  private static rootPath: string = getRootPath();
+  private static configRootPath: string = getConfigRootPath(this.rootPath);
+  private static resourcesRootPath: string = getResourcesRootPath(
+    this.rootPath,
+  );
+  private static overlayRootPath: string = getOverlayRootPath(this.rootPath);
+  private static charactersRootPath: string = getCharactersRootPath(
+    this.rootPath,
+  );
+  // constructor() {
+  //   super();
+  //   this.rootPath = app.getAppPath();
+  //   this.resourcesRootPath = path.join(this.rootPath, "..", "resources");
+  //   this.configRootPath = path.join(this.rootPath, "..", "config");
+  //   this.overlayRootPath = `${this.rootPath}/assets/overlay/`;
+  //   this.charactersRootPath = `${this.rootPath}/assets/characters/`;
+  //   if (process.env.NODE_ENV !== "development") {
+  //     this.overlayRootPath = `${process.resourcesPath}/overlay/`;
+  //     this.charactersRootPath = `${process.resourcesPath}/characters/`;
+  //     if (process.platform == "win32") {
+  //       this.rootPath = process.env.PORTABLE_EXECUTABLE_DIR ?? "undefined";
+  //       this.resourcesRootPath = path.join(this.rootPath, "resources");
+  //       this.configRootPath = path.join(this.rootPath, "config");
+  //     }
+  //   }
+  // }
+
+  private static async serialize(data: any) {
     if (data === null || data === undefined) {
       return "";
     } else if (Array.isArray(data) || isPlainObject(data)) {
@@ -43,7 +92,7 @@ export class FileReaderWriter extends EventStream {
     }
   }
 
-  async write(location: string, data: any) {
+  private static async write(location: string, data: any) {
     const serializedData = await this.serialize(data);
     return outputFile(location, serializedData)
       .then(() => undefined)
@@ -51,7 +100,7 @@ export class FileReaderWriter extends EventStream {
   }
 
   // writes data to text files
-  async writeData(data: Tournament) {
+  static async writeData(data: Tournament) {
     const dataPath = path.join(this.resourcesRootPath, "texts");
     const errors = [] as Error[];
 
@@ -139,7 +188,7 @@ export class FileReaderWriter extends EventStream {
     }
   }
 
-  async writeApiKey(newApiKey: string) {
+  static async writeApiKey(newApiKey: string) {
     const error = await this.write(
       `${this.configRootPath}/api_key.txt`,
       newApiKey,
@@ -150,7 +199,7 @@ export class FileReaderWriter extends EventStream {
     this.notify("Successfully saved API key!");
   }
 
-  async getApiKey() {
+  static async getApiKey() {
     return readFile(`${this.configRootPath}/api_key.txt`, "utf-8")
       .then((key) => key)
       .catch(() => {
@@ -158,7 +207,7 @@ export class FileReaderWriter extends EventStream {
       });
   }
 
-  async getSlippiSettings() {
+  static async getSlippiRelaySettings() {
     return readFile(`${this.configRootPath}/slippi.json`, "utf-8")
       .then((data) => JSON.parse(data))
       .catch(() => {
@@ -166,7 +215,7 @@ export class FileReaderWriter extends EventStream {
       });
   }
 
-  async getShortcuts() {
+  static async getShortcuts() {
     return readFile(`${this.configRootPath}/shortcuts.json`, "utf-8")
       .then((data) => JSON.parse(data))
       .catch(() => {
@@ -174,15 +223,43 @@ export class FileReaderWriter extends EventStream {
       });
   }
 
-  async getObsSettings() {
-    return readFile(`${this.configRootPath}/obs.json`, "utf-8")
-      .then((data) => JSON.parse(data))
-      .catch(() => {
-        return undefined;
-      });
+  static async getObsSettings() {
+    const websocketSettings = await readFile(
+      `${this.configRootPath}/obs/websocket.json`,
+      "utf-8",
+    ).catch(() => {
+      return undefined;
+    });
+    const scenes = await readFile(
+      `${this.configRootPath}/obs/scenes.json`,
+      "utf-8",
+    ).catch(() => {
+      return undefined;
+    });
+
+    return {
+      websocket: JSON.parse(websocketSettings ?? "undefined"),
+      scenes: JSON.parse(scenes ?? "undefined"),
+    };
   }
 
-  async createDirs() {
+  static async writeObsWebsocketSettings(settings: ObsWebsocketSettings) {
+    this.write(`${this.configRootPath}/obs/websocket.json`, settings);
+  }
+
+  static async writeObsScenes(scenes: ObsSceneSettings) {
+    this.write(`${this.configRootPath}/obs/scenes.json`, scenes);
+  }
+
+  static async writeSlippiRelaySettings(settings: SlippiRelaySettings) {
+    this.write(`${this.configRootPath}/slippi.json`, settings);
+  }
+
+  static async writeShortcutSettings(settings: ShortcutSettings) {
+    this.write(`${this.configRootPath}/shortcuts.json`, settings);
+  }
+
+  static async createDirs() {
     // console.log(path.join(this.resourcesRootPath, "overlay"));
     fs.copy(
       this.overlayRootPath,

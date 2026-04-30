@@ -1,4 +1,4 @@
-import { AltCostumeEntry, MeleeCharacter } from "./types.js";
+import { AltCostumeEntry, MeleeCharacter } from "./types/match/game/melee.js";
 
 export const meleeCharacters: MeleeCharacter[] = [
   "Bowser",
