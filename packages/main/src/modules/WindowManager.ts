@@ -12,6 +12,7 @@ import { SocketioServer } from "../components/SocketioServer.js";
 import { ToastMessageCommunicator } from "../components/ToastMessageCommunication.js";
 import { ipcSetup } from "../Ipc.js";
 import { SlippiRelayHandler } from "../components/SlippiRelayHandler.js";
+import { EventStream } from "../components/EventStream.js";
 
 // todo: implement restoration of settings on launch
 class WindowManager implements AppModule {
@@ -59,10 +60,7 @@ class WindowManager implements AppModule {
 
   async attachAllObservers(browserWindow: BrowserWindow) {
     const toast = new ToastMessageCommunicator(browserWindow);
-    ObsController.attach(toast);
-    FileHandler.attach(toast);
-    SocketioServer.attach(toast);
-    SlippiRelayHandler.attach(toast);
+    EventStream.attach(toast);
   }
 
   async createWindow(): Promise<BrowserWindow> {

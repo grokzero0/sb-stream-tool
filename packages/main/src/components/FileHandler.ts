@@ -1,5 +1,5 @@
 import path from "node:path";
-import { EventStream } from "./observer.js";
+import { EventStream } from "./EventStream.js";
 import { app } from "electron";
 import { readFile, mkdir } from "node:fs/promises";
 import {
@@ -52,7 +52,7 @@ const getCharactersRootPath = (rootPath: string) => {
   return charactersRootPath;
 };
 // make this less cluttered right now
-export class FileHandler extends EventStream {
+export class FileHandler {
   private static rootPath: string = getRootPath();
   private static configRootPath: string = getConfigRootPath(this.rootPath);
   private static resourcesRootPath: string = getResourcesRootPath(
@@ -180,11 +180,11 @@ export class FileHandler extends EventStream {
 
     if (errors.length > 0) {
       for (const error of errors) {
-        this.notify(error.message);
+        EventStream.notify(error.message);
       }
-      this.notify(`${errors.length} errors found`);
+      EventStream.notify(`${errors.length} errors found`);
     } else {
-      this.notify("Data successfully saved to files!");
+      EventStream.notify("Data successfully saved to files!");
     }
   }
 
@@ -194,9 +194,9 @@ export class FileHandler extends EventStream {
       newApiKey,
     );
     if (error !== undefined) {
-      return this.notify(error.message);
+      return EventStream.notify(error.message);
     }
-    this.notify("Successfully saved API key!");
+    EventStream.notify("Successfully saved API key!");
   }
 
   static async getApiKey() {

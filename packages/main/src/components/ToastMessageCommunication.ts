@@ -1,5 +1,5 @@
 import { BrowserWindow } from "electron";
-import { EventSink } from "./observer.js";
+import { EventSink } from "./EventStream.js";
 
 // sends message from main process to renderer's toaster component
 export class ToastMessageCommunicator implements EventSink {

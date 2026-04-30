@@ -11,12 +11,14 @@ export interface EventSink {
 // }
 
 // Use Event bus pattern if the EventStream needs both static and instance classes extended from this
+// semi Event Bus pattern, the observer attaches to this, the subjects call this notify method
 export class EventStream {
   // list of EventSinks "attached" to this EventStream
   private static observers: EventSink[] = [];
 
   static attach(newObserver: EventSink): void {
     this.observers.push(newObserver);
+    console.log(this.observers.length);
   }
 
   static detach(observer: EventSink): void {

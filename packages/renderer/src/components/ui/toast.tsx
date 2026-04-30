@@ -24,7 +24,7 @@ function Toast() {
     toastMessage((message, description) => {
       sendToastMessage(message, description);
     });
-  });
+  }, []);
   return <Toaster />;
 }
 

@@ -1,5 +1,5 @@
 import { OBSWebSocket } from "obs-websocket-js";
-import { EventStream } from "./observer.js";
+import { EventStream } from "./EventStream.js";
 import { ObsScene, ObsSceneType } from "@app/common";
 
 class SceneCollection {
@@ -43,7 +43,7 @@ class SceneCollection {
   }
 }
 
-export class ObsController extends EventStream {
+export class ObsController {
   private static socket: OBSWebSocket = new OBSWebSocket();
   private static gameStartScenes: SceneCollection = new SceneCollection(
     this.socket,
@@ -65,17 +65,20 @@ export class ObsController extends EventStream {
   static async initEvents() {
     this.socket.on("ConnectionError", (error) => {
       console.log("Connection Error");
-      this.notify("OBS Connection Error", `Connection Error: ${error}`);
+      EventStream.notify("OBS Connection Error", `Connection Error: ${error}`);
     });
 
     this.socket.on("ConnectionOpened", () => {
       console.log("Connection Opened");
-      this.notify("OBS Connection Success", "Connection Opened");
+      EventStream.notify("OBS Connection Success", "Connection Opened");
     });
 
     this.socket.on("CurrentProgramSceneChanged", (scene) => {
       console.log(`Scene Changed to ${scene.sceneName}`);
-      this.notify("OBS Scene Change", `Scene Changed to ${scene.sceneName}`);
+      EventStream.notify(
+        "OBS Scene Change",
+        `Scene Changed to ${scene.sceneName}`,
+      );
     });
   }
 
@@ -85,14 +88,14 @@ export class ObsController extends EventStream {
     port: string,
     password: string,
   ) {
-    this.notify(
+    EventStream.notify(
       "OBS Websocket connection",
       `Connecting to ${protocol}${url}:${port}`,
     );
     await this.socket
       .connect(`${protocol}${url}:${port}`, password)
       .then(() => {
-        this.notify(
+        EventStream.notify(
           "OBS Websocket connection",
           `Connected to ${protocol}${url}:${port}`,
         );
@@ -141,6 +144,6 @@ export class ObsController extends EventStream {
     this.gameStartScenes.update(newGameStartScenes);
     this.gameEndScenes.update(newGameEndScenes);
     this.setEndScenes.update(newSetEndScenes);
-    this.notify("OBS scenes", "OBS scenes added!");
+    EventStream.notify("OBS scenes", "OBS scenes added!");
   }
 }

@@ -1,5 +1,5 @@
 import { BrowserWindow } from "electron";
-import { EventStream } from "./observer.js";
+import { EventStream } from "./EventStream.js";
 import chokidar, { FSWatcher } from "chokidar";
 import { SlippiGameData, SlippiGameEndData, SlippiPlayer } from "@app/common";
 import {
@@ -13,7 +13,7 @@ import {
 } from "@slippi/slippi-js/node";
 import { SlippiSettingsData } from "../types.js";
 
-export class SlippiRelayHandler extends EventStream {
+export class SlippiRelayHandler {
   private static browserWindow?: BrowserWindow | null = null;
   private static watcher?: FSWatcher | null = null;
   private static listenPath: string = "";
@@ -59,7 +59,7 @@ export class SlippiRelayHandler extends EventStream {
       this.listenPath = "";
     }
     if (!quiet) {
-      this.notify("Slippi Relay", "Stopped Relay");
+      EventStream.notify("Slippi Relay", "Stopped Relay");
     }
   }
 
@@ -74,7 +74,8 @@ export class SlippiRelayHandler extends EventStream {
     });
 
     this.read();
-    this.notify("Slippi Relay", "Started Relay");
+    console.log("SETUP COMPLETE");
+    EventStream.notify("Slippi Relay", "Started Relay");
   }
 
   private static isActualGame(
@@ -236,7 +237,7 @@ export class SlippiRelayHandler extends EventStream {
         settings = game?.gameDataController.getSettings();
         gameEnd = game?.gameDataController.getGameEnd();
       } catch (err) {
-        this.notify("Slippi Relay Error");
+        EventStream.notify("Slippi Relay Error");
         return;
       }
       if (!gameState?.settings && settings) {

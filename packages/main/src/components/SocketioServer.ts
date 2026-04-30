@@ -5,9 +5,9 @@ import {
   ServerToClientEvents,
   SocketData,
 } from "../types.js";
-import { EventStream } from "./observer.js";
+import { EventStream } from "./EventStream.js";
 
-export class SocketioServer extends EventStream {
+export class SocketioServer {
   private static server: Server<
     ClientToServerEvents,
     ServerToClientEvents,
@@ -39,19 +39,19 @@ export class SocketioServer extends EventStream {
       this.sockets.set(socket.id, this.sockets.size + 1);
 
       socket.on("sendDataToServer", (data) => {
-        this.notify("Sending data to overlays");
+        EventStream.notify("Sending data to overlays");
         socket.broadcast.emit("sendDataToClients", data);
       });
 
       socket.on("overlayUpdateSuccess", () => {
-        this.notify(
+        EventStream.notify(
           `Overlay ${this.sockets.get(socket.id)} updated set information successfully!`,
         );
       });
 
       socket.on("disconnect", () => {
         this.sockets.delete(socket.id);
-        this.notify(
+        EventStream.notify(
           "Disconnect",
           `Overlay ${this.sockets.get(socket.id)} disconnected`,
         );
