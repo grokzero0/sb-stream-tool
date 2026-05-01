@@ -3,9 +3,13 @@ import { EventStream } from "./EventStream.js";
 import { app } from "electron";
 import { readFile, mkdir } from "node:fs/promises";
 import {
+  ALL_ACTIONS,
+  ALL_OBS_SCENE_TYPES,
+  ObsScene,
   ObsSceneSettings,
   ObsWebsocketSettings,
   ShortcutSettings,
+  ALL_SLIPPI_RELAY_STATUSES,
   SlippiRelaySettings,
   Tournament,
 } from "@app/common";
@@ -200,30 +204,99 @@ export class FileHandler {
   }
 
   static async getApiKey() {
+    const isApiKey = (key: any): key is string => {
+      return key !== null && typeof key === "string";
+    };
     return readFile(`${this.configRootPath}/api_key.txt`, "utf-8")
-      .then((key) => key)
+      .then((key) => {
+        if (isApiKey(key)) {
+          return key;
+        }
+        return "";
+      })
       .catch(() => {
         return "";
       });
   }
 
   static async getSlippiRelaySettings() {
+    const isSlippiRelaySettings = (data: any): data is SlippiRelaySettings => {
+      return (
+        typeof data === "object" &&
+        ALL_SLIPPI_RELAY_STATUSES.includes(data.relayStatus) &&
+        typeof data.directory === "string" &&
+        typeof data.ip === "string" &&
+        typeof data.port === "string"
+      );
+    };
     return readFile(`${this.configRootPath}/slippi.json`, "utf-8")
-      .then((data) => JSON.parse(data))
+      .then((data) => {
+        const json = JSON.parse(data);
+        if (isSlippiRelaySettings(json)) {
+          return json;
+        }
+        return undefined;
+      })
       .catch(() => {
         return undefined;
       });
   }
 
   static async getShortcuts() {
+    const isShortcutSettings = (data: any): data is ShortcutSettings => {
+      if (!Array.isArray(data)) return false;
+
+      return data.every(
+        (item) =>
+          item !== null &&
+          typeof item === "object" &&
+          typeof item.hotkey === "string" &&
+          ALL_ACTIONS.includes(item.action),
+      );
+    };
     return readFile(`${this.configRootPath}/shortcuts.json`, "utf-8")
-      .then((data) => JSON.parse(data))
+      .then((data) => {
+        const json = JSON.parse(data);
+        if (isShortcutSettings(json)) {
+          return json;
+        }
+        return undefined;
+      })
       .catch(() => {
         return undefined;
       });
   }
 
   static async getObsSettings() {
+    const isWebsocketSettings = (data: any): data is ObsWebsocketSettings => {
+      return (
+        data !== null &&
+        typeof data === "object" &&
+        typeof data.ip === "string" &&
+        typeof data.port === "string"
+      );
+    };
+
+    const isObsScenes = (data: any): data is ObsSceneSettings => {
+      const isObsScene = (obj: any): obj is ObsScene => {
+        return (
+          obj !== null &&
+          typeof obj === "object" &&
+          typeof obj.scene === "string" &&
+          typeof obj.start === "number"
+        );
+      };
+
+      if (!Array.isArray(data)) return false;
+
+      return data.every(
+        (scene) =>
+          scene !== null &&
+          typeof scene === "object" &&
+          ALL_OBS_SCENE_TYPES.includes(scene.type) &&
+          isObsScene(scene.scene),
+      );
+    };
     const websocketSettings = await readFile(
       `${this.configRootPath}/obs/websocket.json`,
       "utf-8",
@@ -236,10 +309,11 @@ export class FileHandler {
     ).catch(() => {
       return undefined;
     });
-
+    const websocketJson = JSON.parse(websocketSettings ?? "[]");
+    const scenesJson = JSON.parse(scenes ?? "[]");
     return {
-      websocket: JSON.parse(websocketSettings ?? "undefined"),
-      scenes: JSON.parse(scenes ?? "undefined"),
+      websocket: isWebsocketSettings(websocketJson) ? websocketJson : undefined,
+      scenes: isObsScenes(scenesJson) ? scenesJson : undefined,
     };
   }
 

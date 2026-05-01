@@ -8,6 +8,12 @@ export type ObsScene = {
   start: number;
 };
 
-export type ObsSceneType = "game-start" | "game-end" | "set-end";
+export const ALL_OBS_SCENE_TYPES = [
+  "game-start",
+  "game-end",
+  "set-end",
+] as const;
+
+export type ObsSceneType = (typeof ALL_OBS_SCENE_TYPES)[number];
 
 export type ObsSceneSettings = { type: ObsSceneType; scene: ObsScene }[];

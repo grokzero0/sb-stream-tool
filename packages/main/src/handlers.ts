@@ -50,13 +50,17 @@ export function createHandlers(
     "obs/save-websocket-settings": (newSettings: ObsWebsocketSettings) =>
       FileHandler.writeObsWebsocketSettings(newSettings),
 
+    "obs/get-settings": () => FileHandler.getObsSettings(),
+
     "obs/save-scenes": (newScenes: ObsSceneSettings) =>
       FileHandler.writeObsScenes(newScenes),
 
-    "startgg/get-api-key": async () => await FileHandler.getApiKey(),
+    "startgg/get-api-key": async () => FileHandler.getApiKey(),
 
     "startgg/update-api-key": (newApiKey: string) =>
       FileHandler.writeApiKey(newApiKey),
+
+    "shortcuts/get-shortcuts": async () => FileHandler.getShortcuts(),
 
     "shortcuts/save-shortcuts": (newSettings: ShortcutSettings) =>
       FileHandler.writeShortcutSettings(newSettings),
@@ -89,5 +93,7 @@ export function createHandlers(
     "slippi-relay/save-settings": (newSettings: SlippiRelaySettings) => {
       FileHandler.writeSlippiRelaySettings(newSettings);
     },
+
+    "slippi-relay/get-settings": () => FileHandler.getSlippiRelaySettings(),
   };
 }

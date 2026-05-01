@@ -1,4 +1,10 @@
-export type SlippiRelayStatus = "disabled" | "direct" | "folder";
+export const ALL_SLIPPI_RELAY_STATUSES = [
+  "disabled",
+  "direct",
+  "folder",
+] as const;
+
+export type SlippiRelayStatus = (typeof ALL_SLIPPI_RELAY_STATUSES)[number];
 
 export type SlippiRelaySettings = {
   relayStatus: SlippiRelayStatus;
