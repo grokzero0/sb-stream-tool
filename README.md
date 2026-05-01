@@ -176,8 +176,8 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] ~~Slippi integration~~
 - [x] ~~Start.gg integration~~
 - [x] ~~Basic keybinds~~
-- [x] More keybinds/shortcuts customization
-- [x] Persistence for settings (OBS websocket credentials, Slippi Folder Path, keybinds etc)
+- [x] ~~More keybinds/shortcuts customization~~
+- [x] ~~Persistence for settings (OBS websocket credentials, Slippi Folder Path, keybinds etc)~~
 - [ ] Persistence for tournament
 - [ ] Web instance (Web app)
 - [ ] Adjustable number of characters
