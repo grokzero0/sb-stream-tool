@@ -61,43 +61,43 @@ send("obs/get-settings")
       websocket: ObsWebsocketSettings | undefined;
       scenes: ObsSceneSettings | undefined;
     }) => {
-      if (settings.websocket === undefined) return;
-      useSettingsStore.setState({
-        websocketIp: settings.websocket.ip,
-        websocketPort: settings.websocket.port,
-      });
-
-      if (settings.scenes === undefined) return;
-
-      const scenesList = {
-        gameStartScenes: [] as ObsScene[],
-        gameEndScenes: [] as ObsScene[],
-        setEndScenes: [] as ObsScene[],
-      };
-
-      settings.scenes.forEach((scene) => {
-        switch (scene.type) {
-          case "game-start":
-            scenesList.gameStartScenes.push(scene.scene);
-            break;
-          case "game-end":
-            scenesList.gameEndScenes.push(scene.scene);
-            break;
-          case "set-end":
-            scenesList.setEndScenes.push(scene.scene);
-            break;
-          default:
-            throw new Error(
-              `UNKNOWN TYPE, idk how you even got this on a known typed value`,
-            );
-        }
-
+      if (settings.websocket !== undefined) {
         useSettingsStore.setState({
-          gameStartScenes: scenesList.gameStartScenes,
-          gameEndScenes: scenesList.gameEndScenes,
-          setEndScenes: scenesList.setEndScenes,
+          websocketIp: settings.websocket.ip,
+          websocketPort: settings.websocket.port,
         });
-      });
+      }
+
+      if (settings.scenes !== undefined) {
+        const scenesList = {
+          gameStartScenes: [] as ObsScene[],
+          gameEndScenes: [] as ObsScene[],
+          setEndScenes: [] as ObsScene[],
+        };
+
+        settings.scenes.forEach((scene) => {
+          switch (scene.type) {
+            case "game-start":
+              scenesList.gameStartScenes.push(scene.scene);
+              break;
+            case "game-end":
+              scenesList.gameEndScenes.push(scene.scene);
+              break;
+            case "set-end":
+              scenesList.setEndScenes.push(scene.scene);
+              break;
+            default:
+              throw new Error(
+                `UNKNOWN TYPE, idk how you even got this on a known typed value`,
+              );
+          }
+          useSettingsStore.setState({
+            gameStartScenes: scenesList.gameStartScenes,
+            gameEndScenes: scenesList.gameEndScenes,
+            setEndScenes: scenesList.setEndScenes,
+          });
+        });
+      }
     },
   )
   .catch((reason) => console.log(reason));

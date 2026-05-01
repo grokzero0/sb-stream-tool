@@ -1,5 +1,7 @@
 import { type StateCreator } from "zustand";
 import { type StoreSliceType } from "./slice";
+import { send } from "@app/preload";
+import { ObsSceneSettings } from "@app/common";
 
 export type ObsScene = {
   scene: string;
@@ -26,10 +28,22 @@ export const createObsScenesSlice: StateCreator<
   gameStartScenes: [],
   gameEndScenes: [],
   setEndScenes: [],
-  updateScenes: (newGameStartScenes, newGameEndScenes, newSetEndScenes) =>
+  updateScenes: (newGameStartScenes, newGameEndScenes, newSetEndScenes) => {
     set((state) => {
       state.gameStartScenes = newGameStartScenes;
       state.gameEndScenes = newGameEndScenes;
       state.setEndScenes = newSetEndScenes;
-    }),
+    });
+    const allScenes = [] as ObsSceneSettings;
+    newGameStartScenes.forEach((scene) =>
+      allScenes.push({ type: "game-start", scene: scene }),
+    );
+    newGameEndScenes.forEach((scene) =>
+      allScenes.push({ type: "game-end", scene: scene }),
+    );
+    newSetEndScenes.forEach((scene) =>
+      allScenes.push({ type: "set-end", scene: scene }),
+    );
+    send("obs/save-scenes", allScenes).catch((error) => console.log(error));
+  },
 });

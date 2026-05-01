@@ -18,7 +18,6 @@ export class EventStream {
 
   static attach(newObserver: EventSink): void {
     this.observers.push(newObserver);
-    console.log(this.observers.length);
   }
 
   static detach(observer: EventSink): void {
