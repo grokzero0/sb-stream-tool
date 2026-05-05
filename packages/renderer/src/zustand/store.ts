@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
@@ -110,6 +111,20 @@ send("slippi-relay/get-settings")
       slippiRelayDirectory: settings.directory,
       slippiRelayIp: settings.ip,
       slippiRelayPort: settings.port,
+    });
+  })
+  .catch((error) => console.log(error));
+
+send("startgg/get-tournament-url")
+  .then((url: string) => {
+    const regex =
+      /^https:\/\/(?:www\.)?start\.gg\/tournament\/([^\/?#]+)\/event\/([^\/?#]+)(?:[\/?#].*)?$/;
+    const match = url.match(regex);
+    if (!match) return;
+    const [, tournamentSlug, eventSlug] = match;
+    useSettingsStore.setState({
+      eventUrl: url,
+      eventSlug: `tournament/${tournamentSlug}/event/${eventSlug}`,
     });
   })
   .catch((error) => console.log(error));

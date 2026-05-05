@@ -266,6 +266,26 @@ export class FileHandler {
         return undefined;
       });
   }
+  // TODO: return BOTH tournament url AND slug here
+  static async getStartggTournamentUrl() {
+    const isStartggTournamentUrl = (url: any): url is string => {
+      const regex =
+        /^https:\/\/(?:www\.)?start\.gg\/tournament\/([^\/?#]+)\/event\/([^\/?#]+)(?:[\/?#].*)?$/;
+      return (
+        url !== null && typeof url === "string" && regex.test(url) === true
+      );
+    };
+    return readFile(`${this.configRootPath}/startgg.txt`, "utf-8")
+      .then((url) => {
+        if (isStartggTournamentUrl(url)) {
+          return url;
+        }
+        return "";
+      })
+      .catch(() => {
+        return "";
+      });
+  }
 
   static async getObsSettings() {
     const isWebsocketSettings = (data: any): data is ObsWebsocketSettings => {
@@ -331,6 +351,10 @@ export class FileHandler {
 
   static async writeShortcutSettings(settings: ShortcutSettings) {
     this.write(`${this.configRootPath}/shortcuts.json`, settings);
+  }
+
+  static async writeStartggUrl(url: string) {
+    this.write(`${this.configRootPath}/startgg.txt`, url);
   }
 
   static async createDirs() {

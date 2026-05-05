@@ -60,6 +60,11 @@ export function createHandlers(
     "startgg/update-api-key": (newApiKey: string) =>
       FileHandler.writeApiKey(newApiKey),
 
+    "startgg/save-tournament-url": (newTournamentUrl: string) =>
+      FileHandler.writeStartggUrl(newTournamentUrl),
+
+    "startgg/get-tournament-url": () => FileHandler.getStartggTournamentUrl(),
+
     "shortcuts/get-shortcuts": async () => FileHandler.getShortcuts(),
 
     "shortcuts/save-shortcuts": (newSettings: ShortcutSettings) =>

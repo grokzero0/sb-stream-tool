@@ -1,3 +1,4 @@
+/* eslint-disable no-useless-escape */
 import { useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { Label } from "./ui/label";
@@ -21,6 +22,17 @@ function FetchEvent() {
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [statusMessage, setStatusMessage] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
+
+  const parseStartggUrl = (url: string) => {
+    const regex =
+      /^https:\/\/(?:www\.)?start\.gg\/tournament\/([^\/?#]+)\/event\/([^\/?#]+)(?:[\/?#].*)?$/;
+    const match = url.match(regex);
+    if (!match) return null;
+
+    const [, tournamentSlug, eventSlug] = match;
+
+    return `tournament/${tournamentSlug}/event/${eventSlug}`;
+  };
   // const apiKey = useSettingsStore((state) => state.apiKey);
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -48,8 +60,14 @@ function FetchEvent() {
           <Button
             type="button"
             onClick={() => {
+              const eventSlug = parseStartggUrl(eventUrl);
+              if (eventSlug === null) {
+                setStatusMessage("Invalid Start.gg URL");
+                return;
+              }
               setStatusMessage(`Applying event ${eventUrl}...`);
-              update(eventUrl);
+              update(eventUrl, eventSlug);
+              setStatusMessage(`Applied event ${eventUrl}!`);
               clearTimeout(timeoutRef.current);
               timeoutRef.current = setTimeout(() => {
                 setStatusMessage("");
