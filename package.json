@@ -1,6 +1,6 @@
 {
   "name": "sb-stream-tool",
-  "description": "Secure boilerplate for Electron app based on Vite",
+  "description": "Stream tool for Super Smash Bros tournaments built in Electron + Vite + React",
   "version": "0.0.4",
   "private": true,
   "type": "module",

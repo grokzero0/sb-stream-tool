@@ -178,7 +178,7 @@ _For more examples, please refer to the [Documentation](https://example.com)_
 - [x] ~~Basic keybinds~~
 - [x] ~~More keybinds/shortcuts customization~~
 - [x] ~~Persistence for settings (OBS websocket credentials, Slippi Folder Path, keybinds etc)~~
-- [x] Persistence for tournament
+- [x] ~~Persistence for tournament~~
 - [ ] Web instance (Web app)
 - [ ] Adjustable number of characters
 - [ ] P+ integration

@@ -1,3 +1,4 @@
+// TODO: SET UP SQLITE3
 import path from "node:path";
 import { EventStream } from "./EventStream.js";
 import { app } from "electron";
