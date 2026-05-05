@@ -1,7 +1,7 @@
 import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "./use-player-form-field-array-context";
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import {
   clearAllListeners,
   onNewSlippiGameData,
@@ -19,6 +19,7 @@ import { useSettingsStore } from "@renderer/zustand/store";
 export function useSlippiDataHandler() {
   const { setValue, getValues, handleSubmit } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
+  const shouldResetScore = useRef(false);
   const slippiRelayStatus = useSettingsStore(
     (state) => state.slippiRelayStatus,
   );
@@ -33,6 +34,14 @@ export function useSlippiDataHandler() {
         changeSetFormat("Singles", teams);
         setValue("setFormat", "Singles");
       }
+
+      if (shouldResetScore.current) {
+        for (let index = 0; index < getValues("teams").length; index++) {
+          setValue(`teams.${index}.score`, 0);
+        }
+        shouldResetScore.current = false;
+      }
+
       for (let i = 0; i < getValues("teams").length; i++) {
         for (
           let j = 0;
@@ -70,10 +79,13 @@ export function useSlippiDataHandler() {
       if (winnerIndex !== undefined) {
         const newScore = getValues(`teams.${winnerIndex}.score`) + 1;
         setValue(`teams.${winnerIndex}.score`, newScore);
+
+        // Set officially ended, new set
         if (newScore >= scoreToBeat) {
           send("obs/play-set-end-scenes").catch((reason) =>
             console.log(reason),
           );
+          shouldResetScore.current = true; // flag to reset score, much more easier than going through every team and see if the score is greater than the score to beat
         } else {
           send("obs/play-game-end-scenes").catch((reason) =>
             console.log(reason),
