@@ -64,6 +64,7 @@ export class SlippiRelayHandler {
   }
 
   static async setup(listenPath: string) {
+    await this.stop(true);
     this.listenPath = listenPath;
     this.watcher = chokidar.watch(listenPath, {
       ignored: "!*.slp", // TODO: This doesn't work. Use regex?
