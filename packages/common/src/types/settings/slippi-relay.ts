@@ -26,6 +26,12 @@ export type SlippiGameData = {
   players: SlippiPlayer[][];
 };
 
+export type SlippiGameStartData = {
+  isTeams: boolean;
+  players: SlippiPlayer[][];
+  isSameGame: boolean;
+};
+
 export type SlippiGameEndData = {
   isTeams: boolean;
   winners: number[]; // all the winners' playerindexes

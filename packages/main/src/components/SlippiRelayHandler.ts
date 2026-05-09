@@ -1,7 +1,12 @@
 import { BrowserWindow } from "electron";
 import { EventStream } from "./EventStream.js";
 import chokidar, { FSWatcher } from "chokidar";
-import { SlippiGameData, SlippiGameEndData, SlippiPlayer } from "@app/common";
+import {
+  SlippiGameEndData,
+  SlippiGameData,
+  SlippiPlayer,
+  SlippiGameStartData,
+} from "@app/common";
 import {
   FrameEntryType,
   GameEndType,
@@ -13,32 +18,17 @@ import {
 } from "@slippi/slippi-js/node";
 import { SlippiSettingsData } from "../types.js";
 
+// todo: don't send new-game ipc with characters if all characters are the same and the set isn't over yet, to avoid the overwritten swapping characters issue in the frontend when new game data is sent
 export class SlippiRelayHandler {
   private static browserWindow?: BrowserWindow | null = null;
   private static watcher?: FSWatcher | null = null;
   private static listenPath: string = "";
   private static ip: string = "";
   private static port: string = "";
-  private static players: SlippiGameData | null = null;
-  private static bestOf: number = 0;
-  // private static previousPlayers:
-  // settings field is used to detect if game started or not, see line 97-100 of https://github.com/project-slippi/slippi-js/blob/master/src/common/SlippiGameBase.ts
+  private static previousPlayers: SlippiGameData | null = null;
+  // settings field in games is used to detect if game started or not, see line 97-100 of https://github.com/project-slippi/slippi-js/blob/master/src/common/SlippiGameBase.ts
   // possibly delete all handwarmers games tbh
   private static games: Map<string, SlippiSettingsData> = new Map();
-  // constructor() {
-  //   super();
-  //   this.browserWindow = null;
-  //   this.watcher = null;
-  //   this.listenPath = null;
-  //   this.ip = null;
-  //   this.port = null;
-  //   this.players = null;
-  //   this.games = new Map<string, SlippiSettingsData>();
-  // }
-
-  static async getPlayers() {
-    return this.players;
-  }
 
   static async setBrowserWindow(browserWindow: BrowserWindow) {
     this.browserWindow = browserWindow;
@@ -75,8 +65,37 @@ export class SlippiRelayHandler {
     });
 
     this.read();
-    console.log("SETUP COMPLETE");
     EventStream.notify("Slippi Relay", "Started Relay");
+  }
+
+  // check if game is the same as the previous one (same characters, ports, type, etc)
+  private static isSameGame(gameData: SlippiGameData) {
+    if (
+      this.previousPlayers === null || // first game ever recorded
+      this.previousPlayers.isTeams !== gameData.isTeams ||
+      this.previousPlayers.players.length !== gameData.players.length
+    )
+      return false;
+    for (let i = 0; i < gameData.players.length; i++) {
+      if (gameData.players[i].length !== this.previousPlayers.players[i].length)
+        return false;
+      for (let j = 0; j < gameData.players[i].length; j++) {
+        if (
+          gameData.players[i][j].character !==
+            this.previousPlayers.players[i][j].character ||
+          gameData.players[i][j].color !==
+            this.previousPlayers.players[i][j].color ||
+          gameData.players[i][j].playerId !==
+            this.previousPlayers.players[i][j].playerId ||
+          gameData.players[i][j].port !==
+            this.previousPlayers.players[i][j].port ||
+          gameData.players[i][j].teamId !==
+            this.previousPlayers.players[i][j].teamId
+        )
+          return false;
+      }
+    }
+    return true;
   }
 
   private static isActualGame(
@@ -243,11 +262,22 @@ export class SlippiRelayHandler {
       }
       if (!gameState?.settings && settings) {
         // a new game has ACTUALLY started, since the settings portion didn't exist before and there are new settings
-        const newData = this.getStartGameData(settings);
+        const newGameData = this.getStartGameData(settings);
+        // now check if it's a runback with the same characters, and the set isn't over
+        const isSameGame = this.isSameGame(newGameData);
+
+        const data: SlippiGameStartData = {
+          isTeams: newGameData.isTeams,
+          players: newGameData.players,
+          isSameGame: isSameGame,
+        };
+
         this.browserWindow?.webContents.send(
           "slippi:new-game-start-data",
-          newData,
+          data,
         );
+
+        this.previousPlayers = newGameData;
       }
       game = this.games.get(path);
       if (game?.state) {
