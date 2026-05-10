@@ -1,5 +1,4 @@
 import { Button } from "@renderer/components/ui/button";
-import { sendToastMessage } from "@renderer/components/ui/toast";
 import { ActionToName } from "@renderer/utils/helpers";
 import { Shortcut } from "@renderer/zustand/slices/shortcutsSlice";
 import { Action } from "@app/common";
@@ -33,9 +32,7 @@ function Shortcuts() {
       className="flex flex-col gap-4 w-full p-2"
       onSubmit={(e) => {
         e.preventDefault();
-        console.log("reached");
         update(editedShortcuts);
-        sendToastMessage("Keybinds", "Keybinds successfully updated!");
       }}
     >
       <h1 className="text-center">Keyboard shortcuts settings</h1>
@@ -66,13 +63,9 @@ function Shortcuts() {
         type="button"
         onClick={() => {
           setKeybinds(new Map(savedShortcuts));
-          sendToastMessage(
-            "Keybinds",
-            "Keybinds successfully reset to default!",
-          );
         }}
       >
-        Reset all keybinds
+        Reset all unsaved keybinds
       </Button>
     </form>
   );

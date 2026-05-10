@@ -1,3 +1,4 @@
+// overhaul for more modular code
 const socket = io("http://127.0.0.1:20242/");
 
 const portToNum = {
@@ -24,6 +25,26 @@ function setElementData(id, data) {
   }
 
   document.getElementById(id).innerText = data;
+}
+
+function clearAllElements() {
+  setElementData("left-playername", "");
+  setElementData("right-playername", "");
+  setElementData("left-score", "");
+  setElementData("right-score", "");
+
+  setElementData("tournament-name", "");
+  setElementData("best-of", "");
+
+  setElementData("left-team", "");
+  setElementData("right-team", "");
+
+  let left_port = document
+    .getElementById("left-port")
+    .getElementsByTagName("img");
+  let right_port = document
+    .getElementById("right-port")
+    .getElementsByTagName("img");
 }
 
 function getPlayerNames(players, inLosers) {
@@ -114,52 +135,51 @@ function getTeams(team) {
 
 function updateOverlay(newData) {
   console.log("updating overlay");
-  console.log(newData)
+  console.log(newData);
   setElementData(
     "left-playername",
-    getPlayerNames(newData.teams[0].players, newData.teams[0].inLosers)
+    getPlayerNames(newData.teams[0].players, newData.teams[0].inLosers),
   );
 
   setElementData(
     "right-playername",
-    getPlayerNames(newData.teams[1].players, newData.teams[1].inLosers)
+    getPlayerNames(newData.teams[1].players, newData.teams[1].inLosers),
   );
 
   setElementData("left-score", newData.teams[0].score);
-  setElementData("right-score", newData.teams[1].score)
+  setElementData("right-score", newData.teams[1].score);
 
-  setElementData("tournament-name", newData.name)
-  setElementData("best-of", newData.bestOf)
+  setElementData("tournament-name", newData.name);
+  setElementData("best-of", newData.bestOf);
 
-  setElementData("left-team", getTeams(newData.teams[0]))
-  setElementData("right-team", newData.teams[1])
+  setElementData("left-team", getTeams(newData.teams[0]));
+  setElementData("right-team", newData.teams[1]);
 
-  console.log(getTeams(newData.teams[0]));
   getPort(
     document.getElementById("left-port").getElementsByTagName("img"),
-    newData.teams[0].players
+    newData.teams[0].players,
   );
   getPort(
     document.getElementById("right-port").getElementsByTagName("img"),
-    newData.teams[1].players
+    newData.teams[1].players,
   );
   document.getElementById("left-pronouns").innerText = getPronouns(
-    newData.teams[0].players
+    newData.teams[0].players,
   );
   document.getElementById("right-pronouns").innerText = getPronouns(
-    newData.teams[1].players
+    newData.teams[1].players,
   );
   getCharacters(
     document.getElementById("left-character").getElementsByTagName("img"),
-    newData.teams[0].players
+    newData.teams[0].players,
   );
   getCharacters(
     document.getElementById("right-character").getElementsByTagName("img"),
-    newData.teams[1].players
+    newData.teams[1].players,
   );
 }
 
 socket.on("sendDataToClients", (newData) => {
   updateOverlay(newData);
-  socket.broadcast.emit("overlayUpdateSuccess")
+  socket.broadcast.emit("overlayUpdateSuccess");
 });

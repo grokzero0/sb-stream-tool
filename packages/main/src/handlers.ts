@@ -12,6 +12,7 @@ import {
   Tournament,
 } from "@app/common";
 import { dialog, shell } from "electron";
+import { SettingsStore } from "./components/SettingsStore.js";
 
 export type SharedRegistry = {
   [key: string]: (...args: any[]) => Promise<any> | any;
@@ -19,9 +20,6 @@ export type SharedRegistry = {
 
 export function createHandlers(
   mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>,
-  //   obs: ObsController,
-  //   fileDataManager: FileReaderWriter,
-  //   slippi: SlippiRelayHandler,
 ): SharedRegistry {
   return {
     "obs/connect": (ip: string, port: string, password: string) => {
@@ -48,27 +46,27 @@ export function createHandlers(
     "obs/play-set-end-scenes": () => ObsController.playScenes("set-end"),
 
     "obs/save-websocket-settings": (newSettings: ObsWebsocketSettings) =>
-      FileHandler.writeObsWebsocketSettings(newSettings),
+      SettingsStore.writeObsWebsocketSettings(newSettings),
 
-    "obs/get-settings": () => FileHandler.getObsSettings(),
+    "obs/get-settings": () => SettingsStore.getObsSettings(),
 
     "obs/save-scenes": (newScenes: ObsSceneSettings) =>
-      FileHandler.writeObsScenes(newScenes),
+      SettingsStore.writeObsScenes(newScenes),
 
-    "startgg/get-api-key": async () => FileHandler.getApiKey(),
+    "startgg/get-api-key": async () => SettingsStore.getStartggApiKey(),
 
     "startgg/update-api-key": (newApiKey: string) =>
-      FileHandler.writeApiKey(newApiKey),
+      SettingsStore.writeStartggApiKey(newApiKey),
 
     "startgg/save-tournament-url": (newTournamentUrl: string) =>
-      FileHandler.writeStartggUrl(newTournamentUrl),
+      SettingsStore.writeStartggTournamentUrl(newTournamentUrl),
 
-    "startgg/get-tournament-url": () => FileHandler.getStartggTournamentUrl(),
+    "startgg/get-tournament-url": () => SettingsStore.getStartggTournamentUrl(),
 
-    "shortcuts/get-shortcuts": async () => FileHandler.getShortcuts(),
+    "shortcuts/get-shortcuts": async () => SettingsStore.getShortcuts(),
 
     "shortcuts/save-shortcuts": (newSettings: ShortcutSettings) =>
-      FileHandler.writeShortcutSettings(newSettings),
+      SettingsStore.writeShortcutSettings(newSettings),
 
     "file:openDialog": async () => {
       const { canceled, filePaths } = await dialog.showOpenDialog({
@@ -96,9 +94,9 @@ export function createHandlers(
     },
 
     "slippi-relay/save-settings": (newSettings: SlippiRelaySettings) => {
-      FileHandler.writeSlippiRelaySettings(newSettings);
+      SettingsStore.writeSlippiRelaySettings(newSettings);
     },
 
-    "slippi-relay/get-settings": () => FileHandler.getSlippiRelaySettings(),
+    "slippi-relay/get-settings": () => SettingsStore.getSlippiRelaySettings(),
   };
 }

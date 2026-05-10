@@ -4,7 +4,7 @@ import { send } from "@app/preload";
 
 export type StartggSlice = {
   startggApiKey: string;
-  updateStartggApiKey: (newApiKey: string) => Promise<void>;
+  updateStartggApiKey: (newApiKey: string) => void;
 };
 
 // https://github.com/pmndrs/zustand/discussions/676
@@ -15,11 +15,12 @@ export const createStartggSlice: StateCreator<
   StartggSlice
 > = (set) => ({
   startggApiKey: "",
-  updateStartggApiKey: async (newApiKey) => {
-    console.log("updateKey");
+  updateStartggApiKey: (newApiKey) => {
     set((state) => {
       state.startggApiKey = newApiKey;
     });
-    await send("startgg/update-api-key", newApiKey);
+    send("startgg/update-api-key", newApiKey).catch((error) =>
+      console.log(error),
+    );
   },
 });

@@ -1,4 +1,3 @@
-import { send } from "@app/preload";
 import { Button } from "@renderer/components/ui/button";
 import { Input } from "@renderer/components/ui/input";
 import { Label } from "@renderer/components/ui/label";
@@ -131,12 +130,6 @@ function Scenes() {
       <Button
         type="button"
         onClick={() => {
-          send(
-            "obs/update-scenes",
-            gameStartScenes,
-            gameEndScenes,
-            setEndScenes,
-          ).catch((reason) => console.log(reason));
           update(gameStartScenes, gameEndScenes, setEndScenes);
         }}
       >

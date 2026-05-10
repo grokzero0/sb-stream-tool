@@ -31,7 +31,7 @@ function Startgg() {
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          update(apiKey).catch((reason) => console.log(reason));
+          update(apiKey);
         }}
       >
         <div className="flex flex-col gap-3">

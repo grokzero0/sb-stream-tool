@@ -44,6 +44,12 @@ export const createObsScenesSlice: StateCreator<
     newSetEndScenes.forEach((scene) =>
       allScenes.push({ type: "set-end", scene: scene }),
     );
-    send("obs/save-scenes", allScenes).catch((error) => console.log(error));
+    send( // send to ObsController
+      "obs/update-scenes",
+      newGameStartScenes,
+      newGameEndScenes,
+      newSetEndScenes,
+    ).catch((error) => console.log(error));
+    send("obs/save-scenes", allScenes).catch((error) => console.log(error)); // save to store
   },
 });
