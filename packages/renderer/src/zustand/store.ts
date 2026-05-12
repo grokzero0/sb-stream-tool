@@ -9,12 +9,10 @@ import { createSlippiSlice } from "./slices/slippiSlice";
 import { createObsWebsocketSlice } from "./slices/obsWebsocketSlice";
 import { send } from "@app/preload";
 import { createEventSlice } from "./slices/eventSlice";
-import {
-  createShortcutsSlice,
-  defaultShortcuts,
-} from "./slices/shortcutsSlice";
+import { createShortcutsSlice } from "./slices/shortcutsSlice";
 import { enableMapSet } from "immer";
 import {
+  Action,
   ObsScene,
   ObsSceneSettings,
   ObsWebsocketSettings,
@@ -44,17 +42,18 @@ send("startgg/get-api-key")
   .then((key: string) => {
     useSettingsStore.setState({ startggApiKey: key });
   })
-  .catch((reason) => console.log(reason));
+  .catch((error) => console.log(error));
 
 send("shortcuts/get-shortcuts")
   .then((shortcutsList: ShortcutSettings | undefined) => {
     if (shortcutsList === undefined) return;
+    const retrievedShortcuts = new Map<Action, Hotkey>();
     shortcutsList.forEach((shortcut) =>
-      defaultShortcuts.set(shortcut.action, shortcut.hotkey as Hotkey),
+      retrievedShortcuts.set(shortcut.action, shortcut.hotkey as Hotkey),
     );
-    useSettingsStore.setState({ shortcuts: defaultShortcuts });
+    useSettingsStore.setState({ shortcuts: retrievedShortcuts });
   })
-  .catch((reason) => console.log(reason));
+  .catch((error) => console.log(error));
 
 send("obs/get-settings")
   .then(
@@ -70,38 +69,36 @@ send("obs/get-settings")
       }
 
       if (settings.scenes !== undefined) {
-        const scenesList = {
-          gameStartScenes: [] as ObsScene[],
-          gameEndScenes: [] as ObsScene[],
-          setEndScenes: [] as ObsScene[],
-        };
+        const gameStartScenes = [] as ObsScene[];
+        const gameEndScenes = [] as ObsScene[];
+        const setEndScenes = [] as ObsScene[];
 
         settings.scenes.forEach((scene) => {
           switch (scene.type) {
             case "game-start":
-              scenesList.gameStartScenes.push(scene.scene);
+              gameStartScenes.push(scene.scene);
               break;
             case "game-end":
-              scenesList.gameEndScenes.push(scene.scene);
+              gameEndScenes.push(scene.scene);
               break;
             case "set-end":
-              scenesList.setEndScenes.push(scene.scene);
+              setEndScenes.push(scene.scene);
               break;
             default:
               throw new Error(
                 `UNKNOWN TYPE, idk how you even got this on a known typed value`,
               );
           }
-          useSettingsStore.setState({
-            gameStartScenes: scenesList.gameStartScenes,
-            gameEndScenes: scenesList.gameEndScenes,
-            setEndScenes: scenesList.setEndScenes,
-          });
+        });
+        useSettingsStore.setState({
+          gameStartScenes: gameStartScenes,
+          gameEndScenes: gameEndScenes,
+          setEndScenes: setEndScenes,
         });
       }
     },
   )
-  .catch((reason) => console.log(reason));
+  .catch((error) => console.log(error));
 
 send("slippi-relay/get-settings")
   .then((settings: SlippiRelaySettings | undefined) => {

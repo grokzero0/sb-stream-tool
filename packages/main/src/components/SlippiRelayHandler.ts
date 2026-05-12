@@ -308,7 +308,9 @@ export class SlippiRelayHandler {
             );
           }
         }
-        game.state.gameEnded = true; // chokidar does sometimes fire twice on one slippi file a second apart from each other: this could be because of a slight change in the file, metadata flush, some small, very minute, irrelevant change to the file/buffer via os, etc
+        // chokidar does sometimes fire twice on one slippi file a second apart from each other: this could be because of a slight change in the file, metadata flush, some small, very minute, irrelevant change to the file/buffer via os, etc
+        // so we must ensure the file end stuff only gets read once
+        game.state.gameEnded = true;
         this.games.set(path, game);
         console.log(this.games.get(path));
       }

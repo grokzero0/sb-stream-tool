@@ -1,6 +1,6 @@
 import { Button } from "@renderer/components/ui/button";
 import { ActionToName } from "@renderer/utils/helpers";
-import { Shortcut } from "@renderer/zustand/slices/shortcutsSlice";
+import { defaultShortcuts } from "@renderer/zustand/slices/shortcutsSlice";
 import { Action } from "@app/common";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { formatForDisplay, useHotkeyRecorder } from "@tanstack/react-hotkeys";
@@ -9,17 +9,17 @@ import { useState } from "react";
 function Shortcuts() {
   const savedShortcuts = useSettingsStore((state) => state.shortcuts);
   const update = useSettingsStore((state) => state.updateKeys);
-  const [keybinds, setKeybinds] = useState(new Map(savedShortcuts));
-  const [editedShortcuts, setEditedShortcuts] = useState<Shortcut[]>([]);
+  const [shortcuts, setShortcuts] = useState(new Map(savedShortcuts));
   const [editingAction, setEditingAction] = useState<Action | null>(null);
+  const areShortcutsSaved = Array.from(shortcuts).every(
+    ([action, hotkey]) => savedShortcuts.get(action) === hotkey,
+  );
   const recorder = useHotkeyRecorder({
     onRecord: (hotkey) => {
       if (editingAction) {
-        setKeybinds((keys) => keys.set(editingAction, hotkey));
-        setEditedShortcuts((prev) => [
-          ...prev,
-          { action: editingAction, hotkey: hotkey },
-        ]);
+        setShortcuts((shortcuts) =>
+          new Map(shortcuts).set(editingAction, hotkey),
+        );
       }
     },
 
@@ -32,14 +32,20 @@ function Shortcuts() {
       className="flex flex-col gap-4 w-full p-2"
       onSubmit={(e) => {
         e.preventDefault();
-        update(editedShortcuts);
+        update(shortcuts);
       }}
     >
       <h1 className="text-center">Keyboard shortcuts settings</h1>
+      {!areShortcutsSaved && (
+        <h2 className="text-center">Shortcut changes are not saved.</h2>
+      )}
       <div>
-        {Array.from(keybinds).map(([action, hotkey]) => (
+        {Array.from(shortcuts).map(([action, hotkey]) => (
           <div key={action} className="flex justify-between">
-            <span>{ActionToName[action]}</span>
+            <span>
+              {ActionToName[action]}{" "}
+              {savedShortcuts.get(action) !== shortcuts.get(action) && "*"}
+            </span>
             <div className="flex gap-2">
               <span>{formatForDisplay(hotkey)}</span>
               <Button
@@ -62,10 +68,18 @@ function Shortcuts() {
       <Button
         type="button"
         onClick={() => {
-          setKeybinds(new Map(savedShortcuts));
+          setShortcuts(new Map(savedShortcuts));
         }}
       >
         Reset all unsaved keybinds
+      </Button>
+      <Button
+        type="button"
+        onClick={() => {
+          setShortcuts(new Map(defaultShortcuts));
+        }}
+      >
+        Reset all keybinds to default
       </Button>
     </form>
   );

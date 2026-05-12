@@ -14,7 +14,6 @@ import { ipcSetup } from "../Ipc.js";
 import { SlippiRelayHandler } from "../components/SlippiRelayHandler.js";
 import { EventStream } from "../components/EventStream.js";
 
-// todo: implement restoration of settings on launch
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
   readonly #renderer: { path: string } | URL;

@@ -10,7 +10,7 @@ export type Shortcut = { action: Action; hotkey: Hotkey };
 
 export type ShortcutsSlice = {
   shortcuts: Shortcuts;
-  updateKeys: (keysToUpdate: Shortcut[]) => void;
+  updateKeys: (newShortcuts: Map<Action, Hotkey>) => void;
   resetShortcutsToDefault: () => void;
 };
 
@@ -26,19 +26,19 @@ export const createShortcutsSlice: StateCreator<
   [["zustand/immer", never]],
   [],
   ShortcutsSlice
-> = (set, get) => ({
+> = (set) => ({
   shortcuts: defaultShortcuts,
-  updateKeys: (keysToUpdate) => {
+  updateKeys: (newShortcuts) => {
     set((state) => {
-      for (const key of keysToUpdate) {
-        state.shortcuts.set(key.action, key.hotkey);
-      }
+      state.shortcuts = newShortcuts;
     });
-    const newShortcuts = [] as ShortcutSettings;
-    get().shortcuts.forEach((hotkey, action) =>
-      newShortcuts.push({ action: action, hotkey: hotkey }),
+
+    const newShortcutSettings = [] as ShortcutSettings;
+    newShortcuts.forEach((hotkey, action) =>
+      newShortcutSettings.push({ action: action, hotkey: hotkey }),
     );
-    send("shortcuts/save-shortcuts", newShortcuts).catch((error) =>
+
+    send("shortcuts/save-shortcuts", newShortcutSettings).catch((error) =>
       console.log(error),
     );
   },

@@ -1,6 +1,7 @@
 import { OBSWebSocket } from "obs-websocket-js";
 import { EventStream } from "./EventStream.js";
 import { ObsScene, ObsSceneType } from "@app/common";
+import { SettingsStore } from "./SettingsStore.js";
 
 class SceneCollection {
   private scenes: ObsScene[];
@@ -13,10 +14,11 @@ class SceneCollection {
     this.socket = socket;
   }
 
-  async stop() {
+  stop() {
     for (const id of this.sceneTimeoutIds) {
       clearTimeout(id);
     }
+    this.sceneTimeoutIds = [];
   }
 
   async play() {
@@ -38,7 +40,6 @@ class SceneCollection {
 
   async update(newScenes: ObsScene[]) {
     this.stop();
-    this.sceneTimeoutIds = [];
     this.scenes = newScenes;
   }
 }
@@ -62,25 +63,6 @@ export class ObsController {
   //   this.setEndScenes = new SceneCollection(this.socket);
   //   this.gameEndScenes = new SceneCollection(this.socket);
   // }
-  static async initEvents() {
-    this.socket.on("ConnectionError", (error) => {
-      console.log("Connection Error");
-      EventStream.notify("OBS Connection Error", `Connection Error: ${error}`);
-    });
-
-    this.socket.on("ConnectionOpened", () => {
-      console.log("Connection Opened");
-      EventStream.notify("OBS Connection Success", "Connection Opened");
-    });
-
-    this.socket.on("CurrentProgramSceneChanged", (scene) => {
-      console.log(`Scene Changed to ${scene.sceneName}`);
-      EventStream.notify(
-        "OBS Scene Change",
-        `Scene Changed to ${scene.sceneName}`,
-      );
-    });
-  }
 
   static async connect(
     protocol: string,
@@ -145,5 +127,50 @@ export class ObsController {
     this.gameEndScenes.update(newGameEndScenes);
     this.setEndScenes.update(newSetEndScenes);
     EventStream.notify("OBS scenes", "OBS scenes added!");
+  }
+
+  static async initEvents() {
+    this.socket.on("ConnectionError", (error) => {
+      console.log("Connection Error");
+      EventStream.notify("OBS Connection Error", `Connection Error: ${error}`);
+    });
+
+    this.socket.on("ConnectionOpened", () => {
+      console.log("Connection Opened");
+      EventStream.notify("OBS Connection Success", "Connection Opened");
+    });
+
+    this.socket.on("CurrentProgramSceneChanged", (scene) => {
+      console.log(`Scene Changed to ${scene.sceneName}`);
+      EventStream.notify(
+        "OBS Scene Change",
+        `Scene Changed to ${scene.sceneName}`,
+      );
+    });
+
+    const scenes = await SettingsStore.getObsScenes();
+    if (scenes !== undefined) {
+      const gameStartScenes = [] as ObsScene[];
+      const gameEndScenes = [] as ObsScene[];
+      const setEndScenes = [] as ObsScene[];
+      for (const scene of scenes) {
+        switch (scene.type) {
+          case "game-start":
+            gameStartScenes.push(scene.scene);
+            break;
+          case "game-end":
+            gameEndScenes.push(scene.scene);
+            break;
+          case "set-end":
+            setEndScenes.push(scene.scene);
+            break;
+          default:
+            throw new Error(
+              `UNKNOWN TYPE, idk how you even got this on a known typed value`,
+            );
+        }
+      }
+      this.updateScenes(gameStartScenes, gameEndScenes, setEndScenes);
+    }
   }
 }
