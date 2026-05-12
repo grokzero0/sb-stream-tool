@@ -285,7 +285,7 @@ export class SlippiRelayHandler {
         game.state.settings = settings;
         this.games.set(path, game);
       }
-      if (game && gameEnd !== undefined && !game.state.gameEnded) {
+      if (game && gameEnd !== undefined && game.state.gameEnded === false) {
         if (
           this.isActualGame(
             game.gameDataController.getMetadata(),
