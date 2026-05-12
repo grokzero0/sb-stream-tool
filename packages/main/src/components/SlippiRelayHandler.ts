@@ -248,6 +248,7 @@ export class SlippiRelayHandler {
             gameDataController: new SlippiGame(path, { processOnTheFly: true }),
             state: {
               settings: undefined,
+              gameEnded: false,
             },
           });
         }
@@ -284,17 +285,17 @@ export class SlippiRelayHandler {
         game.state.settings = settings;
         this.games.set(path, game);
       }
-      if (gameEnd !== undefined) {
+      if (game && gameEnd !== undefined && !game.state.gameEnded) {
         if (
           this.isActualGame(
-            game?.gameDataController.getMetadata(),
+            game.gameDataController.getMetadata(),
             gameEnd,
-            game?.gameDataController.getStats(),
+            game.gameDataController.getStats(),
           )
         ) {
           const winner = this.getWinner(
             settings,
-            game?.gameDataController.getLatestFrame(),
+            game.gameDataController.getLatestFrame(),
             gameEnd,
           );
           if (winner !== undefined) {
@@ -303,10 +304,13 @@ export class SlippiRelayHandler {
               winner,
             );
             console.log(
-              `winners = ${winner.winners}, isTeam = ${winner.isTeams}`,
+              `winners = ${winner.winners}, isTeam = ${winner.isTeams}, gameEnded = ${game.state.gameEnded}`,
             );
           }
         }
+        game.state.gameEnded = true; // chokidar does sometimes fire twice on one slippi file a second apart from each other: this could be because of a slight change in the file, metadata flush, some small, very minute, irrelevant change to the file/buffer via os, etc
+        this.games.set(path, game);
+        console.log(this.games.get(path));
       }
     });
   }

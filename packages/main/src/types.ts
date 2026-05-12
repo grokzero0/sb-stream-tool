@@ -6,6 +6,7 @@ export type SlippiSettingsData = {
   state: {
     // perhaps extended upon in the future to include punishes, for example, etc
     settings: GameStartType | undefined;
+    gameEnded: boolean;
   };
 };
 

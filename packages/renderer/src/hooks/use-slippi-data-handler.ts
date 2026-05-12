@@ -71,9 +71,8 @@ export function useSlippiDataHandler() {
         }
       }
 
-      send("obs/play-game-start-scenes").catch((reason) =>
-        console.log(`game-start-scenes-error: ${reason}`),
-      );
+      send("obs/play-game-start-scenes").catch((error) => console.log(error));
+
       if (slippiRelayStatus !== "disabled") {
         handleSubmit(onSubmit)().catch((error) => console.log(error));
       }
@@ -88,19 +87,14 @@ export function useSlippiDataHandler() {
       const scoreToBeat =
         bestOf % 2 === 0 ? bestOf / 2 + 1 : Math.ceil(bestOf / 2);
       if (winnerIndex !== undefined) {
-        console.log(`UPDATING SCORE, time = ${Date.now().toLocaleString()}`);
         const newScore = getValues(`teams.${winnerIndex}.score`) + 1;
         setValue(`teams.${winnerIndex}.score`, newScore);
 
-        // Set officially ended, new set
+        // Set officially ended, new set, else game officially ended, new game
         if (newScore >= scoreToBeat) {
-          send("obs/play-set-end-scenes").catch((reason) =>
-            console.log(reason),
-          );
+          send("obs/play-set-end-scenes").catch((error) => console.log(error));
         } else {
-          send("obs/play-game-end-scenes").catch((reason) =>
-            console.log(reason),
-          );
+          send("obs/play-game-end-scenes").catch((error) => console.log(error));
         }
 
         if (slippiRelayStatus !== "disabled") {

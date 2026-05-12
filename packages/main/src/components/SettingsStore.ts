@@ -36,7 +36,7 @@ export class SettingsStore {
     const relayIp = await this.serialize(settings.ip);
     const relayPort = await this.serialize(settings.port);
 
-    db.transaction(async (txn: Transaction) => {
+    await db.transaction(async (txn: Transaction) => {
       (txn.put("slippi-relay-status", relayStatus),
         txn.put("slippi-relay-directory", directory),
         txn.put("slippi-relay-ip", relayIp),
@@ -83,7 +83,7 @@ export class SettingsStore {
   static async writeShortcutSettings(settings: ShortcutSettings) {
     const serializedSettings = await this.serialize(settings);
     const db = RocksDatabase.open(this.storePath);
-    db.put("shortcuts", serializedSettings);
+    await db.put("shortcuts", serializedSettings);
     db.close();
     EventStream.notify("Shortcuts", "Successfully saved shortcuts!");
   }
@@ -118,7 +118,7 @@ export class SettingsStore {
     const db = RocksDatabase.open(this.storePath);
     const serializedKey = await this.serialize(newApiKey);
     // console.log(serializedKey)
-    db.put("startgg-api-key", serializedKey);
+    await db.put("startgg-api-key", serializedKey);
     db.close();
     EventStream.notify("Start.gg API Key", "Successfully saved API Key!");
   }
@@ -141,7 +141,7 @@ export class SettingsStore {
     const serializedUrl = await this.serialize(url);
 
     const db = RocksDatabase.open(this.storePath);
-    db.put("startgg-tournament-url", serializedUrl);
+    await db.put("startgg-tournament-url", serializedUrl);
 
     db.close();
   }
@@ -229,7 +229,7 @@ export class SettingsStore {
     const serializedIp = await this.serialize(settings.ip);
     const serializedPort = await this.serialize(settings.port);
 
-    db.transaction(async (txn: Transaction) => {
+    await db.transaction(async (txn: Transaction) => {
       (txn.put("obs-websocket-ip", serializedIp),
         txn.put("obs-websocket-port", serializedPort));
     });
@@ -242,7 +242,7 @@ export class SettingsStore {
 
     const serializedScenes = await this.serialize(scenes);
 
-    db.put("obs-scenes", serializedScenes);
+    await db.put("obs-scenes", serializedScenes);
 
     db.close();
   }
