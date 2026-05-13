@@ -5,11 +5,12 @@ import { Action } from "@app/common";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { formatForDisplay, useHotkeyRecorder } from "@tanstack/react-hotkeys";
 import { useState } from "react";
+import { useHydratedState } from "@renderer/hooks/use-hydrated-state";
 
 function Shortcuts() {
   const savedShortcuts = useSettingsStore((state) => state.shortcuts);
   const update = useSettingsStore((state) => state.updateKeys);
-  const [shortcuts, setShortcuts] = useState(new Map(savedShortcuts));
+  const [shortcuts, setShortcuts] = useHydratedState(new Map(savedShortcuts));
   const [editingAction, setEditingAction] = useState<Action | null>(null);
   const areShortcutsSaved = Array.from(shortcuts).every(
     ([action, hotkey]) => savedShortcuts.get(action) === hotkey,

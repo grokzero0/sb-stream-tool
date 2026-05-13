@@ -14,11 +14,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "./ui/sheet";
+import { useHydratedState } from "@renderer/hooks/use-hydrated-state";
 
 function FetchEvent() {
   const savedEventUrl = useSettingsStore((state) => state.eventUrl);
   const update = useSettingsStore((state) => state.updateEventUrl);
-  const [eventUrl, setEventUrl] = useState(savedEventUrl);
+  const [eventUrl, setEventUrl] = useHydratedState(savedEventUrl);
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
   const [statusMessage, setStatusMessage] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);

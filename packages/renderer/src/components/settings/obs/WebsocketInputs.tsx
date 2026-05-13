@@ -1,9 +1,9 @@
-import { useState } from "react";
 import { useSettingsStore } from "../../../zustand/store";
 import { send } from "@app/preload";
 import { Label } from "@renderer/components/ui/label";
 import { Input } from "@renderer/components/ui/input";
 import { Button } from "@renderer/components/ui/button";
+import { useHydratedState } from "@renderer/hooks/use-hydrated-state";
 
 function WebsocketInputs() {
   const savedIp = useSettingsStore((state) => state.websocketIp);
@@ -11,9 +11,9 @@ function WebsocketInputs() {
   const savedPassword = useSettingsStore((state) => state.websocketPassword);
   const update = useSettingsStore((state) => state.updateWebsocketSettings);
 
-  const [ip, setIp] = useState(savedIp);
-  const [port, setPort] = useState(savedPort);
-  const [password, setPassword] = useState(savedPassword);
+  const [ip, setIp] = useHydratedState(savedIp);
+  const [port, setPort] = useHydratedState(savedPort);
+  const [password, setPassword] = useHydratedState(savedPassword);
 
   return (
     <form

@@ -1,14 +1,14 @@
 import { useSettingsStore } from "@renderer/zustand/store";
 import { Button } from "../ui/button";
 import { send } from "@app/preload";
-import { useState } from "react";
+import { useHydratedState } from "@renderer/hooks/use-hydrated-state";
 
 function FolderBrowser({ disabled }: { disabled: boolean }) {
   const savedDirectory = useSettingsStore(
     (state) => state.slippiRelayDirectory,
   );
   const update = useSettingsStore((state) => state.updateSlippiRelayDirectory);
-  const [directory, setDirectory] = useState(savedDirectory);
+  const [directory, setDirectory] = useHydratedState(savedDirectory);
 
   return (
     <div className="flex items-center flex-col gap-4 border-t-2 p-4 w-full">

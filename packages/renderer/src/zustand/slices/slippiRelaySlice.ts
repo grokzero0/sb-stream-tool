@@ -21,7 +21,7 @@ export type SlippiRelaySlice = {
 };
 
 // https://github.com/pmndrs/zustand/discussions/676
-export const createSlippiSlice: StateCreator<
+export const createSlippiRelaySlice: StateCreator<
   StoreSliceType,
   [["zustand/immer", never]],
   [],
