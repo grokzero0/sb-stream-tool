@@ -1,18 +1,19 @@
 import { Socket } from "socket.io-client";
 import { FileHandler } from "./components/FileHandler.js";
 import { ObsController } from "./components/ObsController.js";
-import { SlippiRelayHandler } from "./components/SlippiRelayHandler.js";
 import { ClientToServerEvents, ServerToClientEvents } from "./types.js";
 import {
   ObsScene,
   ObsSceneSettings,
   ObsWebsocketSettings,
   ShortcutSettings,
+  SlippiRelayConfig,
   SlippiRelaySettings,
   Tournament,
 } from "@app/common";
 import { dialog, shell } from "electron";
 import { SettingsStore } from "./components/SettingsStore.js";
+import { SlippiRelayHandler } from "./components/slippi/SlippiRelayHandler.js";
 
 export type SharedRegistry = {
   [key: string]: (...args: any[]) => Promise<any> | any;
@@ -81,16 +82,16 @@ export function createHandlers(
 
     "link/open": (link: string) => shell.openExternal(link),
 
-    "slippi-relay/read-folder": (listenPath: string) => {
-      SlippiRelayHandler.setup(listenPath);
+    "slippi-relay/start": (config: SlippiRelayConfig) => {
+      SlippiRelayHandler.setup(config);
     },
 
-    "slippi-relay/stop-reading-folder": () => {
-      SlippiRelayHandler.stop(false);
+    "slippi-relay/stop": () => {
+      SlippiRelayHandler.getRelay()?.stop(false);
     },
 
-    "slippi-relay/auto-stop-reading-folder": () => {
-      SlippiRelayHandler.stop(true);
+    "slippi-relay/auto-stop": () => {
+      SlippiRelayHandler.getRelay()?.stop(true);
     },
 
     "slippi-relay/save-settings": (newSettings: SlippiRelaySettings) => {

@@ -11,19 +11,15 @@ import { ClientToServerEvents, ServerToClientEvents } from "../types.js";
 import { SocketioServer } from "../components/SocketioServer.js";
 import { ToastMessageCommunicator } from "../components/ToastMessageCommunication.js";
 import { ipcSetup } from "../Ipc.js";
-import { SlippiRelayHandler } from "../components/SlippiRelayHandler.js";
 import { EventStream } from "../components/EventStream.js";
+import { SlippiRelayHandler } from "../components/slippi/SlippiRelayHandler.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
   readonly #renderer: { path: string } | URL;
   readonly #openDevTools;
 
-  // private obs: ObsController;
-  // private dataFileManager: FileReaderWriter;
-  // private websocketServer: SocketioServer;
   private mainSocket: Socket<ServerToClientEvents, ClientToServerEvents>;
-  // private slippi: SlippiRelayHandler;
 
   constructor({
     initConfig,
@@ -35,12 +31,7 @@ class WindowManager implements AppModule {
     this.#preload = initConfig.preload;
     this.#renderer = initConfig.renderer;
     this.#openDevTools = openDevTools;
-
-    // this.obs = new ObsController();
-    // this.dataFileManager = new FileReaderWriter();
-    // this.websocketServer = new SocketioServer();
     this.mainSocket = io("http://localhost:20242");
-    // this.slippi = new SlippiRelayHandler();
   }
 
   async enable({ app }: ModuleContext): Promise<void> {
@@ -62,7 +53,16 @@ class WindowManager implements AppModule {
     EventStream.attach(toast);
   }
 
-  async createWindow(): Promise<BrowserWindow> {
+  async attachWindow(browserWindow: BrowserWindow) {
+    SlippiRelayHandler.setBrowserWindow(browserWindow);
+    // SlippiRelayHandler.restoreFromConfig();
+    this.attachAllObservers(browserWindow);
+
+    const menu = buildMenu(browserWindow);
+    Menu.setApplicationMenu(menu);
+  }
+
+  async createAndSetupWindow(): Promise<BrowserWindow> {
     const browserWindow = new BrowserWindow({
       show: false, // Use the 'ready-to-show' event to show the instantiated BrowserWindow.
       webPreferences: {
@@ -75,12 +75,7 @@ class WindowManager implements AppModule {
       icon: join(import.meta.dirname, "..", "src", "assets", "icon.ico"),
     });
 
-    SlippiRelayHandler.setBrowserWindow(browserWindow);
-
-    this.attachAllObservers(browserWindow);
-
-    const menu = buildMenu(browserWindow);
-    Menu.setApplicationMenu(menu);
+    await this.attachWindow(browserWindow);
 
     if (this.#renderer instanceof URL) {
       await browserWindow.loadURL(this.#renderer.href);
@@ -95,7 +90,7 @@ class WindowManager implements AppModule {
     let window = BrowserWindow.getAllWindows().find((w) => !w.isDestroyed());
 
     if (window === undefined) {
-      window = await this.createWindow();
+      window = await this.createAndSetupWindow();
     }
 
     if (!show) {

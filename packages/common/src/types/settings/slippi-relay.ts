@@ -36,3 +36,7 @@ export type SlippiGameEndData = {
   isTeams: boolean;
   winners: number[]; // all the winners' playerindexes
 };
+
+export type SlippiRelayConfig =
+  | { type: "folder"; listenPath: string }
+  | { type: "console"; ip: string; port: string };

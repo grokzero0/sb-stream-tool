@@ -2,6 +2,7 @@ import { useSettingsStore } from "@renderer/zustand/store";
 import { Button } from "../ui/button";
 import { send } from "@app/preload";
 import { useHydratedState } from "@renderer/hooks/use-hydrated-state";
+import { SlippiRelayConfig } from "@app/common";
 
 function FolderBrowser({ disabled }: { disabled: boolean }) {
   const savedDirectory = useSettingsStore(
@@ -46,9 +47,10 @@ function FolderBrowser({ disabled }: { disabled: boolean }) {
             // className="w-full"
             onClick={() => {
               update(directory);
-              send("slippi-relay/read-folder", directory).catch((reason) =>
-                console.log(reason),
-              );
+              send("slippi-relay/start", {
+                type: "folder",
+                listenPath: directory,
+              } as SlippiRelayConfig).catch((reason) => console.log(reason));
             }}
           >
             Save and start reading
@@ -56,9 +58,7 @@ function FolderBrowser({ disabled }: { disabled: boolean }) {
           <Button
             type="button"
             onClick={() => {
-              send("slippi-relay/stop-reading-folder").catch((error) =>
-                console.log(error),
-              );
+              send("slippi-relay/stop").catch((error) => console.log(error));
             }}
             disabled={disabled}
           >
