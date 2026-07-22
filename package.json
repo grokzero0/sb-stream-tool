@@ -32,7 +32,7 @@
     "@playwright/test": "1.61.1",
     "@types/node": "26.1.1",
     "create-vite": "9.1.1",
-    "electron": "43.1.1",
+    "electron": "43.2.0",
     "electron-builder": "26.15.3",
     "glob": "13.0.6",
     "playwright": "^1.61.1"
