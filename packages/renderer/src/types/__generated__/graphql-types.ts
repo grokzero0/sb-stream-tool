@@ -1,38 +1,42 @@
-import * as Types from '../types/__generated__/graphql';
+/** Internal type. DO NOT USE DIRECTLY. */
+type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
+/** Internal type. DO NOT USE DIRECTLY. */
+export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
+import type * as Types from './graphql';
 
 import { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
-export type SetEntrantsQueryVariables = Types.Exact<{
-  setId: Types.Scalars['ID']['input'];
+export type SetEntrantsQueryVariables = Exact<{
+  setId: string | number;
 }>;
 
 
-export type SetEntrantsQuery = { set: { __typename: 'Set', id: string | null, fullRoundText: string | null, event: { __typename: 'Event', name: string | null, tournament: { __typename: 'Tournament', name: string | null } | null, videogame: { __typename: 'Videogame', id: string | null, displayName: string | null } | null } | null, slots: Array<{ __typename: 'SetSlot', id: string | null, entrant: { __typename: 'Entrant', id: string | null, name: string | null, participants: Array<{ __typename: 'Participant', id: string | null, prefix: string | null, gamerTag: string | null, connectedAccounts: unknown | null, user: { __typename: 'User', genderPronoun: string | null, authorizations: Array<{ __typename: 'ProfileAuthorization', externalUsername: string | null } | null> | null } | null } | null> | null } | null } | null> | null } | null };
+export type SetEntrantsQuery = { set: { __typename: 'Set', id: string | null, fullRoundText: string | null, event: { __typename: 'Event', name: string | null, tournament: { __typename: 'Tournament', name: string | null } | null, videogame: { __typename: 'Videogame', id: string | null, displayName: string | null } | null } | null, slots: Array<{ __typename: 'SetSlot', id: string | null, entrant: { __typename: 'Entrant', id: string | null, name: string | null, participants: Array<{ __typename: 'Participant', id: string | null, prefix: string | null, gamerTag: string | null, connectedAccounts: unknown, user: { __typename: 'User', genderPronoun: string | null, authorizations: Array<{ __typename: 'ProfileAuthorization', externalUsername: string | null } | null> | null } | null } | null> | null } | null } | null> | null } | null };
 
-export type EntrantsByVideogameInTournamentQueryVariables = Types.Exact<{
-  tourneySlug?: Types.InputMaybe<Types.Scalars['String']['input']>;
-  videogameId?: Types.InputMaybe<Array<Types.InputMaybe<Types.Scalars['ID']['input']>> | Types.InputMaybe<Types.Scalars['ID']['input']>>;
+export type EntrantsByVideogameInTournamentQueryVariables = Exact<{
+  tourneySlug?: string | null | undefined;
+  videogameId?: Array<string | number | null | undefined> | string | number | null | undefined;
 }>;
 
 
 export type EntrantsByVideogameInTournamentQuery = { tournament: { __typename: 'Tournament', id: string | null, name: string | null, events: Array<{ __typename: 'Event', id: string | null, name: string | null, entrants: { __typename: 'EntrantConnection', nodes: Array<{ __typename: 'Entrant', id: string | null, participants: Array<{ __typename: 'Participant', id: string | null, prefix: string | null, gamerTag: string | null, user: { __typename: 'User', genderPronoun: string | null, authorizations: Array<{ __typename: 'ProfileAuthorization', externalUsername: string | null } | null> | null } | null } | null> | null } | null> | null } | null } | null> | null } | null };
 
-export type LiveEventSetsQueryVariables = Types.Exact<{
-  eventSlug: Types.Scalars['String']['input'];
-  page: Types.Scalars['Int']['input'];
-  perPage: Types.Scalars['Int']['input'];
+export type LiveEventSetsQueryVariables = Exact<{
+  eventSlug: string;
+  page: number;
+  perPage: number;
 }>;
 
 
-export type LiveEventSetsQuery = { event: { __typename: 'Event', id: string | null, name: string | null, tournament: { __typename: 'Tournament', name: string | null } | null, sets: { __typename: 'SetConnection', pageInfo: { __typename: 'PageInfo', total: number | null, totalPages: number | null } | null, nodes: Array<{ __typename: 'Set', fullRoundText: string | null, state: number | null, stream: { __typename: 'Streams', streamSource: Types.StreamSource | null, streamName: string | null } | null, slots: Array<{ __typename: 'SetSlot', id: string | null, entrant: { __typename: 'Entrant', id: string | null, name: string | null, participants: Array<{ __typename: 'Participant', id: string | null, prefix: string | null, gamerTag: string | null, connectedAccounts: unknown | null, user: { __typename: 'User', genderPronoun: string | null, authorizations: Array<{ __typename: 'ProfileAuthorization', externalUsername: string | null } | null> | null } | null } | null> | null } | null } | null> | null } | null> | null } | null } | null };
+export type LiveEventSetsQuery = { event: { __typename: 'Event', id: string | null, name: string | null, tournament: { __typename: 'Tournament', name: string | null } | null, sets: { __typename: 'SetConnection', pageInfo: { __typename: 'PageInfo', total: number | null, totalPages: number | null } | null, nodes: Array<{ __typename: 'Set', fullRoundText: string | null, state: number | null, stream: { __typename: 'Streams', streamSource: Types.StreamSource | null, streamName: string | null } | null, slots: Array<{ __typename: 'SetSlot', id: string | null, entrant: { __typename: 'Entrant', id: string | null, name: string | null, participants: Array<{ __typename: 'Participant', id: string | null, prefix: string | null, gamerTag: string | null, connectedAccounts: unknown, user: { __typename: 'User', genderPronoun: string | null, authorizations: Array<{ __typename: 'ProfileAuthorization', externalUsername: string | null } | null> | null } | null } | null> | null } | null } | null> | null } | null> | null } | null } | null };
 
-export type EventSetsQueryVariables = Types.Exact<{
-  eventSlug: Types.Scalars['String']['input'];
-  page: Types.Scalars['Int']['input'];
-  perPage: Types.Scalars['Int']['input'];
+export type EventSetsQueryVariables = Exact<{
+  eventSlug: string;
+  page: number;
+  perPage: number;
 }>;
 
 
-export type EventSetsQuery = { event: { __typename: 'Event', id: string | null, name: string | null, tournament: { __typename: 'Tournament', name: string | null } | null, sets: { __typename: 'SetConnection', pageInfo: { __typename: 'PageInfo', total: number | null, totalPages: number | null } | null, nodes: Array<{ __typename: 'Set', fullRoundText: string | null, state: number | null, stream: { __typename: 'Streams', streamSource: Types.StreamSource | null, streamName: string | null } | null, slots: Array<{ __typename: 'SetSlot', id: string | null, entrant: { __typename: 'Entrant', id: string | null, name: string | null, participants: Array<{ __typename: 'Participant', id: string | null, prefix: string | null, gamerTag: string | null, connectedAccounts: unknown | null, user: { __typename: 'User', genderPronoun: string | null, authorizations: Array<{ __typename: 'ProfileAuthorization', externalUsername: string | null } | null> | null } | null } | null> | null } | null } | null> | null } | null> | null } | null } | null };
+export type EventSetsQuery = { event: { __typename: 'Event', id: string | null, name: string | null, tournament: { __typename: 'Tournament', name: string | null } | null, sets: { __typename: 'SetConnection', pageInfo: { __typename: 'PageInfo', total: number | null, totalPages: number | null } | null, nodes: Array<{ __typename: 'Set', fullRoundText: string | null, state: number | null, stream: { __typename: 'Streams', streamSource: Types.StreamSource | null, streamName: string | null } | null, slots: Array<{ __typename: 'SetSlot', id: string | null, entrant: { __typename: 'Entrant', id: string | null, name: string | null, participants: Array<{ __typename: 'Participant', id: string | null, prefix: string | null, gamerTag: string | null, connectedAccounts: unknown, user: { __typename: 'User', genderPronoun: string | null, authorizations: Array<{ __typename: 'ProfileAuthorization', externalUsername: string | null } | null> | null } | null } | null> | null } | null } | null> | null } | null> | null } | null } | null };
 
 
 export const SetEntrantsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SetEntrants"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"setId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"set"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"setId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"fullRoundText"}},{"kind":"Field","name":{"kind":"Name","value":"event"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"tournament"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"videogame"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"slots"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"entrant"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"participants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"prefix"}},{"kind":"Field","name":{"kind":"Name","value":"gamerTag"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"genderPronoun"}},{"kind":"Field","name":{"kind":"Name","value":"authorizations"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"types"},"value":{"kind":"EnumValue","value":"TWITTER"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"externalUsername"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"connectedAccounts"}}]}}]}}]}}]}}]}}]} as unknown as DocumentNode<SetEntrantsQuery, SetEntrantsQueryVariables>;

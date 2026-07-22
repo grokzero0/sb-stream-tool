@@ -5,10 +5,11 @@ import {
   Tournament,
   type SlippiPlayer,
 } from "@app/common";
-import type { EventSetsQuery, LiveEventSetsQuery } from "./queries.generated";
+
 import type { SetEntry, SetFormat } from "@renderer/types/tournament";
 import { UseFormGetValues, type UseFieldArrayReturn } from "react-hook-form";
 import { updateOverlay } from "@app/preload";
+import { EventSetsQuery, LiveEventSetsQuery } from "@renderer/types/__generated__/graphql-types";
 
 export const getValueWithinRange = (
   value: number,

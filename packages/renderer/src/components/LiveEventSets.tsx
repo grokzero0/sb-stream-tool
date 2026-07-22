@@ -6,7 +6,6 @@ import {
   isInPlacementList,
   sleep,
 } from "@renderer/utils/helpers";
-import { LiveEventSetsDocument } from "@renderer/utils/queries.generated";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { useRef, useState } from "react";
 import {
@@ -27,6 +26,7 @@ import { RowSelectionState } from "@tanstack/react-table";
 import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "../hooks/use-player-form-field-array-context";
+import { LiveEventSetsDocument } from "@renderer/types/__generated__/graphql-types";
 
 function LiveEventSets() {
   const savedApiKey = useSettingsStore((state) => state.startggApiKey);

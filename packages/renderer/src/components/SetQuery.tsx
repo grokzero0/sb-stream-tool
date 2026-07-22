@@ -14,7 +14,6 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useRef, useState } from "react";
 import { useSettingsStore } from "@renderer/zustand/store";
-import { SetEntrantsDocument } from "@renderer/utils/queries.generated";
 import { useLazyQuery } from "@apollo/client/react";
 import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
@@ -24,6 +23,8 @@ import {
   isInPlacementList,
 } from "@renderer/utils/helpers";
 import { usePlayerFormFieldArrayContext } from "@renderer/hooks/use-player-form-field-array-context";
+import { SetEntrantsDocument } from "@renderer/types/__generated__/graphql-types";
+
 function SetQuery() {
   const [setId, setSetId] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);

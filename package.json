@@ -28,14 +28,14 @@
     "init": "npm run create-renderer && npm run integrate-renderer && npm install"
   },
   "devDependencies": {
-    "@npmcli/map-workspaces": "5.0.3",
-    "@playwright/test": "1.59.1",
-    "@types/node": "25.6.0",
-    "create-vite": "9.0.4",
-    "electron": "41.2.0",
-    "electron-builder": "26.8.1",
+    "@npmcli/map-workspaces": "6.0.0",
+    "@playwright/test": "1.61.1",
+    "@types/node": "26.1.1",
+    "create-vite": "9.1.1",
+    "electron": "43.1.1",
+    "electron-builder": "26.15.3",
     "glob": "13.0.6",
-    "playwright": "^1.59.1"
+    "playwright": "^1.61.1"
   },
   "dependencies": {
     "@app/main": "*"
