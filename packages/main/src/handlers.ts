@@ -87,11 +87,11 @@ export function createHandlers(
     },
 
     "slippi-relay/stop": () => {
-      SlippiRelayHandler.getRelay()?.stop(false);
+      SlippiRelayHandler.stopRelay(false);
     },
 
     "slippi-relay/auto-stop": () => {
-      SlippiRelayHandler.getRelay()?.stop(true);
+      SlippiRelayHandler.stopRelay(true);
     },
 
     "slippi-relay/save-settings": (newSettings: SlippiRelaySettings) => {

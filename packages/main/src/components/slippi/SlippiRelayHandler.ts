@@ -29,4 +29,8 @@ export class SlippiRelayHandler {
   static getRelay() {
     return this.relay;
   }
+
+  static stopRelay(quiet: boolean) {
+    this.relay?.stop(quiet);
+  }
 }
