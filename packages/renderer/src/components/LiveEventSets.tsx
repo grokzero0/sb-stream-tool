@@ -1,10 +1,7 @@
-import { useLazyQuery } from "@apollo/client/react";
 import {
   changeSetFormat,
-  filterLiveSets,
   getSetFormat,
   isInPlacementList,
-  sleep,
 } from "@renderer/utils/helpers";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { useRef, useState } from "react";
@@ -19,27 +16,25 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { Button } from "./ui/button";
-import { SetEntry, SetTableEntry } from "@renderer/types/tournament";
+import { SetTableEntry } from "@renderer/types/tournament";
 import { DataTable } from "./ui/data-table";
 import { columns } from "@renderer/types/columns";
 import { RowSelectionState } from "@tanstack/react-table";
 import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "../hooks/use-player-form-field-array-context";
-import { LiveEventSetsDocument } from "@renderer/types/__generated__/graphql-types";
+import { platformById, resolveEventUrl } from "@renderer/platform/registry";
+import { FetchProgress, PlatformSet } from "@renderer/platform/types";
 
 function LiveEventSets() {
   const savedApiKey = useSettingsStore((state) => state.startggApiKey);
   const savedEventSlug = useSettingsStore((state) => state.eventSlug);
+  const savedEventUrl = useSettingsStore((state) => state.eventUrl);
   const currentEventSlug = useRef("");
-  const requestsLimitExceeded = useRef(false);
   const totalPagesRef = useRef(1); // for the for loop
   const [pagesLoaded, setPagesLoaded] = useState(0);
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [getData, { fetchMore, error }] = useLazyQuery(LiveEventSetsDocument, {
-    fetchPolicy: "network-only",
-  });
-  const [setsFetched, setSetsFetched] = useState<SetEntry[]>([]);
+  const [setsFetched, setSetsFetched] = useState<PlatformSet[]>([]);
   const [tournamentName, setTournamentName] = useState("unknown event");
   const [totalPagesState, setTotalPagesState] = useState(0); // for ui rendering
   const [selectedRow, setSelectedRow] = useState<RowSelectionState>({});
@@ -47,8 +42,8 @@ function LiveEventSets() {
     return {
       stream: set.stream,
       matchName: set.matchName,
-      firstGroupName: set.groups[0].name,
-      secondGroupName: set.groups[1].name,
+      firstGroupName: set.entrants[0].name,
+      secondGroupName: set.entrants[1].name,
     };
   }) as SetTableEntry[];
   const { setValue, getValues } = useFormContext<Tournament>();
@@ -60,13 +55,13 @@ function LiveEventSets() {
     const selectedSetIndex = parseInt(Object.keys(selectedRow)[0]);
     if (
       Number.isNaN(selectedSetIndex) ||
-      setsFetched[selectedSetIndex].groups.length <= 0
+      setsFetched[selectedSetIndex].entrants.length <= 0
     ) {
       return;
     }
     const setFormat = getSetFormat(
       getValues("teams.0.players").length, // each team's player count are guaranteed to be the same
-      setsFetched[selectedSetIndex].groups[0].players.length, // all sets are guaranteed to be the same
+      setsFetched[selectedSetIndex].entrants[0].players.length, // all sets are guaranteed to be the same
     );
     changeSetFormat(setFormat, teams);
     setValue("setFormat", setFormat);
@@ -91,11 +86,13 @@ function LiveEventSets() {
     for (let i = 0; i < getValues("teams").length; i++) {
       for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
         setValue(`teams.${i}.players.${j}.playerInfo`, {
-          teamName: setsFetched[selectedSetIndex].groups[i].players[j].teamName,
+          teamName:
+            setsFetched[selectedSetIndex].entrants[i].players[j].teamName,
           playerTag:
-            setsFetched[selectedSetIndex].groups[i].players[j].playerTag,
-          pronouns: setsFetched[selectedSetIndex].groups[i].players[j].pronouns,
-          twitter: setsFetched[selectedSetIndex].groups[i].players[j].twitter,
+            setsFetched[selectedSetIndex].entrants[i].players[j].playerTag,
+          pronouns:
+            setsFetched[selectedSetIndex].entrants[i].players[j].pronouns,
+          twitter: setsFetched[selectedSetIndex].entrants[i].players[j].twitter,
         });
       }
     }
@@ -108,37 +105,29 @@ function LiveEventSets() {
     }, 2000);
   };
 
-  const fetchSets = async () => {
-    for (let i = 1; i <= totalPagesRef.current; i++) {
-      do {
-        if (error && !requestsLimitExceeded.current) {
-          console.log("Error found");
-          requestsLimitExceeded.current = true;
-          await sleep(60000).then(
-            () => (requestsLimitExceeded.current = false),
-          );
-        }
-        if (i == 1) {
-          const { data } = await getData({
-            variables: {
-              eventSlug: currentEventSlug.current,
-              page: i,
-              perPage: 50,
-            },
-          });
-          totalPagesRef.current = data?.event?.sets?.pageInfo?.totalPages ?? 0;
-          setTotalPagesState(data?.event?.sets?.pageInfo?.totalPages ?? 0);
-          setTournamentName(data?.event?.tournament?.name ?? "unknown event");
-          setSetsFetched(filterLiveSets(data?.event?.sets?.nodes));
-        } else {
-          const { data } = await fetchMore({ variables: { page: i } });
-          const filteredSets = filterLiveSets(data?.event?.sets?.nodes);
-          setSetsFetched((prevSets) => [...prevSets, ...filteredSets]);
-        }
-        setPagesLoaded((pages) => pages + 1);
-      } while (requestsLimitExceeded.current);
+  const onFetchProgress = (progress: FetchProgress) => {
+    totalPagesRef.current = progress.total;
+    setTotalPagesState(progress.total);
+    setPagesLoaded(progress.loaded);
+    if (progress.loaded === 1) {
+      setTournamentName(progress.tournamentName);
     }
+    setSetsFetched((prevSets) =>
+      progress.loaded === 1 ? progress.sets : [...prevSets, ...progress.sets],
+    );
   };
+
+  const fetchSets = async () => {
+    const eventId = resolveEventUrl(savedEventUrl);
+    if (!eventId) {
+      return;
+    }
+
+    await platformById(eventId.platform)
+      .withApiKey(savedApiKey)
+      .getSets(eventId, { upcomingOnly: true }, onFetchProgress);
+  };
+
   return (
     <Sheet
       open={sheetOpen}

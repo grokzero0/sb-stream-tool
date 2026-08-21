@@ -15,6 +15,7 @@ import {
   SheetTrigger,
 } from "./ui/sheet";
 import { useHydratedState } from "@renderer/hooks/use-hydrated-state";
+import { resolveEventUrl } from "@renderer/platform/registry";
 
 function FetchEvent() {
   const savedEventUrl = useSettingsStore((state) => state.eventUrl);
@@ -24,16 +25,6 @@ function FetchEvent() {
   const [statusMessage, setStatusMessage] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
 
-  const parseStartggUrl = (url: string) => {
-    const regex =
-      /^https:\/\/(?:www\.)?start\.gg\/tournament\/([^\/?#]+)\/event\/([^\/?#]+)(?:[\/?#].*)?$/;
-    const match = url.match(regex);
-    if (!match) return null;
-
-    const [, tournamentSlug, eventSlug] = match;
-
-    return `tournament/${tournamentSlug}/event/${eventSlug}`;
-  };
   // const apiKey = useSettingsStore((state) => state.apiKey);
   return (
     <Sheet open={sheetOpen} onOpenChange={setSheetOpen}>
@@ -61,13 +52,13 @@ function FetchEvent() {
           <Button
             type="button"
             onClick={() => {
-              const eventSlug = parseStartggUrl(eventUrl);
-              if (eventSlug === null) {
+              const eventId = resolveEventUrl(eventUrl);
+              if (eventId === null) {
                 setStatusMessage("Invalid Start.gg URL");
                 return;
               }
               setStatusMessage(`Applying event ${eventUrl}...`);
-              update(eventUrl, eventSlug);
+              update(eventId.url, eventId.id);
               setStatusMessage(`Applied event ${eventUrl}!`);
               clearTimeout(timeoutRef.current);
               timeoutRef.current = setTimeout(() => {
