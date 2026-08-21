@@ -15,14 +15,12 @@
     "@app/common": "*",
     "@app/preload": "*",
     "@app/renderer": "*",
-    "@harperfast/rocksdb-js": "^2.4.0",
+    "@harperfast/rocksdb-js": "^2.7.1",
     "@slippi/slippi-js": "^9.1.2",
-    "@types/better-sqlite3": "^7.6.13",
-    "better-sqlite3": "^13.0.1",
     "chokidar": "^5.0.0",
     "electron-updater": "6.8.9",
-    "es-toolkit": "^1.49.0",
-    "fs-extra": "^11.3.6",
+    "es-toolkit": "^1.51.0",
+    "fs-extra": "^11.4.0",
     "obs-websocket-js": "^5.0.8",
     "socket.io": "^4.8.3",
     "socket.io-client": "^4.8.3"
@@ -31,6 +29,6 @@
     "@app/electron-versions": "*",
     "electron-devtools-installer": "4.0.0",
     "typescript": "7.0.2",
-    "vite": "8.1.5"
+    "vite": "8.2.2"
   }
 }
