@@ -1,20 +1,21 @@
-/* eslint-disable @typescript-eslint/no-unsafe-call */
-/* eslint-disable @typescript-eslint/no-unsafe-assignment */
-/* eslint-disable react-hooks/incompatible-library */
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   ColumnDef,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  // getPaginationRowModel,
-  useReactTable,
-  ColumnFiltersState,
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  createFilteredRowModel,
+  createPaginatedRowModel,
+  createSortedRowModel,
+  createTableHook,
+  filterFn_includesString,
+  RowData,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  RowSelectionState,
+  rowSortingFeature,
+  sortFn_alphanumeric,
+  sortFn_text,
+  tableFeatures,
 } from "@tanstack/react-table";
-import { useVirtualizer } from "@tanstack/react-virtual";
-
-import { useRef, useState } from "react";
-import { Input } from "./input";
 import {
   Table,
   TableBody,
@@ -23,178 +24,97 @@ import {
   TableHeader,
   TableRow,
 } from "./table";
-import { Button } from "./button";
-import { cn } from "@renderer/lib/utils";
+import { Atom } from "@tanstack/react-store";
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+export const features = tableFeatures({
+  columnFilteringFeature,
+  columnVisibilityFeature,
+  rowPaginationFeature,
+  rowSelectionFeature,
+  rowSortingFeature,
+  filteredRowModel: createFilteredRowModel(),
+  paginatedRowModel: createPaginatedRowModel(),
+  sortedRowModel: createSortedRowModel(),
+  filterFns: { includesString: filterFn_includesString },
+  sortFns: { alphanumeric: sortFn_alphanumeric, text: sortFn_text },
+});
+
+export const { useAppTable, createAppColumnHelper } = createTableHook({
+  features,
+  debugTable: true,
+  enableSortingRemoval: false,
+});
+
+interface DataTableProps<TData extends RowData> {
+  columns: ColumnDef<typeof features, TData>[];
   data: TData[];
   multiRows?: boolean;
-  setSelection?: any;
   className?: string;
   pagination?: boolean;
+  rowSelectionAtom: Atom<RowSelectionState>;
 }
 
-// const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
-//   // Rank the item
-//   const itemRank = rankItem(row.getValue(columnId), value)
-
-//   // Store the itemRank info
-//   addMeta({ itemRank })
-
-//   // Return if the item should be filtered in/out
-//   return itemRank.passed
-// }
-
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   multiRows = true,
-  setSelection,
+  rowSelectionAtom,
   pagination = false,
   className,
-}: DataTableProps<TData, TValue>) {
-  const tableContainerRef = useRef<HTMLDivElement>(null);
-  const [rowSelection, setRowSelection] = useState({});
-  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([]);
-  const [globalFilter, setGlobalFilter] = useState<any>([]);
-  const table = useReactTable({
-    data,
+}: DataTableProps<TData>) {
+
+  const table = useAppTable({
+    key: "data-table",
     columns,
-    // filterFns: {
-    //   fuzzy: fuzzyFilter
-    // },
-    // globalFilterFn: 'fuzzy' as FilterFnOption<TData>,
-    getCoreRowModel: getCoreRowModel(),
+    data,
     enableMultiRowSelection: multiRows,
-    onRowSelectionChange: (e) => {
-      setRowSelection(e);
-      if (setSelection) {
-        setSelection(e);
-      }
+    enableRowSelection: true,
+    atoms: {
+      rowSelection: rowSelectionAtom,
     },
-    onColumnFiltersChange: setColumnFilters,
-    // getPaginationRowModel: getPaginationRowModel(),
-    onGlobalFilterChange: setGlobalFilter,
-
-    getFilteredRowModel: getFilteredRowModel(),
-    autoResetPageIndex: false,
-    state: {
-      rowSelection,
-      globalFilter,
-      columnFilters,
-    },
-    // initialState: {
-    //   pagination: {
-    //     pageIndex: 0,
-    //     pageSize: 100,
-    //   },
-    // },
   });
-
-  const rowVirtualizer = useVirtualizer({
-    count: data.length,
-    estimateSize: () => 10,
-    getScrollElement: () => tableContainerRef.current,
-  });
-
-  const { rows } = table.getRowModel();
 
   return (
-    <div>
-      <div className="flex items-center py-4 space-x-4">
-        <Input
-          placeholder="Filter by keyword"
-          value={(globalFilter as string) ?? ""}
-          onChange={(event) =>
-            table.setGlobalFilter(String(event.target.value))
-          }
-          className="max-w-sm"
-        />
-        {/* <div className="flex items-center space-x-2">
-          <Checkbox id="live-sets" onCheckedChange={table.getColumn('stream')?.setFilterValue} />
-          <Label htmlFor="live-sets">Only live sets</Label>
-        </div> */}
-      </div>
-      <div
-        ref={tableContainerRef}
-        className={cn("overflow-auto rounded-md border max-h-96", className)}
-      >
-        <Table>
-          <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
-                  return (
-                    <TableHead key={header.id} className="break-all">
-                      {header.isPlaceholder
-                        ? null
-                        : flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                    </TableHead>
-                  );
-                })}
+    <div className="overflow-hidden rounded-md border">
+      <Table>
+        <TableHeader>
+          {table.getHeaderGroups().map((headerGroup) => (
+            <TableRow key={headerGroup.id}>
+              {headerGroup.headers.map((header) => {
+                return (
+                  <TableHead key={header.id}>
+                    {header.isPlaceholder ? null : (
+                      <table.FlexRender header={header} />
+                    )}
+                  </TableHead>
+                );
+              })}
+            </TableRow>
+          ))}
+        </TableHeader>
+        <TableBody>
+          {table.getRowModel().rows?.length ? (
+            table.getRowModel().rows.map((row) => (
+              <TableRow
+                key={row.id}
+                data-state={row.getIsSelected() && "selected"}
+              >
+                {row.getVisibleCells().map((cell) => (
+                  <TableCell key={cell.id}>
+                    <table.FlexRender cell={cell} />
+                  </TableCell>
+                ))}
               </TableRow>
-            ))}
-          </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              rowVirtualizer.getVirtualItems().map((virtualRow) => {
-                const row = rows[virtualRow.index];
-                if (row !== undefined) {
-                  return (
-                    <TableRow
-                      data-index={virtualRow.index}
-                      key={row.id}
-                      data-state={row.getIsSelected() && "selected"}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <TableCell key={cell.id} className="break-all">
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </TableCell>
-                      ))}
-                    </TableRow>
-                  );
-                }
-              })
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className="h-24 text-center break-all"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
-        </Table>
-      </div>
-      {pagination && (
-        <div className="flex items-center justify-end space-x-2 py-4">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
-            disabled={!table.getCanPreviousPage()}
-          >
-            Previous
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
-            disabled={!table.getCanNextPage()}
-          >
-            Next
-          </Button>
-        </div>
-      )}
+            ))
+          ) : (
+            <TableRow>
+              <TableCell colSpan={columns.length} className="h-24 text-center">
+                No results.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   );
 }

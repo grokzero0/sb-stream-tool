@@ -27,6 +27,7 @@ import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "../hooks/use-player-form-field-array-context";
 import { EventSetsDocument } from "@renderer/types/__generated__/graphql-types";
+import { useCreateAtom, useSelector } from "@tanstack/react-store";
 
 function EventSets() {
   const savedApiKey = useSettingsStore((state) => state.startggApiKey);
@@ -42,7 +43,8 @@ function EventSets() {
   const [setsFetched, setSetsFetched] = useState<SetEntry[]>([]);
   const [tournamentName, setTournamentName] = useState("unknown event");
   const [totalPagesState, setTotalPagesState] = useState(0); // for ui rendering
-  const [selectedRow, setSelectedRow] = useState<RowSelectionState>({});
+  const rowSelectionAtom = useCreateAtom<RowSelectionState>({});
+  const selectedRow = useSelector(rowSelectionAtom);
   const filteredData = setsFetched.map((set) => {
     return {
       stream: set.stream,
@@ -172,7 +174,7 @@ function EventSets() {
           <DataTable
             columns={columns}
             data={filteredData}
-            setSelection={setSelectedRow}
+            rowSelectionAtom={rowSelectionAtom}
             multiRows={false}
           />
         </div>

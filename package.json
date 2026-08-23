@@ -31,6 +31,7 @@
     "@npmcli/map-workspaces": "6.0.0",
     "@playwright/test": "1.62.1",
     "@types/node": "26.2.0",
+    "@typescript/typescript-win32-x64": "^7.0.2",
     "create-vite": "9.1.2",
     "electron": "43.4.1",
     "electron-builder": "26.15.3",

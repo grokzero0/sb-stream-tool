@@ -1,4 +1,5 @@
 import { CodegenConfig } from "@graphql-codegen/cli";
+import 'dotenv/config'
 
 const config: CodegenConfig = {
   overwrite: true,
@@ -6,8 +7,8 @@ const config: CodegenConfig = {
     {
       "https://api.start.gg/gql/alpha": {
         headers: {
-          // it is required that you have an .env file in the root of the renderer folder with the key-value pair VITE_STARTGG_AUTH_TOKEN="Bearer (your key here)" if you want to generate new apollo query files
-          Authorization: `Bearer (your key here)`,
+          // it is required that you have an .env file in the root of the renderer folder with the key-value pair STARTGG_AUTH_TOKEN="Bearer (your key here)" if you want to generate new apollo query type definitions
+          Authorization: `${process.env.STARTGG_AUTH_TOKEN}`,
           "Content-Type": "application/json",
         },
       },
