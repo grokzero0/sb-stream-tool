@@ -14,7 +14,6 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { useRef, useState } from "react";
 import { useSettingsStore } from "@renderer/zustand/store";
-import { useLazyQuery } from "@apollo/client/react";
 import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import {
@@ -23,16 +22,16 @@ import {
   isInPlacementList,
 } from "@renderer/utils/helpers";
 import { usePlayerFormFieldArrayContext } from "@renderer/hooks/use-player-form-field-array-context";
-import { SetEntrantsDocument } from "@renderer/types/__generated__/graphql-types";
+import { platformForEventUrl } from "@renderer/platform/registry";
 
 function SetQuery() {
   const [setId, setSetId] = useState("");
   const [sheetOpen, setSheetOpen] = useState(false);
   const [statusMessage, setStatusMessage] = useState("");
-  const [getData, { loading, error }] = useLazyQuery(SetEntrantsDocument, {
-    fetchPolicy: "network-only",
-  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<Error | undefined>(undefined);
   const apiKey = useSettingsStore((state) => state.startggApiKey);
+  const eventUrl = useSettingsStore((state) => state.eventUrl);
   const { setValue, getValues } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
   const timeoutId = useRef<NodeJS.Timeout>(undefined);
@@ -43,24 +42,34 @@ function SetQuery() {
       return;
     }
 
-    const { data } = await getData({ variables: { setId: setId } });
+    setLoading(true);
+    setError(undefined);
 
-    if (!data) {
+    let set;
+    try {
+      set = await platformForEventUrl(eventUrl).withApiKey(apiKey).getSet(setId);
+    } catch (reason) {
+      setError(reason instanceof Error ? reason : new Error(String(reason)));
+    } finally {
+      setLoading(false);
+    }
+
+    if (!set) {
       setStatusMessage("No information found");
       return;
     }
 
     setStatusMessage(`Set ${setId} found! Applying information...`);
-    setValue("name", data.set?.event?.tournament?.name ?? "");
+    setValue("name", set.tournamentName);
 
     const setFormat = getSetFormat(
       getValues("teams.0.players").length,
-      data?.set?.slots?.[0]?.entrant?.participants?.length ?? 0,
+      set.entrants[0]?.players.length ?? 0,
     );
     changeSetFormat(setFormat, teams);
     setValue("setFormat", setFormat);
 
-    const setRoundFormat = data?.set?.fullRoundText ?? "Unknown";
+    const setRoundFormat = set.matchName;
     const parsedSetRoundFormat = setRoundFormat?.split(" ");
     if (
       (setRoundFormat.includes("Losers Round") ||
@@ -85,16 +94,10 @@ function SetQuery() {
     for (let i = 0; i < getValues("teams").length; i++) {
       for (let j = 0; j < getValues(`teams.${i}.players`).length; j++) {
         setValue(`teams.${i}.players.${j}.playerInfo`, {
-          teamName:
-            data?.set?.slots?.[i]?.entrant?.participants?.[j]?.prefix ?? "",
-          playerTag:
-            data?.set?.slots?.[i]?.entrant?.participants?.[j]?.gamerTag ?? "",
-          pronouns:
-            data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user
-              ?.genderPronoun ?? "",
-          twitter:
-            data?.set?.slots?.[i]?.entrant?.participants?.[j]?.user
-              ?.authorizations?.[0]?.externalUsername ?? "",
+          teamName: set.entrants[i]?.players[j]?.teamName ?? "",
+          playerTag: set.entrants[i]?.players[j]?.playerTag ?? "",
+          pronouns: set.entrants[i]?.players[j]?.pronouns ?? "",
+          twitter: set.entrants[i]?.players[j]?.twitter ?? "",
         });
       }
     }

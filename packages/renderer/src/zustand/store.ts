@@ -21,6 +21,7 @@ import {
 } from "@app/common";
 import { Hotkey } from "@tanstack/react-hotkeys";
 import { createZustandStateSlice } from "./slices/zustandStateSlice";
+import { resolveEventUrl } from "@renderer/platform/registry";
 
 enableMapSet();
 
@@ -113,14 +114,11 @@ Promise.all([
     .catch((error) => console.log(error)),
   send("startgg/get-tournament-url")
     .then((url: string) => {
-      const regex =
-        /^https:\/\/(?:www\.)?start\.gg\/tournament\/([^\/?#]+)\/event\/([^\/?#]+)(?:[\/?#].*)?$/;
-      const match = url.match(regex);
-      if (!match) return;
-      const [, tournamentSlug, eventSlug] = match;
+      const eventId = resolveEventUrl(url);
+      if (!eventId) return;
       useSettingsStore.setState({
-        eventUrl: url,
-        eventSlug: `tournament/${tournamentSlug}/event/${eventSlug}`,
+        eventUrl: eventId.url,
+        eventSlug: eventId.id,
       });
     })
     .catch((error) => console.log(error)),
