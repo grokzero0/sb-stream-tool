@@ -7,6 +7,7 @@ import {
   createSortedRowModel,
   createTableHook,
   filterFn_includesString,
+  globalFilteringFeature,
   RowData,
   rowPaginationFeature,
   rowSelectionFeature,
@@ -25,9 +26,12 @@ import {
   TableRow,
 } from "./table";
 import { Atom } from "@tanstack/react-store";
+import { cn } from "@renderer/lib/utils";
+import { Input } from "./input";
 
 export const features = tableFeatures({
   columnFilteringFeature,
+  globalFilteringFeature,
   columnVisibilityFeature,
   rowPaginationFeature,
   rowSelectionFeature,
@@ -59,10 +63,8 @@ export function DataTable<TData extends RowData>({
   data,
   multiRows = true,
   rowSelectionAtom,
-  pagination = false,
   className,
 }: DataTableProps<TData>) {
-
   const table = useAppTable({
     key: "data-table",
     columns,
@@ -75,46 +77,58 @@ export function DataTable<TData extends RowData>({
   });
 
   return (
-    <div className="overflow-hidden rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <table.FlexRender header={header} />
-                    )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    <table.FlexRender cell={cell} />
-                  </TableCell>
-                ))}
+    <div>
+      <div className="flex items-center py-4 space-x-4">
+        <Input
+          placeholder="Filter by keyword"
+          value={table.state.globalFilter || ""}
+          onChange={(e) => table.setGlobalFilter(String(e.target.value))}
+        />
+      </div>
+      <div className={cn("overflow-hidden rounded-md border", className)}>
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <table.FlexRender header={header} />
+                      )}
+                    </TableHead>
+                  );
+                })}
               </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && "selected"}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      <table.FlexRender cell={cell} />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell
+                  colSpan={columns.length}
+                  className="h-24 text-center"
+                >
+                  No results.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   );
 }
