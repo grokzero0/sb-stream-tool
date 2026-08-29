@@ -13,6 +13,7 @@ import { ToastMessageCommunicator } from "../components/ToastMessageCommunicatio
 import { ipcSetup } from "../Ipc.js";
 import { EventStream } from "../components/EventStream.js";
 import { SlippiRelayHandler } from "../components/slippi/SlippiRelayHandler.js";
+import { ObsMessageCommunicator } from "../components/ObsMessageCommunication.js";
 
 class WindowManager implements AppModule {
   readonly #preload: { path: string };
@@ -50,11 +51,14 @@ class WindowManager implements AppModule {
 
   async attachAllObservers(browserWindow: BrowserWindow) {
     const toast = new ToastMessageCommunicator(browserWindow);
-    EventStream.attach(toast);
+    const obsStatusEmitter = new ObsMessageCommunicator(browserWindow);
+    EventStream.attach("toast", toast);
+    EventStream.attach("obs", obsStatusEmitter);
   }
 
   async attachWindow(browserWindow: BrowserWindow) {
     SlippiRelayHandler.setBrowserWindow(browserWindow);
+    ObsController.setBrowserWindow(browserWindow);
     // SlippiRelayHandler.restoreFromConfig();
     this.attachAllObservers(browserWindow);
 

@@ -14,24 +14,35 @@ export interface EventSink {
 // semi Event Bus pattern, the observer attaches to this, the subjects call this notify method
 export class EventStream {
   // list of EventSinks "attached" to this EventStream
-  private static observers: EventSink[] = [];
+  private static observers: Map<string, EventSink[]> = new Map();
 
-  static attach(newObserver: EventSink): void {
-    this.observers.push(newObserver);
+  static attach(eventType: string, newObserver: EventSink): void {
+    if (!this.observers.has(eventType)) {
+      this.observers.set(eventType, []);
+    }
+    this.observers.get(eventType)?.push(newObserver);
   }
 
   static detach(observer: EventSink): void {
-    const observerIndex = this.observers.indexOf(observer);
-    if (observerIndex === -1) {
-      return console.log(`No observer found at index ${observerIndex}`);
+    for (const [event, observers] of this.observers.entries()) {
+      const observerIndex = observers.indexOf(observer);
+      if (observerIndex !== -1) {
+        observers.splice(observerIndex, 1);
+        console.log(
+          `Detached an observer at index ${observerIndex} from event "${event}"`,
+        );
+        return;
+      }
     }
-    this.observers.splice(observerIndex, 1);
-    console.log(`Detached an observer at index ${observerIndex}`);
+    console.log(`No observer found`);
   }
 
-  static notify(message?: string, description?: string): void {
-    for (const observer of this.observers) {
-      observer.update(message, description);
+  static notify(eventType: string, ...args: any[]): void {
+    const observers = this.observers.get(eventType);
+    if (observers) {
+      for (const observer of observers) {
+        observer.update(...args);
+      }
     }
   }
 }

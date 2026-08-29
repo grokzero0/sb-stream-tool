@@ -39,12 +39,13 @@ export class SocketioServer {
       this.sockets.set(socket.id, this.sockets.size + 1);
 
       socket.on("sendDataToServer", (data) => {
-        EventStream.notify("Sending data to overlays");
+        EventStream.notify("toast", "Sending data to overlays");
         socket.broadcast.emit("sendDataToClients", data);
       });
 
       socket.on("overlayUpdateSuccess", () => {
         EventStream.notify(
+          "toast",
           `Overlay ${this.sockets.get(socket.id)} updated set information successfully!`,
         );
       });
@@ -52,6 +53,7 @@ export class SocketioServer {
       socket.on("disconnect", () => {
         this.sockets.delete(socket.id);
         EventStream.notify(
+          "toast",
           "Disconnect",
           `Overlay ${this.sockets.get(socket.id)} disconnected`,
         );

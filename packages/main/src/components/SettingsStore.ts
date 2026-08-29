@@ -85,7 +85,7 @@ export class SettingsStore {
     const db = RocksDatabase.open(this.storePath);
     await db.put("shortcuts", serializedSettings);
     db.close();
-    EventStream.notify("Shortcuts", "Successfully saved shortcuts!");
+    EventStream.notify("toast", "Shortcuts", "Successfully saved shortcuts!");
   }
 
   static async getShortcuts() {
@@ -120,7 +120,7 @@ export class SettingsStore {
     // console.log(serializedKey)
     await db.put("startgg-api-key", serializedKey);
     db.close();
-    EventStream.notify("Start.gg API Key", "Successfully saved API Key!");
+    EventStream.notify("toast", "Start.gg API Key", "Successfully saved API Key!");
   }
 
   static async getStartggApiKey() {

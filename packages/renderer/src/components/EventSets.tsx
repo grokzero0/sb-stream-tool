@@ -28,6 +28,7 @@ import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "../hooks/use-player-form-field-array-context";
 import { EventSetsDocument } from "@renderer/types/__generated__/graphql-types";
 import { useCreateAtom, useSelector } from "@tanstack/react-store";
+import { Spinner } from "./ui/spinner";
 
 function EventSets() {
   const savedApiKey = useSettingsStore((state) => state.startggApiKey);
@@ -36,6 +37,7 @@ function EventSets() {
   const requestsLimitExceeded = useRef(false);
   const totalPagesRef = useRef(1); // for the for loop
   const [pagesLoaded, setPagesLoaded] = useState(0);
+  const [loading, setLoading] = useState(true);
   const [sheetOpen, setSheetOpen] = useState(false);
   const [getData, { fetchMore, error }] = useLazyQuery(EventSetsDocument, {
     fetchPolicy: "network-only",
@@ -56,8 +58,7 @@ function EventSets() {
   const { setValue, getValues } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const [statusMessage, setStatusMessage] = useState("");
-
+  const [statusMessage, setStatusMessage] = useState(""); // status messages (applying set, errors, etc)
   const apply = () => {
     const selectedSetIndex = parseInt(Object.keys(selectedRow)[0]);
     if (
@@ -112,6 +113,7 @@ function EventSets() {
 
   const fetchSets = async () => {
     for (let i = 1; i <= totalPagesRef.current; i++) {
+      setLoading(true);
       do {
         if (error && !requestsLimitExceeded.current) {
           console.log("Error found");
@@ -140,6 +142,7 @@ function EventSets() {
         setPagesLoaded((pages) => pages + 1);
       } while (requestsLimitExceeded.current);
     }
+    setLoading(false);
   };
   return (
     <Sheet
@@ -164,11 +167,18 @@ function EventSets() {
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom">
-        <SheetHeader>
-          <SheetTitle>All sets in {tournamentName}</SheetTitle>
-          <SheetDescription>
-            Pages {pagesLoaded} of {totalPagesState} loaded
-          </SheetDescription>
+        <SheetHeader className="flex flex-row gap-4">
+          <div className="flex items-center">
+            {loading && <Spinner className="size-8" />}
+          </div>
+          <div>
+            <SheetTitle>All sets in {tournamentName}</SheetTitle>
+            <SheetDescription>
+              {loading
+                ? `Loading sets, pages ${pagesLoaded} of ${totalPagesState} loaded`
+                : `Pages ${pagesLoaded} of ${totalPagesState} loaded`}
+            </SheetDescription>
+          </div>
         </SheetHeader>
         <div>
           <DataTable

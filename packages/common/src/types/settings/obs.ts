@@ -17,3 +17,5 @@ export const ALL_OBS_SCENE_TYPES = [
 export type ObsSceneType = (typeof ALL_OBS_SCENE_TYPES)[number];
 
 export type ObsSceneSettings = { type: ObsSceneType; scene: ObsScene }[];
+
+export type ObsConnectionStatus = "connected" | "disconnected" | "error"

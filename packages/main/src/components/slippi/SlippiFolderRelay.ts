@@ -236,7 +236,7 @@ export class SlippiFolderRelay implements SlippiRelay {
         settings = game?.gameDataController.getSettings();
         gameEnd = game?.gameDataController.getGameEnd();
       } catch (err) {
-        EventStream.notify("Slippi Relay Error");
+        EventStream.notify("toast", "Slippi Relay Error");
         return;
       }
       if (!gameState?.settings && settings) {
@@ -300,7 +300,7 @@ export class SlippiFolderRelay implements SlippiRelay {
       this.listenPath = "";
     }
     if (!quiet) {
-      EventStream.notify("Slippi Relay", "Stopped Relay");
+      EventStream.notify("toast", "Slippi Relay", "Stopped Relay");
     }
   }
 

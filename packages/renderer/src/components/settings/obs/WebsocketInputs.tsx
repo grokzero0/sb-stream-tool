@@ -4,6 +4,7 @@ import { Label } from "@renderer/components/ui/label";
 import { Input } from "@renderer/components/ui/input";
 import { Button } from "@renderer/components/ui/button";
 import { useHydratedState } from "@renderer/hooks/use-hydrated-state";
+import { useObsWebsocketStatus } from "@renderer/hooks/use-obs-websocket-status";
 
 function WebsocketInputs() {
   const savedIp = useSettingsStore((state) => state.websocketIp);
@@ -15,6 +16,7 @@ function WebsocketInputs() {
   const [port, setPort] = useHydratedState(savedPort);
   const [password, setPassword] = useHydratedState(savedPassword);
 
+  const { obsWebsocketStatus } = useObsWebsocketStatus();
   return (
     <form
       onSubmit={(e) => {
@@ -37,6 +39,7 @@ function WebsocketInputs() {
         <h1 className="text-center font-semibold text-xl">
           Connect to the OBS Websocket
         </h1>
+        <h2 className="text-center">Status: {obsWebsocketStatus}</h2>
         <div className="flex flex-col gap-2">
           <Label>IP Address</Label>
           <Input

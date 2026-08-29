@@ -3,7 +3,7 @@ import {
   columnFilteringFeature,
   columnVisibilityFeature,
   createFilteredRowModel,
-  createPaginatedRowModel,
+  // createPaginatedRowModel,
   createSortedRowModel,
   createTableHook,
   filterFn_includesString,
@@ -28,6 +28,7 @@ import {
 import { Atom } from "@tanstack/react-store";
 import { cn } from "@renderer/lib/utils";
 import { Input } from "./input";
+// import { useRef } from "react";
 
 export const features = tableFeatures({
   columnFilteringFeature,
@@ -37,7 +38,7 @@ export const features = tableFeatures({
   rowSelectionFeature,
   rowSortingFeature,
   filteredRowModel: createFilteredRowModel(),
-  paginatedRowModel: createPaginatedRowModel(),
+  // paginatedRowModel: createPaginatedRowModel(),
   sortedRowModel: createSortedRowModel(),
   filterFns: { includesString: filterFn_includesString },
   sortFns: { alphanumeric: sortFn_alphanumeric, text: sortFn_text },
@@ -85,7 +86,7 @@ export function DataTable<TData extends RowData>({
           onChange={(e) => table.setGlobalFilter(String(e.target.value))}
         />
       </div>
-      <div className={cn("overflow-hidden rounded-md border", className)}>
+      <div className={cn("overflow-auto rounded-md border max-h-96", className)}>
         <Table>
           <TableHeader>
             {table.getHeaderGroups().map((headerGroup) => (
