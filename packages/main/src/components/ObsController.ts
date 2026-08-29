@@ -91,7 +91,10 @@ export class ObsController {
         // );
         console.log("Connected");
       })
-      .catch((reason) => console.log(`Error: ${reason}`));
+      .catch((reason) => {
+        EventStream.notify("obs", "error")
+        EventStream.notify("toast", "Obs Connection Error", reason)
+        console.log(`Error: ${reason}`)});
   }
 
   static async playScenes(sceneCollection: ObsSceneType) {
