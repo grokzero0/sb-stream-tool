@@ -2,6 +2,7 @@ import { useSettingsStore } from "@renderer/zustand/store";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import FolderBrowser from "./FolderBrowser";
+import ConsoleConnection from "./ConsoleConnection";
 
 function Slippi() {
   const relayStatus = useSettingsStore((state) => state.slippiRelayStatus);
@@ -19,10 +20,10 @@ function Slippi() {
           updateRelayStatus(value as typeof relayStatus)
         }
       >
-        {/* <div>
-            <RadioGroupItem value="direct" id="r1" />
-            <Label htmlFor="r1">Connect via direct connection</Label>
-          </div> */}
+        <div>
+          <RadioGroupItem value="console" id="r1" />
+          <Label htmlFor="r1">Connect via direct Wii connection</Label>
+        </div>
         <div className="flex items-center gap-2">
           <RadioGroupItem value="folder" id="r2" />
           <Label htmlFor="r2">Connect via folder</Label>
@@ -37,6 +38,7 @@ function Slippi() {
         {relayStatus === "folder" && (
           <FolderBrowser disabled={relayStatus !== "folder"} />
         )}
+        {relayStatus === "console" && <ConsoleConnection />}
       </div>
     </div>
   );

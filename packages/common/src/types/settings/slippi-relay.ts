@@ -1,6 +1,7 @@
 export const ALL_SLIPPI_RELAY_STATUSES = [
   "disabled",
-  "direct",
+  "console",
+  "dolphin",
   "folder",
 ] as const;
 
@@ -39,4 +40,5 @@ export type SlippiGameEndData = {
 
 export type SlippiRelayConfig =
   | { type: "folder"; listenPath: string }
-  | { type: "console"; ip: string; port: string };
+  | { type: "console"; ip: string; port: number }
+  | { type: "dolphin"; ip: string; port: number };

@@ -2,6 +2,7 @@ import { SlippiRelayConfig } from "@app/common";
 import { SlippiRelay } from "./SlippiRelay.js";
 import { SlippiFolderRelay } from "./SlippiFolderRelay.js";
 import { BrowserWindow } from "electron";
+import { SlippiConsoleRelay } from "./SlippiConsoleRelay.js";
 
 export class SlippiRelayHandler {
   private static relay: SlippiRelay | null = null;
@@ -14,6 +15,16 @@ export class SlippiRelayHandler {
     this.relay?.stop(false);
     if (config.type === "folder") {
       this.relay = new SlippiFolderRelay(config.listenPath, this.browserWindow);
+    }
+    if (config.type === "console") {
+      this.relay = new SlippiConsoleRelay(
+        config.ip,
+        config.port,
+        this.browserWindow,
+      );
+    }
+    if (config.type === "dolphin") {
+      console.log("Dolphin Connect");
     }
     this.relay?.start();
   }
