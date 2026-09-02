@@ -30,8 +30,11 @@ function SetQuery() {
   const [statusMessage, setStatusMessage] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | undefined>(undefined);
-  const apiKey = useSettingsStore((state) => state.startggApiKey);
   const eventUrl = useSettingsStore((state) => state.eventUrl);
+  const platform = platformForEventUrl(eventUrl);
+  const apiKey = useSettingsStore(
+    (state) => state.credentials[platform.id] ?? "",
+  );
   const { setValue, getValues } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
   const timeoutId = useRef<NodeJS.Timeout>(undefined);
@@ -47,7 +50,7 @@ function SetQuery() {
 
     let set;
     try {
-      set = await platformForEventUrl(eventUrl).withApiKey(apiKey).getSet(setId);
+      set = await platform.withApiKey(apiKey).getSet(setId);
     } catch (reason) {
       setError(reason instanceof Error ? reason : new Error(String(reason)));
     } finally {
@@ -118,7 +121,16 @@ function SetQuery() {
       }}
     >
       <SheetTrigger asChild>
-        <Button disabled={!apiKey || apiKey === ""}>Get a specific set</Button>
+        <Button
+          disabled={!platform.supportsSetLookup || !apiKey || apiKey === ""}
+          title={
+            platform.supportsSetLookup
+              ? undefined
+              : `${platform.displayName} does not support looking a set up by id`
+          }
+        >
+          Get a specific set
+        </Button>
       </SheetTrigger>
       <SheetContent>
         <SheetHeader>

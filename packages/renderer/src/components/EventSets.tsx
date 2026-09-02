@@ -23,13 +23,19 @@ import { RowSelectionState } from "@tanstack/react-table";
 import { useFormContext } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { usePlayerFormFieldArrayContext } from "../hooks/use-player-form-field-array-context";
-import { platformById, resolveEventUrl } from "@renderer/platform/registry";
+import {
+  platformById,
+  platformForEventUrl,
+  resolveEventUrl,
+} from "@renderer/platform/registry";
 import { FetchProgress, PlatformSet } from "@renderer/platform/types";
 
 function EventSets() {
-  const savedApiKey = useSettingsStore((state) => state.startggApiKey);
   const savedEventSlug = useSettingsStore((state) => state.eventSlug);
   const savedEventUrl = useSettingsStore((state) => state.eventUrl);
+  const savedApiKey = useSettingsStore(
+    (state) => state.credentials[platformForEventUrl(savedEventUrl).id] ?? "",
+  );
   const currentEventSlug = useRef("");
   const totalPagesRef = useRef(1); // for the for loop
   const [pagesLoaded, setPagesLoaded] = useState(0);

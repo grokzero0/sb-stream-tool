@@ -54,15 +54,16 @@ export function createHandlers(
     "obs/save-scenes": (newScenes: ObsSceneSettings) =>
       SettingsStore.writeObsScenes(newScenes),
 
-    "startgg/get-api-key": async () => SettingsStore.getStartggApiKey(),
+    "platform/get-credential": async (platform: string) =>
+      SettingsStore.getPlatformApiKey(platform),
 
-    "startgg/update-api-key": (newApiKey: string) =>
-      SettingsStore.writeStartggApiKey(newApiKey),
+    "platform/save-credential": (platform: string, newApiKey: string) =>
+      SettingsStore.writePlatformApiKey(platform, newApiKey),
 
-    "startgg/save-tournament-url": (newTournamentUrl: string) =>
-      SettingsStore.writeStartggTournamentUrl(newTournamentUrl),
+    "platform/save-event-url": (newEventUrl: string) =>
+      SettingsStore.writeEventUrl(newEventUrl),
 
-    "startgg/get-tournament-url": () => SettingsStore.getStartggTournamentUrl(),
+    "platform/get-event-url": () => SettingsStore.getEventUrl(),
 
     "shortcuts/get-shortcuts": async () => SettingsStore.getShortcuts(),
 

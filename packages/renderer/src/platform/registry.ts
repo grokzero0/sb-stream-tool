@@ -1,7 +1,11 @@
+import { ParryggPlatform } from "./parrygg/ParryggPlatform";
 import { StartggPlatform } from "./startgg/StartggPlatform";
 import type { EventId, PlatformId, TournamentPlatform } from "./types";
 
-export const PLATFORMS: TournamentPlatform[] = [StartggPlatform];
+export const PLATFORMS: TournamentPlatform[] = [
+  StartggPlatform,
+  ParryggPlatform,
+];
 
 export function platformById(id: PlatformId): TournamentPlatform {
   const platform = PLATFORMS.find((candidate) => candidate.id === id);

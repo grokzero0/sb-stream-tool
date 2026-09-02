@@ -21,7 +21,7 @@ export const createEventSlice: StateCreator<
       state.eventUrl = newEventUrl;
       state.eventSlug = newEventSlug;
     });
-    send("startgg/save-tournament-url", newEventUrl).catch((error) =>
+    send("platform/save-event-url", newEventUrl).catch((error) =>
       console.log(error),
     );
   },

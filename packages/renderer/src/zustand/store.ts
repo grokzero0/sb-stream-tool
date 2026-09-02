@@ -3,7 +3,7 @@ import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 import { subscribeWithSelector } from "zustand/middleware";
 import { createObsScenesSlice } from "./slices/obsScenesSlice";
-import { createStartggSlice } from "./slices/startggSlice";
+import { createPlatformSlice } from "./slices/platformSlice";
 import { type StoreSliceType } from "./slices/slice";
 import { createSlippiRelaySlice } from "./slices/slippiRelaySlice";
 import { createObsWebsocketSlice } from "./slices/obsWebsocketSlice";
@@ -21,7 +21,7 @@ import {
 } from "@app/common";
 import { Hotkey } from "@tanstack/react-hotkeys";
 import { createZustandStateSlice } from "./slices/zustandStateSlice";
-import { resolveEventUrl } from "@renderer/platform/registry";
+import { PLATFORMS, resolveEventUrl } from "@renderer/platform/registry";
 
 enableMapSet();
 
@@ -29,7 +29,7 @@ export const useSettingsStore = create<StoreSliceType>()(
   subscribeWithSelector(
     immer((...a) => ({
       ...createObsScenesSlice(...a),
-      ...createStartggSlice(...a),
+      ...createPlatformSlice(...a),
       ...createSlippiRelaySlice(...a),
       ...createObsWebsocketSlice(...a),
       ...createEventSlice(...a),
@@ -42,11 +42,15 @@ export const useSettingsStore = create<StoreSliceType>()(
 // restore settings
 // https://github.com/pmndrs/zustand/discussions/676
 Promise.all([
-  send("startgg/get-api-key")
-    .then((key: string) => {
-      useSettingsStore.setState({ startggApiKey: key });
-    })
-    .catch((error) => console.log(error)),
+  ...PLATFORMS.map((platform) =>
+    send("platform/get-credential", platform.id)
+      .then((key: string) => {
+        useSettingsStore.setState((state) => ({
+          credentials: { ...state.credentials, [platform.id]: key },
+        }));
+      })
+      .catch((error) => console.log(error)),
+  ),
   send("shortcuts/get-shortcuts")
     .then((shortcutsList: ShortcutSettings | undefined) => {
       if (shortcutsList === undefined) return;
@@ -112,7 +116,7 @@ Promise.all([
       });
     })
     .catch((error) => console.log(error)),
-  send("startgg/get-tournament-url")
+  send("platform/get-event-url")
     .then((url: string) => {
       const eventId = resolveEventUrl(url);
       if (!eventId) return;

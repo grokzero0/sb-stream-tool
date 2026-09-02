@@ -14,6 +14,15 @@ import { RocksDatabase, Transaction } from "@harperfast/rocksdb-js";
 import { isPlainObject } from "es-toolkit";
 import { EventStream } from "./EventStream.js";
 
+const EVENT_URL_DB_KEY = "event-url";
+const LEGACY_API_KEY_DB_KEY = "startgg-api-key";
+const LEGACY_EVENT_URL_DB_KEY = "startgg-tournament-url";
+const LEGACY_STARTGG_PLATFORM = "startgg";
+
+function platformApiKeyDbKey(platform: string) {
+  return `platform:${platform}:api-key`;
+}
+
 export class SettingsStore {
   private static storePath = path.join(app.getPath("userData"), "settings");
 
@@ -114,55 +123,60 @@ export class SettingsStore {
     }
   }
 
-  static async writeStartggApiKey(newApiKey: string) {
+  static async writePlatformApiKey(platform: string, newApiKey: string) {
     const db = RocksDatabase.open(this.storePath);
     const serializedKey = await this.serialize(newApiKey);
-    // console.log(serializedKey)
-    await db.put("startgg-api-key", serializedKey);
+    await db.put(platformApiKeyDbKey(platform), serializedKey);
     db.close();
-    EventStream.notify("Start.gg API Key", "Successfully saved API Key!");
+    EventStream.notify("API Key", "Successfully saved API Key!");
   }
 
-  static async getStartggApiKey() {
+  static async getPlatformApiKey(platform: string) {
     const isApiKey = (key: any): key is string => {
-      return key !== null && typeof key === "string";
+      return key !== null && typeof key === "string" && key !== "";
     };
     const db = RocksDatabase.open(this.storePath);
-    const key = await db.get("startgg-api-key");
+    const key = await db.get(platformApiKeyDbKey(platform));
+    // Keys used to be stored per-app rather than per-platform.
+    const legacy =
+      platform === LEGACY_STARTGG_PLATFORM && !isApiKey(key)
+        ? await db.get(LEGACY_API_KEY_DB_KEY)
+        : undefined;
+    db.close();
+
     if (isApiKey(key)) {
-      db.close();
       return key;
     }
-    db.close();
-    return "";
+    return isApiKey(legacy) ? legacy : "";
   }
 
-  static async writeStartggTournamentUrl(url: string) {
+  static async writeEventUrl(url: string) {
     const serializedUrl = await this.serialize(url);
 
     const db = RocksDatabase.open(this.storePath);
-    await db.put("startgg-tournament-url", serializedUrl);
+    await db.put(EVENT_URL_DB_KEY, serializedUrl);
 
     db.close();
   }
 
-  static async getStartggTournamentUrl() {
-    const isStartggTournamentUrl = (url: any): url is string => {
-      const regex =
-        /^https:\/\/(?:www\.)?start\.gg\/tournament\/([^\/?#]+)\/event\/([^\/?#]+)(?:[\/?#].*)?$/;
-      return (
-        url !== null && typeof url === "string" && regex.test(url) === true
-      );
+  // Returned unvalidated: only the renderer's platform registry knows which URL
+  // shapes are recognised, and it drops anything it cannot parse.
+  static async getEventUrl() {
+    const isUrl = (url: any): url is string => {
+      return url !== null && typeof url === "string" && url !== "";
     };
 
     const db = RocksDatabase.open(this.storePath);
-    const url = await db.get("startgg-tournament-url");
+    const url = await db.get(EVENT_URL_DB_KEY);
+    const legacy = isUrl(url)
+      ? undefined
+      : await db.get(LEGACY_EVENT_URL_DB_KEY);
     db.close();
 
-    if (isStartggTournamentUrl(url)) {
+    if (isUrl(url)) {
       return url;
     }
-    return "";
+    return isUrl(legacy) ? legacy : "";
   }
 
   static async getObsWebsocketSettings() {

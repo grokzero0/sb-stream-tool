@@ -11,6 +11,7 @@ import {
   SidebarRail,
 } from "../ui/sidebar";
 import { Link, useLocation } from "wouter";
+import { PLATFORMS } from "@renderer/platform/registry";
 
 function SettingsSidebar() {
   const [location] = useLocation();
@@ -21,11 +22,11 @@ function SettingsSidebar() {
       url: "/obs",
       icon: Video,
     },
-    {
-      title: "start.gg",
-      url: "/startgg",
+    ...PLATFORMS.map((platform) => ({
+      title: platform.displayName,
+      url: `/${platform.id}`,
       icon: Webhook,
-    },
+    })),
     {
       title: "Slippi",
       url: "/slippi",

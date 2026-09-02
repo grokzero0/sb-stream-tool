@@ -51,6 +51,21 @@ export function buildMenu(browserWindow: BrowserWindow) {
         },
       ],
     },
+    // Required for clipboard keyboard shortcuts: macOS dispatches Cmd+X/C/V/A
+    // through these menu roles, so replacing the default menu without them
+    // silently breaks paste in every input.
+    {
+      label: "Edit",
+      submenu: [
+        { role: "undo" },
+        { role: "redo" },
+        { type: "separator" },
+        { role: "cut" },
+        { role: "copy" },
+        { role: "paste" },
+        { role: "selectAll" },
+      ],
+    },
     {
       label: "OBS",
       submenu: [
