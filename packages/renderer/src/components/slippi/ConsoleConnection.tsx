@@ -14,7 +14,7 @@ function ConsoleConnection() {
         <Button type="button" onClick={() => {send("slippi-relay/start", {
           type: "console",
           ip: "192.168.1.164",
-          port: 1667
+          port: 51441
         } as SlippiRelayConfig)}}>Connect</Button>
         <Button type="button">Disconnect</Button>
       </div>
