@@ -10,8 +10,10 @@ export type SlippiRelayStatus = (typeof ALL_SLIPPI_RELAY_STATUSES)[number];
 export type SlippiRelaySettings = {
   relayStatus: SlippiRelayStatus;
   directory: string;
-  ip: string;
-  port: string;
+  wiiIp: string;
+  wiiPort: number;
+  dolphinIp: string;
+  dolphinPort: number;
 };
 
 export type SlippiPlayer = {
@@ -42,3 +44,8 @@ export type SlippiRelayConfig =
   | { type: "folder"; listenPath: string }
   | { type: "console"; ip: string; port: number }
   | { type: "dolphin"; ip: string; port: number };
+
+export type SlippiConnectionStatus = {
+  type: "wii" | "dolphin" | "folder" | "none";
+  status: "connected" | "disconnected" | "connecting" | "error";
+};

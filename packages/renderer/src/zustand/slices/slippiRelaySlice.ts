@@ -10,14 +10,21 @@ import { send } from "@app/preload";
 export type SlippiRelaySlice = {
   slippiRelayStatus: SlippiRelayStatus;
   slippiRelayDirectory: string;
-  slippiRelayIp: string;
-  slippiRelayPort: string;
+  slippiWiiRelayIp: string;
+  slippiWiiRelayPort: number;
+  slippiDolphinRelayIp: string;
+  slippiDolphinRelayPort: number;
   players: SlippiPlayer[][];
   slippiRelayAutoupload: boolean;
   setPlayers: (newData: SlippiPlayer[][]) => void;
   swapCharacters: (firstIndex: number, secondIndex: number) => void;
   updateSlippiRelayStatus: (newRelayStatus: SlippiRelayStatus) => void;
   updateSlippiRelayDirectory: (newDirectory: string) => void;
+  updateSlippiWiiRelayConnection: (newIp: string, newPort: number) => void;
+  updateSlippiDolphinRelayConnection: (newIp: string, newPort: number) => void;
+  writeSlippiRelaySettingsToFile: (
+    settings: Partial<SlippiRelaySettings>,
+  ) => void;
 };
 
 // https://github.com/pmndrs/zustand/discussions/676
@@ -29,8 +36,10 @@ export const createSlippiRelaySlice: StateCreator<
 > = (set, get) => ({
   slippiRelayStatus: "disabled",
   slippiRelayDirectory: "",
-  slippiRelayIp: "",
-  slippiRelayPort: "",
+  slippiWiiRelayIp: "",
+  slippiWiiRelayPort: 0,
+  slippiDolphinRelayIp: "",
+  slippiDolphinRelayPort: 0,
   // consoleConnection: false,
   players: [] as SlippiPlayer[][],
   slippiRelayAutoupload: false,
@@ -56,25 +65,29 @@ export const createSlippiRelaySlice: StateCreator<
     set((state) => {
       state.slippiRelayDirectory = newDirectory;
     });
-    send("slippi-relay/save-settings", {
-      relayStatus: get().slippiRelayStatus,
-      directory: newDirectory,
-      ip: get().slippiRelayIp,
-      port: get().slippiRelayPort,
-    } as SlippiRelaySettings).catch((error) => console.log(error));
+  },
+  updateSlippiWiiRelayConnection: (newIp, newPort) => {
+    set((state) => {
+      state.slippiWiiRelayIp = newIp;
+      state.slippiWiiRelayPort = newPort;
+    });
+  },
+  updateSlippiDolphinRelayConnection: (newIp, newPort) => {
+    set((state) => {
+      state.slippiWiiRelayIp = newIp;
+      state.slippiWiiRelayPort = newPort;
+    });
   },
   updateSlippiRelayStatus: (newRelayStatus: SlippiRelayStatus) => {
     set((state) => {
       state.slippiRelayStatus = newRelayStatus;
     });
-    if (newRelayStatus === "disabled") {
-      send("slippi-relay/save-settings", {
-        relayStatus: newRelayStatus,
-        directory: get().slippiRelayDirectory,
-        ip: get().slippiRelayIp,
-        port: get().slippiRelayPort,
-      } as SlippiRelaySettings).catch((error) => console.log(error));
-    }
+  },
+  writeSlippiRelaySettingsToFile: (settings: Partial<SlippiRelaySettings>) => {
+    send("slippi-relay/save-settings", {
+      relayStatus: get().slippiRelayStatus,
+      ...settings,
+    } as Partial<SlippiRelaySettings>);
   },
   updateSlippiRelayAutoupload: (enabled: boolean) =>
     set((state) => {

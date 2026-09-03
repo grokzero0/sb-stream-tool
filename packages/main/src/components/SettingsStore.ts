@@ -14,6 +14,14 @@ import { RocksDatabase, Transaction } from "@harperfast/rocksdb-js";
 import { isPlainObject } from "es-toolkit";
 import { EventStream } from "./EventStream.js";
 
+const defaultSlippiRelaySettings: SlippiRelaySettings = {
+  relayStatus: "disabled",
+  directory: "",
+  wiiIp: "",
+  wiiPort: 0,
+  dolphinIp: "",
+  dolphinPort: 0,
+};
 export class SettingsStore {
   private static storePath = path.join(app.getPath("userData"), "settings");
 
@@ -29,54 +37,75 @@ export class SettingsStore {
     }
   }
 
-  static async writeSlippiRelaySettings(settings: SlippiRelaySettings) {
+  private static isSlippiRelaySettings(data: any): data is SlippiRelaySettings {
+    const dolphinPort = parseInt(data.dolphinPort);
+    const wiiPort = parseInt(data.wiiPort);
+    if (Number.isNaN(dolphinPort) || Number.isNaN(wiiPort)) return false;
+    return (
+      typeof data === "object" &&
+      ALL_SLIPPI_RELAY_STATUSES.includes(data.relayStatus) &&
+      typeof data.directory === "string" &&
+      typeof data.wiiIp === "string" &&
+      typeof wiiPort === "number" &&
+      typeof data.dolphinIp === "string" &&
+      typeof dolphinPort === "number"
+    );
+  }
+  static async writeSlippiRelaySettings(
+    settings: Partial<SlippiRelaySettings>,
+  ) {
     const db = RocksDatabase.open(this.storePath);
-    const relayStatus = await this.serialize(settings.relayStatus);
-    const directory = await this.serialize(settings.directory);
-    const relayIp = await this.serialize(settings.ip);
-    const relayPort = await this.serialize(settings.port);
+    const savedSettings = await db.get("slippi-relay-settings");
+    let jsonSavedSettings;
 
-    await db.transaction(async (txn: Transaction) => {
-      (txn.put("slippi-relay-status", relayStatus),
-        txn.put("slippi-relay-directory", directory),
-        txn.put("slippi-relay-ip", relayIp),
-        txn.put("slippi-relay-port", relayPort));
-    });
+    try {
+      jsonSavedSettings = JSON.parse(savedSettings);
+    } catch {
+      jsonSavedSettings = defaultSlippiRelaySettings;
+    }
 
+    if (this.isSlippiRelaySettings(jsonSavedSettings)) {
+      Object.assign(jsonSavedSettings, settings);
+      const serializedSettings = await this.serialize(jsonSavedSettings);
+      console.log(serializedSettings)
+      await db.transaction(async (txn: Transaction) => {
+        txn.put("slippi-relay-settings", serializedSettings);
+      });
+
+      EventStream.notify("Slippi Relay", "Successfully saved Relay settings!");
+    }
+    console.log(jsonSavedSettings)
     db.close();
-
-    // EventStream.notify("Slippi Relay", "Successfully saved Relay settings!");
   }
 
   static async getSlippiRelaySettings() {
-    const isSlippiRelaySettings = (data: any): data is SlippiRelaySettings => {
-      return (
-        typeof data === "object" &&
-        ALL_SLIPPI_RELAY_STATUSES.includes(data.relayStatus) &&
-        typeof data.directory === "string" &&
-        typeof data.ip === "string" &&
-        typeof data.port === "string"
-      );
-    };
     const db = RocksDatabase.open(this.storePath);
 
-    const relayStatus = await db.get("slippi-relay-status");
-    const directory = await db.get("slippi-relay-directory");
-    const ip = await db.get("slippi-relay-ip");
-    const port = await db.get("slippi-relay-port");
+    const savedSettings = await db.get("slippi-relay-settings");
+    let jsonSavedSettings;
+    console.log(savedSettings)
+    try {
+      jsonSavedSettings = JSON.parse(savedSettings);
+      console.log("jsonSavedSettings")
+      console.log(jsonSavedSettings)
+    } catch {
+      db.close();
+      return undefined;
+    }
 
-    const settings: SlippiRelaySettings = {
-      relayStatus: relayStatus,
-      directory: directory,
-      ip: ip,
-      port: port,
-    };
-
-    db.close();
-
-    if (isSlippiRelaySettings(settings)) {
+    if (this.isSlippiRelaySettings(jsonSavedSettings)) {
+      const settings: SlippiRelaySettings = {
+        relayStatus: jsonSavedSettings.relayStatus,
+        directory: jsonSavedSettings.directory,
+        wiiIp: jsonSavedSettings.wiiIp,
+        wiiPort: jsonSavedSettings.wiiPort,
+        dolphinIp: jsonSavedSettings.dolphinIp,
+        dolphinPort: jsonSavedSettings.dolphinPort,
+      };
+      db.close();
       return settings;
     }
+    db.close();
     return undefined;
   }
 
@@ -120,7 +149,11 @@ export class SettingsStore {
     // console.log(serializedKey)
     await db.put("startgg-api-key", serializedKey);
     db.close();
-    EventStream.notify("toast", "Start.gg API Key", "Successfully saved API Key!");
+    EventStream.notify(
+      "toast",
+      "Start.gg API Key",
+      "Successfully saved API Key!",
+    );
   }
 
   static async getStartggApiKey() {

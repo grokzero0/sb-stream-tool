@@ -5,6 +5,7 @@ import {
   SlippiGameEndData,
   Tournament,
   ObsConnectionStatus,
+  SlippiConnectionStatus,
 } from "@app/common";
 import { ipcRenderer } from "electron";
 
@@ -52,6 +53,13 @@ function onObsConnectionStatusChange(
   );
 }
 
+function onSlippiRelayConnectionStatusChange(
+  callback: (status: SlippiConnectionStatus) => void,
+) {
+  ipcRenderer.on("slippi:connection-status-change", (_event, status) =>
+    callback(status),
+  );
+}
 // function autoStopSlippiRelay() {
 //   return ipcRenderer.invoke("slippi:autoStopReadingFolder");
 // }
@@ -65,4 +73,5 @@ export {
   onNewSlippiGameEndData,
   clearAllListeners,
   onObsConnectionStatusChange,
+  onSlippiRelayConnectionStatusChange,
 };

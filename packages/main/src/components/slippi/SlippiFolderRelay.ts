@@ -39,6 +39,7 @@ export class SlippiFolderRelay implements SlippiRelay {
       usePolling: true,
       ignoreInitial: true,
     });
+    EventStream.notify("toast", `Saved and connected to ${listenPath}`);
   }
 
   async setBrowserWindow(browserWindow: BrowserWindow) {
@@ -126,7 +127,6 @@ export class SlippiFolderRelay implements SlippiRelay {
             game.gameDataController.getStats(),
           )
         ) {
-          console.log("winners:");
           let gameWinners = game.gameDataController.getWinners();
           if (gameWinners.length > 0) {
             const gameEndData: SlippiGameEndData = {
@@ -146,7 +146,6 @@ export class SlippiFolderRelay implements SlippiRelay {
         // so we must ensure the file end stuff only gets read once
         game.state.gameEnded = true;
         this.games.set(path, game);
-        console.log(this.games.get(path));
       }
     });
   }
@@ -157,6 +156,7 @@ export class SlippiFolderRelay implements SlippiRelay {
       this.watcher?.close();
       this.listenPath = "";
     }
+
     if (!quiet) {
       EventStream.notify("toast", "Slippi Relay", "Stopped Relay");
     }

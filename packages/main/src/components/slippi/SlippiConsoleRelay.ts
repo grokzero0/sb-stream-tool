@@ -1,9 +1,9 @@
 import { BrowserWindow } from "electron";
 import { SlippiRelay } from "./SlippiRelay.js";
 import {
+  ConnectionStatus,
   ConsoleConnection,
   FrameEntryType,
-  GameEndType,
   GameStartType,
   SlpParser,
   SlpStream,
@@ -19,6 +19,7 @@ import {
   isActualGame,
   isSameGame,
 } from "./helpers.js";
+import { EventStream } from "../EventStream.js";
 
 export class SlippiConsoleRelay implements SlippiRelay {
   private browserWindow: BrowserWindow;
@@ -52,7 +53,6 @@ export class SlippiConsoleRelay implements SlippiRelay {
 
   async setBrowserWindow(browserWindow: BrowserWindow) {
     this.browserWindow = browserWindow;
-    console.log(this.browserWindow);
   }
 
   async clearPrevGame() {
@@ -74,12 +74,31 @@ export class SlippiConsoleRelay implements SlippiRelay {
     this.connection.on("data", (data) => this.stream.process(data));
 
     // connection status changes
-    this.connection.on("connect", () => console.log("MAIN: connecting")); // this for "connecting"
-    this.connection.on("statusChange", (data) =>
-      console.log(`MAIN: StatusChange: ${data}`),
-    ); // this for any sort of connection success/error status changes
+    this.connection.on("connect", () =>
+      EventStream.notify("toast", `Connecting to ${this.ip}:${this.port}`),
+    ); // this for "connecting"
+    this.connection.on("statusChange", (data) => {
+      switch (data) {
+        case ConnectionStatus.CONNECTED:
+          EventStream.notify("toast", `Connected to ${this.ip}:${this.port}`);
+          EventStream.notify("slippi", { type: "wii", status: "connected" });
+          break;
+        case ConnectionStatus.DISCONNECTED:
+          EventStream.notify("toast", `Slippi Wii Relay disconnected`);
+          EventStream.notify("slippi", { type: "wii", status: "disconnected" });
+
+          break;
+        case ConnectionStatus.RECONNECT_WAIT:
+          EventStream.notify("toast", `Reconnecting ${this.ip}:${this.port}`);
+          EventStream.notify("slippi", { type: "wii", status: "connecting" });
+          break;
+        default:
+          EventStream.notify("toast", `Connecting to ${this.ip}:${this.port}`);
+          EventStream.notify("slippi", { type: "wii", status: "connecting" });
+      }
+    }); // this for any sort of connection success/error status changes
     this.connection.on("error", (err) =>
-      console.log(`MAIN: Error found: ${err}`),
+      EventStream.notify("toast", `Slippi Wii Connection error, ${err}`),
     ); // this for purely connection errors
 
     // any sort of event triggered will be passed onto the parser for handling
@@ -135,14 +154,11 @@ export class SlippiConsoleRelay implements SlippiRelay {
         game.settings?.isTeams !== undefined
       ) {
         if (isActualGame(gameEnd, this.lastFrame, this.playerDamages)) {
-          console.log("ended game 3");
           const winnersIndices = getWinner(
             game.settings,
             this.lastFrame,
             gameEnd,
           );
-          console.log("ended game");
-          console.log(winnersIndices);
           if (winnersIndices.length > 0) {
             const gameEndData: SlippiGameEndData = {
               isTeams: game.settings.isTeams,
@@ -157,7 +173,6 @@ export class SlippiConsoleRelay implements SlippiRelay {
         game.gameEnded = true;
         this.games.set(this.gameNumber, game);
       }
-      console.log(`MAIN: Game end: `);
       this.clearPrevGame();
       this.gameNumber++;
     });

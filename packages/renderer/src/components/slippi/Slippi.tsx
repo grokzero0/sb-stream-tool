@@ -3,6 +3,7 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Label } from "../ui/label";
 import FolderBrowser from "./FolderBrowser";
 import ConsoleConnection from "./ConsoleConnection";
+import { SlippiRelayStatus } from "@app/common";
 
 function Slippi() {
   const relayStatus = useSettingsStore((state) => state.slippiRelayStatus);
@@ -16,21 +17,23 @@ function Slippi() {
       <RadioGroup
         className="flex gap-4 justify-center"
         value={relayStatus}
-        onValueChange={(value) =>
-          updateRelayStatus(value as typeof relayStatus)
-        }
+        onValueChange={(value) => updateRelayStatus(value as SlippiRelayStatus)}
       >
-        <div>
+        <div className="flex items-center gap-3">
           <RadioGroupItem value="console" id="r1" />
           <Label htmlFor="r1">Connect via direct Wii connection</Label>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <RadioGroupItem value="folder" id="r2" />
           <Label htmlFor="r2">Connect via folder</Label>
         </div>
         <div className="flex items-center gap-3">
-          <RadioGroupItem value="disabled" id="r3" />
-          <Label htmlFor="r3">Disabled</Label>
+          <RadioGroupItem value="dolphin" id="r3" />
+          <Label htmlFor="r3">Connect via Dolphin connection</Label>
+        </div>
+        <div className="flex items-center gap-3">
+          <RadioGroupItem value="disabled" id="r4" />
+          <Label htmlFor="r4">Disabled</Label>
         </div>
       </RadioGroup>
 

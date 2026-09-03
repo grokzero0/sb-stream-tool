@@ -4,12 +4,12 @@ import { Label } from "@renderer/components/ui/label";
 import { Input } from "@renderer/components/ui/input";
 import { Button } from "@renderer/components/ui/button";
 import { useHydratedState } from "@renderer/hooks/use-hydrated-state";
-import { useObsWebsocketStatus } from "@renderer/hooks/use-obs-websocket-status";
-import {
-  Dialog,
-  DialogContent,
-  DialogTrigger,
-} from "@renderer/components/ui/dialog";
+// import { useObsWebsocketStatus } from "@renderer/hooks/use-obs-websocket-status";
+// import {
+//   Dialog,
+//   DialogContent,
+//   DialogTrigger,
+// } from "@renderer/components/ui/dialog";
 
 function WebsocketInputs() {
   const savedIp = useSettingsStore((state) => state.websocketIp);
@@ -21,7 +21,7 @@ function WebsocketInputs() {
   const [port, setPort] = useHydratedState(savedPort);
   const [password, setPassword] = useHydratedState(savedPassword);
 
-  const { obsWebsocketStatus } = useObsWebsocketStatus();
+  // const { obsWebsocketStatus } = useObsWebsocketStatus();
   return (
     <form
       onSubmit={(e) => {
@@ -44,8 +44,8 @@ function WebsocketInputs() {
         <h1 className="text-center font-semibold text-xl">
           Connect to the OBS Websocket
         </h1>
-        <h2 className="text-center">Status: {obsWebsocketStatus}</h2>
-        {obsWebsocketStatus === "disconnected" && (
+        {/* <h2 className="text-center">Status: {obsWebsocketStatus}</h2> */}
+        {/* {obsWebsocketStatus === "disconnected" && (
           <p className="text-center">
             In order to use the automated scene switch, you must connect to OBS.{" "}
             <Dialog>
@@ -74,7 +74,7 @@ function WebsocketInputs() {
               </DialogContent>
             </Dialog>
           </p>
-        )}
+        )} */}
 
         <div className="flex flex-col gap-2">
           <Label>IP Address</Label>

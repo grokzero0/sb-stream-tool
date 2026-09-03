@@ -18,6 +18,7 @@ import {
   ObsWebsocketSettings,
   ShortcutSettings,
   SlippiRelaySettings,
+  // SlippiRelaySettings,
 } from "@app/common";
 import { Hotkey } from "@tanstack/react-hotkeys";
 import { createZustandStateSlice } from "./slices/zustandStateSlice";
@@ -102,12 +103,16 @@ Promise.all([
     .catch((error) => console.log(error)),
   send("slippi-relay/get-settings")
     .then((settings: SlippiRelaySettings | undefined) => {
+      console.log("yess")
+      console.log(settings)
       if (settings === undefined) return;
       useSettingsStore.setState({
         slippiRelayStatus: settings.relayStatus,
         slippiRelayDirectory: settings.directory,
-        slippiRelayIp: settings.ip,
-        slippiRelayPort: settings.port,
+        slippiWiiRelayIp: settings.wiiIp,
+        slippiWiiRelayPort: settings.wiiPort,
+        slippiDolphinRelayIp: settings.dolphinIp,
+        slippiDolphinRelayPort: settings.dolphinPort,
       });
     })
     .catch((error) => console.log(error)),
