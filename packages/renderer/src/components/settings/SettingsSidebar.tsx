@@ -12,6 +12,16 @@ import {
 } from "../ui/sidebar";
 import { Link, useLocation } from "wouter";
 import { PLATFORMS } from "@renderer/platform/registry";
+import type { PlatformId } from "@renderer/platform/types";
+import ParryggIcon from "@renderer/components/icons/ParryggIcon";
+import type { ComponentType, SVGProps } from "react";
+
+// Platforms without a brand mark fall back to the generic Webhook icon.
+const PLATFORM_ICONS: Partial<
+  Record<PlatformId, ComponentType<SVGProps<SVGSVGElement>>>
+> = {
+  parrygg: ParryggIcon,
+};
 
 function SettingsSidebar() {
   const [location] = useLocation();
@@ -25,7 +35,7 @@ function SettingsSidebar() {
     ...PLATFORMS.map((platform) => ({
       title: platform.displayName,
       url: `/${platform.id}`,
-      icon: Webhook,
+      icon: PLATFORM_ICONS[platform.id] ?? Webhook,
     })),
     {
       title: "Slippi",
