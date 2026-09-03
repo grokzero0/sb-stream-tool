@@ -1,10 +1,6 @@
 import type { SVGProps } from "react";
 
-/**
- * parry.gg brand mark, taken from parrygg-web's ParryLogo. The source uses the
- * brand mint (#38FFB7) plus white; this renders in currentColor instead so it
- * matches the lucide icons beside it and stays legible in either theme.
- */
+/** parry.gg brand mark from parrygg-web, recolored to currentColor. */
 function ParryggIcon(props: SVGProps<SVGSVGElement>) {
   return (
     <svg

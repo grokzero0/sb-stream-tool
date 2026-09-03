@@ -45,7 +45,7 @@ const NO_TOURNAMENT_MESSAGE = "No parry.gg tournament found at";
 const ROUND_ROBIN_ROUND_NAME = "Round Robin";
 const TEAM_NAME_SEPARATOR = " / ";
 
-// Admin URLs interleave a "_manage" segment: parry.gg/<tournament>/_manage/<event>/...
+// Admin URLs interleave a "_manage" segment before the event.
 const MANAGE_PATH = "/_manage/";
 const EVENT_URL_PATTERN =
   /^https:\/\/(?:www\.)?parry\.gg\/([^/?#]+)\/([^/?#]+)(?:[/?#].*)?$/;
@@ -68,9 +68,7 @@ function toSetState(state: MatchState): SetState {
   }
 }
 
-// start.gg's equivalent filter is literally state:[1] (CREATED). parry splits that
-// into PENDING and READY, and READY -- both entrants assigned -- is the category a
-// stream operator actually wants, so both count as upcoming here.
+// READY means both entrants are assigned, which still counts as upcoming.
 function isUpcoming(state: SetState) {
   return state === "pending" || state === "ready";
 }
@@ -84,13 +82,12 @@ function toPlayer(user: {
     teamName: user.getSponsorName(),
     playerTag: user.getGamerTag(),
     pronouns: user.getPronouns(),
-    // parry has no Twitter field; LinkedAccount only covers Discord and start.gg.
+    // parry has no Twitter field; LinkedAccount is only Discord and start.gg.
     twitter: "",
   };
 }
 
-// Falls back to the projected entrant so a slot fed by an unfinished progression
-// shows who is expected there rather than a blank row.
+// Projected entrants fill slots whose feeding progression is unfinished.
 function toEntrant(seed: Seed | undefined): PlatformEntrant | null {
   const eventEntrant = seed?.hasEventEntrant()
     ? seed.getEventEntrant()
@@ -175,8 +172,7 @@ function toPlatformSet(
 }
 
 function tournamentNameFromHierarchy(hierarchy: Hierarchy | undefined) {
-  // PATH_TYPE_TOURNAMENT is 0, which protobuf also reports for an unset enum, so
-  // a match here is not proof the field was populated.
+  // PATH_TYPE_TOURNAMENT is 0, which is also protobuf's unset-enum default.
   return (
     hierarchy
       ?.getPathsList()
@@ -192,9 +188,7 @@ class ParryggClient implements PlatformClient {
     this.metadata = { [API_KEY_HEADER]: apiKey };
   }
 
-  // Surfaces a bad key as something actionable instead of a raw RpcError, and
-  // never lets a blank RpcError message reach the UI as an empty error box --
-  // parry.gg returns NOT_FOUND and several others with no message at all.
+  // parry.gg returns most failures with an empty message.
   private toError(reason: unknown): unknown {
     if (!(reason instanceof RpcError)) {
       return reason;
@@ -215,7 +209,6 @@ class ParryggClient implements PlatformClient {
     }
   }
 
-  /** Resolves to undefined on NOT_FOUND, which callers treat as "no such record". */
   private async callOptional<T>(request: Promise<T>): Promise<T | undefined> {
     try {
       return await request;
@@ -236,7 +229,6 @@ class ParryggClient implements PlatformClient {
     return response?.getTournament();
   }
 
-  /** Maps stream id to channel name for every stream on the tournament. */
   private async getStreams(tournamentSlug: string) {
     const identifier = new TournamentIdentifier();
     identifier.setTournamentSlug(tournamentSlug);
@@ -273,9 +265,6 @@ class ParryggClient implements PlatformClient {
       return null;
     }
 
-    // A MatchContext carries its seeds and round inline, so unlike a list walk
-    // this needs no bracket fetch. Stream is left empty to match start.gg, whose
-    // set-by-id query does not select it either.
     const seeds = new Map(
       context.getSeedsList().map((seed) => [seed.getId(), seed]),
     );
@@ -284,6 +273,7 @@ class ParryggClient implements PlatformClient {
       match,
       seeds,
       context.getRound()?.getLabel() ?? "",
+      // A MatchContext has no stream queue entry to resolve against.
       new Map(),
       tournamentNameFromHierarchy(context.getHierarchy()),
     );
@@ -298,7 +288,6 @@ class ParryggClient implements PlatformClient {
 
     const tournament = await this.getTournament(tournamentSlug);
     if (!tournament) {
-      // Otherwise a typo in the pasted URL reads as an event with no sets.
       throw new Error(`${NO_TOURNAMENT_MESSAGE} ${eventId.url}`);
     }
 
@@ -306,8 +295,7 @@ class ParryggClient implements PlatformClient {
     const brackets = eventBrackets(tournament, eventSlug);
 
     if (brackets.length === 0) {
-      // start.gg always reports its first page, so emit once regardless -- the
-      // sheet only reads the tournament name when loaded is 1.
+      // The sheet only reads the tournament name when loaded is 1.
       onProgress?.({ loaded: 1, total: 0, tournamentName, sets: [] });
       return [];
     }
@@ -316,8 +304,6 @@ class ParryggClient implements PlatformClient {
     const sets: PlatformSet[] = [];
     let loaded = 0;
 
-    // Brackets are independent, so fetch them concurrently and report each as it
-    // lands rather than making the sheet wait for the whole event.
     await Promise.all(
       brackets.map(async (bracketRef) => {
         const bracket = await this.getBracket(bracketRef.getId());
@@ -350,10 +336,6 @@ function eventBrackets(tournament: Tournament | undefined, eventSlug: string) {
   );
 }
 
-/**
- * A Slot only carries a seed id, so players come from joining against the
- * bracket's seeds; round labels join on (number, winners side).
- */
 function bracketSetList(
   bracket: Bracket,
   streams: Map<string, string>,
@@ -392,8 +374,7 @@ export const ParryggPlatform: TournamentPlatform = {
   id: PLATFORM_ID,
   displayName: DISPLAY_NAME,
   apiKeyDocsUrl: API_KEY_DOCS_URL,
-  // parry.gg does not surface a set id a user could paste, so the lookup is
-  // hidden for now even though getSet below works.
+  // getSet works, but parry.gg exposes no set id a user could paste.
   supportsSetLookup: false,
 
   parseEventUrl(url) {

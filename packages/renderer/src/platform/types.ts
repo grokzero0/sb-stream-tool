@@ -37,10 +37,7 @@ export interface TournamentPlatform {
   readonly id: PlatformId;
   readonly displayName: string;
   readonly apiKeyDocsUrl: string;
-  /**
-   * Whether looking a set up by its id is offered to the user. Platforms that
-   * set this false still implement getSet; the UI just does not expose it.
-   */
+  /** When false, getSet still works but the UI does not offer it. */
   readonly supportsSetLookup: boolean;
 
   parseEventUrl(url: string): EventId | null;

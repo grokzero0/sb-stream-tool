@@ -16,7 +16,6 @@ import type { PlatformId } from "@renderer/platform/types";
 import ParryggIcon from "@renderer/components/icons/ParryggIcon";
 import type { ComponentType, SVGProps } from "react";
 
-// Platforms without a brand mark fall back to the generic Webhook icon.
 const PLATFORM_ICONS: Partial<
   Record<PlatformId, ComponentType<SVGProps<SVGSVGElement>>>
 > = {

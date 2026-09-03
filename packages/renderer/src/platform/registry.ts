@@ -15,10 +15,7 @@ export function platformById(id: PlatformId): TournamentPlatform {
   return platform;
 }
 
-/**
- * Used when no event is selected, since set lookup by id works without one.
- * Revisit once a second platform makes the choice non-obvious.
- */
+/** Used when no event is selected. */
 export function defaultPlatform(): TournamentPlatform {
   return PLATFORMS[0];
 }
