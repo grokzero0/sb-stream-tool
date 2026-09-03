@@ -2,6 +2,7 @@ import { OBSWebSocket } from "obs-websocket-js";
 import { EventStream } from "./EventStream.js";
 import { ObsScene, ObsSceneType } from "@app/common";
 import { SettingsStore } from "./SettingsStore.js";
+import { BrowserWindow } from "electron";
 
 class SceneCollection {
   private scenes: ObsScene[];
@@ -56,6 +57,8 @@ export class ObsController {
     this.socket,
   );
 
+  private static browserWindow: BrowserWindow | null = null;
+
   // constructor() {
   //   super();
   //   this.socket = new OBSWebSocket();
@@ -64,6 +67,10 @@ export class ObsController {
   //   this.gameEndScenes = new SceneCollection(this.socket);
   // }
 
+  static async setBrowserWindow(window: BrowserWindow) {
+    this.browserWindow = window;
+  }
+
   static async connect(
     protocol: string,
     url: string,
@@ -71,19 +78,23 @@ export class ObsController {
     password: string,
   ) {
     EventStream.notify(
+      "toast",
       "OBS Websocket connection",
       `Connecting to ${protocol}${url}:${port}`,
     );
     await this.socket
       .connect(`${protocol}${url}:${port}`, password)
       .then(() => {
-        EventStream.notify(
-          "OBS Websocket connection",
-          `Connected to ${protocol}${url}:${port}`,
-        );
+        // EventStream.notify(
+        //   "OBS Websocket connection",
+        //   `Connected to ${protocol}${url}:${port}`,
+        // );
         console.log("Connected");
       })
-      .catch((reason) => console.log(`Error: ${reason}`));
+      .catch((reason) => {
+        EventStream.notify("obs", "error")
+        EventStream.notify("toast", "Obs Connection Error", reason)
+        console.log(`Error: ${reason}`)});
   }
 
   static async playScenes(sceneCollection: ObsSceneType) {
@@ -126,23 +137,34 @@ export class ObsController {
     this.gameStartScenes.update(newGameStartScenes);
     this.gameEndScenes.update(newGameEndScenes);
     this.setEndScenes.update(newSetEndScenes);
-    EventStream.notify("OBS scenes", "OBS scenes added!");
+    EventStream.notify("toast", "OBS scenes", "OBS scenes added!");
   }
 
   static async initEvents() {
     this.socket.on("ConnectionError", (error) => {
       console.log("Connection Error");
-      EventStream.notify("OBS Connection Error", `Connection Error: ${error}`);
+      EventStream.notify("obs", "error");
+      EventStream.notify(
+        "toast",
+        "OBS Connection Error",
+        `Connection Error: ${error}`,
+      );
     });
 
     this.socket.on("ConnectionOpened", () => {
       console.log("Connection Opened");
-      EventStream.notify("OBS Connection Success", "Connection Opened");
+      EventStream.notify("obs", "connected");
+      EventStream.notify(
+        "toast",
+        "OBS Connection Success",
+        "Connection Opened",
+      );
     });
 
     this.socket.on("CurrentProgramSceneChanged", (scene) => {
       console.log(`Scene Changed to ${scene.sceneName}`);
       EventStream.notify(
+        "toast",
         "OBS Scene Change",
         `Scene Changed to ${scene.sceneName}`,
       );

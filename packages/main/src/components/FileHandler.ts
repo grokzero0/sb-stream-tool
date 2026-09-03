@@ -174,11 +174,11 @@ export class FileHandler {
 
     if (errors.length > 0) {
       for (const error of errors) {
-        EventStream.notify(error.message);
+        EventStream.notify("toast", error.message);
       }
-      EventStream.notify(`${errors.length} errors found`);
+      EventStream.notify("toast", `${errors.length} errors found`);
     } else {
-      EventStream.notify("Data successfully saved to files!");
+      EventStream.notify("toast", "Data successfully saved to files!");
     }
   }
 

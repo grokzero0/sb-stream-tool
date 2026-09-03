@@ -1,12 +1,14 @@
 "use client";
 
-import type { ColumnDef } from "@tanstack/react-table";
-import type { SetTableEntry } from "./tournament";
+import { createAppColumnHelper } from "@renderer/components/ui/data-table";
+import { SetTableEntry } from "./tournament";
 import { Checkbox } from "@renderer/components/ui/checkbox";
 
-export const columns: ColumnDef<SetTableEntry>[] = [
-  {
-    id: "select",
+const columnHelper = createAppColumnHelper<SetTableEntry>();
+
+export const columns = columnHelper.columns([
+  columnHelper.display({
+    id: "actions",
     cell: ({ row }) => (
       <Checkbox
         checked={row.getIsSelected()}
@@ -14,28 +16,17 @@ export const columns: ColumnDef<SetTableEntry>[] = [
         aria-label="Select row"
       />
     ),
-  },
-
-  {
-    accessorKey: "stream",
+  }),
+  columnHelper.accessor("stream", {
     header: "Stream",
-    // filterFn: (row, _, filterValue) => {
-    //   if (!filterValue) {
-    //     return true
-    //   }
-    //   return row.getValue('stream') !== ''
-    // }
-  },
-  {
-    accessorKey: "matchName",
-    header: "Match",
-  },
-  {
-    accessorKey: "firstGroupName",
+  }),
+  columnHelper.accessor("matchName", {
+    header: "Match Name",
+  }),
+  columnHelper.accessor("firstGroupName", {
     header: "Group 1",
-  },
-  {
-    accessorKey: "secondGroupName",
+  }),
+  columnHelper.accessor("secondGroupName", {
     header: "Group 2",
-  },
-];
+  }),
+]);

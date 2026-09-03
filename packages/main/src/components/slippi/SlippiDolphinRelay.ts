@@ -2,7 +2,7 @@ import { BrowserWindow } from "electron";
 import { SlippiRelay } from "./SlippiRelay.js";
 import {
   ConnectionStatus,
-  ConsoleConnection,
+  DolphinConnection,
   FrameEntryType,
   GameStartType,
   SlpParser,
@@ -21,11 +21,11 @@ import {
 } from "./helpers.js";
 import { EventStream } from "../EventStream.js";
 
-export class SlippiConsoleRelay implements SlippiRelay {
+export class SlippiDolphinRelay implements SlippiRelay {
   private browserWindow: BrowserWindow;
   private ip: string;
   private port: number;
-  private connection: ConsoleConnection;
+  private connection: DolphinConnection;
   private parser: SlpParser;
   private stream: SlpStream;
   private games: Map<
@@ -41,7 +41,7 @@ export class SlippiConsoleRelay implements SlippiRelay {
     this.browserWindow = browserWindow;
     this.ip = ip;
     this.port = port;
-    this.connection = new ConsoleConnection();
+    this.connection = new DolphinConnection();
     this.parser = new SlpParser();
     this.stream = new SlpStream();
     this.gameNumber = 1;
@@ -64,7 +64,7 @@ export class SlippiConsoleRelay implements SlippiRelay {
   async start() {
     // console.log("Connecting");
     try {
-      await this.connection.connect(this.ip, this.port, true);
+      await this.connection.connect(this.ip, this.port);
     } catch (err) {
       console.log(`Error, ${err}`);
       return;

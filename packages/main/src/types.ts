@@ -1,5 +1,10 @@
 import { Tournament } from "@app/common";
-import { GameStartType, SlippiGame } from "@slippi/slippi-js/node";
+import {
+  FrameEntryType,
+  GameStartType,
+  PostFrameUpdateType,
+  SlippiGame,
+} from "@slippi/slippi-js/node";
 
 export type SlippiSettingsData = {
   gameDataController: SlippiGame;
@@ -8,6 +13,12 @@ export type SlippiSettingsData = {
     settings: GameStartType | undefined;
     gameEnded: boolean;
   };
+};
+
+export type TeamAggregate = {
+  totalStocks: number;
+  totalPercent: number;
+  players: PostFrameUpdateType[];
 };
 
 export type ServerToClientEvents = {

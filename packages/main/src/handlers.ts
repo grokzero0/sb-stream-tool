@@ -95,7 +95,7 @@ export function createHandlers(
       SlippiRelayHandler.stopRelay(true);
     },
 
-    "slippi-relay/save-settings": (newSettings: SlippiRelaySettings) => {
+    "slippi-relay/save-settings": (newSettings: Partial<SlippiRelaySettings>) => {
       SettingsStore.writeSlippiRelaySettings(newSettings);
     },
 

@@ -29,6 +29,8 @@ import {
   resolveEventUrl,
 } from "@renderer/platform/registry";
 import { FetchProgress, PlatformSet } from "@renderer/platform/types";
+import { useCreateAtom, useSelector } from "@tanstack/react-store";
+import { Spinner } from "./ui/spinner";
 
 function LiveEventSets() {
   const savedEventSlug = useSettingsStore((state) => state.eventSlug);
@@ -43,7 +45,8 @@ function LiveEventSets() {
   const [setsFetched, setSetsFetched] = useState<PlatformSet[]>([]);
   const [tournamentName, setTournamentName] = useState("unknown event");
   const [totalPagesState, setTotalPagesState] = useState(0); // for ui rendering
-  const [selectedRow, setSelectedRow] = useState<RowSelectionState>({});
+  const rowSelectionAtom = useCreateAtom<RowSelectionState>({});
+  const selectedRow = useSelector(rowSelectionAtom);
   const filteredData = setsFetched.map((set) => {
     return {
       stream: set.stream,
@@ -55,7 +58,8 @@ function LiveEventSets() {
   const { setValue, getValues } = useFormContext<Tournament>();
   const teams = usePlayerFormFieldArrayContext();
   const timeoutRef = useRef<NodeJS.Timeout | undefined>(undefined);
-  const [statusMessage, setStatusMessage] = useState("");
+  const [statusMessage, setStatusMessage] = useState(""); // status messages (applying set, errors, etc)
+  const [loading, setLoading] = useState(true);
 
   const apply = () => {
     const selectedSetIndex = parseInt(Object.keys(selectedRow)[0]);
@@ -153,21 +157,29 @@ function LiveEventSets() {
     >
       <SheetTrigger asChild>
         <Button disabled={savedApiKey === "" || savedEventSlug === ""}>
-          Get all live sets in {savedEventSlug === "" ? "event" : savedEventSlug}
+          Get all live sets in{" "}
+          {savedEventSlug === "" ? "event" : savedEventSlug}
         </Button>
       </SheetTrigger>
       <SheetContent side="bottom">
-        <SheetHeader>
-          <SheetTitle>All live sets in {tournamentName}</SheetTitle>
-          <SheetDescription>
-            Pages {pagesLoaded} of {totalPagesState} loaded
-          </SheetDescription>
+        <SheetHeader className="flex flex-row gap-4">
+          <div className="flex items-center">
+            {loading && <Spinner className="size-8" />}
+          </div>
+          <div>
+            <SheetTitle>All live sets in {tournamentName}</SheetTitle>
+            <SheetDescription>
+              {loading
+                ? `Loading sets, pages ${pagesLoaded} of ${totalPagesState} loaded`
+                : `Pages ${pagesLoaded} of ${totalPagesState} loaded`}
+            </SheetDescription>
+          </div>
         </SheetHeader>
         <div>
           <DataTable
             columns={columns}
             data={filteredData}
-            setSelection={setSelectedRow}
+            rowSelectionAtom={rowSelectionAtom}
             multiRows={false}
           />
         </div>
