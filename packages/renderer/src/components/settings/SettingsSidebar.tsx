@@ -11,6 +11,16 @@ import {
   SidebarRail,
 } from "../ui/sidebar";
 import { Link, useLocation } from "wouter";
+import { PLATFORMS } from "@renderer/platform/registry";
+import type { PlatformId } from "@renderer/platform/types";
+import ParryggIcon from "@renderer/components/icons/ParryggIcon";
+import type { ComponentType, SVGProps } from "react";
+
+const PLATFORM_ICONS: Partial<
+  Record<PlatformId, ComponentType<SVGProps<SVGSVGElement>>>
+> = {
+  parrygg: ParryggIcon,
+};
 
 function SettingsSidebar() {
   const [location] = useLocation();
@@ -21,11 +31,11 @@ function SettingsSidebar() {
       url: "/obs",
       icon: Video,
     },
-    {
-      title: "start.gg",
-      url: "/startgg",
-      icon: Webhook,
-    },
+    ...PLATFORMS.map((platform) => ({
+      title: platform.displayName,
+      url: `/${platform.id}`,
+      icon: PLATFORM_ICONS[platform.id] ?? Webhook,
+    })),
     {
       title: "Slippi",
       url: "/slippi",

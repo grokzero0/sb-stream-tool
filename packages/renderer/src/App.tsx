@@ -4,10 +4,8 @@ import { useHashLocation } from "wouter/use-hash-location";
 import Match from "./components/Match";
 import Layout from "./layout";
 import Settings from "./components/settings/Settings";
-import Startgg from "./components/settings/startgg/Startgg";
-import { ApolloClient, HttpLink, InMemoryCache } from "@apollo/client";
-import { useSettingsStore } from "./zustand/store";
-import { ApolloProvider } from "@apollo/client/react";
+import PlatformSettings from "./components/settings/platform/PlatformSettings";
+import { PLATFORMS } from "./platform/registry";
 import { FormProvider, useForm } from "react-hook-form";
 import { Tournament } from "@app/common";
 import { TournamentDefaultValues } from "./utils/form";
@@ -15,59 +13,38 @@ import Obs from "./components/settings/obs/Obs";
 import Slippi from "./components/slippi/Slippi";
 import Shortcuts from "./components/settings/shortcuts/Shortcuts";
 
-const client = new ApolloClient({
-  link: new HttpLink({
-    uri: "https://api.start.gg/gql/alpha",
-    headers: {
-      Authorization: "", // initiated upon the store being created
-      "Content-Type": "application/json",
-    },
-  }),
-  cache: new InMemoryCache(),
-});
-
-useSettingsStore.subscribe((state) =>
-  client.setLink(
-    new HttpLink({
-      uri: "https://api.start.gg/gql/alpha",
-      headers: {
-        Authorization: `Bearer ${state.startggApiKey}`, // initiated upon the store being created
-        "Content-Type": "application/json",
-      },
-    }),
-  ),
-);
-
 function App() {
   const methods = useForm<Tournament>({
     defaultValues: TournamentDefaultValues,
   });
   return (
     <ThemeProvider defaultTheme="dark">
-      <ApolloProvider client={client}>
-        <FormProvider {...methods}>
-          <PlayerFormFieldArrayProvider>
-            <Router hook={useHashLocation}>
-              <Layout>
-                <Switch>
-                  <Route path="/" component={Match}></Route>
-                  <Route path="/settings" nest>
-                    <Settings>
-                      <Switch>
-                        <Route path="/" component={Obs}></Route>
-                        <Route path="/obs" component={Obs}></Route>
-                        <Route path="/startgg" component={Startgg}></Route>
-                        <Route path="/slippi" component={Slippi}></Route>
-                        <Route path="/shortcuts" component={Shortcuts}></Route>
-                      </Switch>
-                    </Settings>
-                  </Route>
-                </Switch>
-              </Layout>
-            </Router>
-          </PlayerFormFieldArrayProvider>
-        </FormProvider>
-      </ApolloProvider>
+      <FormProvider {...methods}>
+        <PlayerFormFieldArrayProvider>
+          <Router hook={useHashLocation}>
+            <Layout>
+              <Switch>
+                <Route path="/" component={Match}></Route>
+                <Route path="/settings" nest>
+                  <Settings>
+                    <Switch>
+                      <Route path="/" component={Obs}></Route>
+                      <Route path="/obs" component={Obs}></Route>
+                      {PLATFORMS.map((platform) => (
+                        <Route key={platform.id} path={`/${platform.id}`}>
+                          <PlatformSettings platform={platform} />
+                        </Route>
+                      ))}
+                      <Route path="/slippi" component={Slippi}></Route>
+                      <Route path="/shortcuts" component={Shortcuts}></Route>
+                    </Switch>
+                  </Settings>
+                </Route>
+              </Switch>
+            </Layout>
+          </Router>
+        </PlayerFormFieldArrayProvider>
+      </FormProvider>
     </ThemeProvider>
   );
 }

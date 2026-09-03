@@ -2,18 +2,25 @@ import { send } from "@app/preload";
 import { Button } from "@renderer/components/ui/button";
 import { Input } from "@renderer/components/ui/input";
 import { Label } from "@renderer/components/ui/label";
+import type { TournamentPlatform } from "@renderer/platform/types";
 import { useSettingsStore } from "@renderer/zustand/store";
 import { useState } from "react";
 
-function Startgg() {
-  const savedApiKey = useSettingsStore((state) => state.startggApiKey);
-  const update = useSettingsStore((state) => state.updateStartggApiKey);
+type PlatformSettingsProps = {
+  platform: TournamentPlatform;
+};
+
+function PlatformSettings({ platform }: PlatformSettingsProps) {
+  const savedApiKey = useSettingsStore(
+    (state) => state.credentials[platform.id] ?? "",
+  );
+  const update = useSettingsStore((state) => state.updateCredential);
   const [apiKey, setApiKey] = useState(savedApiKey);
 
   return (
     <div className="flex flex-col gap-2">
       <h1 className="text-center font-semibold text-xl">
-        Connect to Start.gg API
+        Connect to {platform.displayName} API
       </h1>
       <h2 className="text-center">
         Confused? See:{" "}
@@ -21,21 +28,19 @@ function Startgg() {
           variant="link"
           className="text-md"
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick={() =>
-            send("link/open", "https://developer.start.gg/docs/authentication/")
-          }
+          onClick={() => send("link/open", platform.apiKeyDocsUrl)}
         >
-          https://developer.start.gg/docs/authentication/
+          {platform.apiKeyDocsUrl}
         </Button>
       </h2>
       <form
         onSubmit={(e) => {
           e.preventDefault();
-          update(apiKey);
+          update(platform.id, apiKey);
         }}
       >
         <div className="flex flex-col gap-3">
-          <Label>Start.gg API key</Label>
+          <Label>{platform.displayName} API key</Label>
           <Input
             value={apiKey}
             onChange={(e) => setApiKey(e.currentTarget.value)}
@@ -56,4 +61,4 @@ function Startgg() {
   );
 }
 
-export default Startgg;
+export default PlatformSettings;

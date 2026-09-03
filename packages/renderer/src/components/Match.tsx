@@ -14,10 +14,15 @@ import EventSets from "./EventSets";
 import LiveEventSets from "./LiveEventSets";
 import { useHotkey } from "@tanstack/react-hotkeys";
 import { onSubmit } from "@renderer/utils/helpers";
+import { platformForEventUrl } from "@renderer/platform/registry";
 // import { sendToastMessage } from "./ui/toast";
 
 function Match() {
-  const apiKey = useSettingsStore((state) => state.startggApiKey);
+  const eventUrl = useSettingsStore((state) => state.eventUrl);
+  const platform = platformForEventUrl(eventUrl);
+  const apiKey = useSettingsStore(
+    (state) => state.credentials[platform.id] ?? "",
+  );
   const { handleSubmit } = useFormContext<Tournament>();
   const submitHotkey = useSettingsStore(
     (state) => state.shortcuts.get("submit") ?? "Enter",
@@ -33,8 +38,8 @@ function Match() {
         <Alert>
           <AlertCircleIcon />
           <AlertTitle>
-            You must have a start.gg api key in order to use the automated set
-            fetching tools (go to settings to set it!)
+            You must have a {platform.displayName} api key in order to use the
+            automated set fetching tools (go to settings to set it!)
           </AlertTitle>
         </Alert>
       )}

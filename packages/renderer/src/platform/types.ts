@@ -1,6 +1,6 @@
 import type { PlayerInfo } from "@app/common";
 
-export type PlatformId = "startgg";
+export type PlatformId = "startgg" | "parrygg";
 
 export type EventId = {
   platform: PlatformId;
@@ -36,6 +36,9 @@ export type ProgressCallback = (progress: FetchProgress) => void;
 export interface TournamentPlatform {
   readonly id: PlatformId;
   readonly displayName: string;
+  readonly apiKeyDocsUrl: string;
+  /** When false, getSet still works but the UI does not offer it. */
+  readonly supportsSetLookup: boolean;
 
   parseEventUrl(url: string): EventId | null;
 

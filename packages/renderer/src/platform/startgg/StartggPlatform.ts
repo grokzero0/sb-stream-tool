@@ -20,6 +20,7 @@ import type {
 
 const PLATFORM_ID: PlatformId = "startgg";
 const DISPLAY_NAME = "start.gg";
+const API_KEY_DOCS_URL = "https://developer.start.gg/docs/authentication/";
 const API_URL = "https://api.start.gg/gql/alpha";
 const PER_PAGE = 50;
 const UNKNOWN_EVENT_NAME = "unknown event";
@@ -210,6 +211,8 @@ class StartggClient implements PlatformClient {
 export const StartggPlatform: TournamentPlatform = {
   id: PLATFORM_ID,
   displayName: DISPLAY_NAME,
+  apiKeyDocsUrl: API_KEY_DOCS_URL,
+  supportsSetLookup: true,
 
   parseEventUrl(url) {
     const match = url.match(EVENT_URL_PATTERN);
