@@ -133,9 +133,13 @@ function LiveEventSets() {
       return;
     }
 
+    setLoading(true);
+
     await platformById(eventId.platform)
       .withApiKey(savedApiKey)
       .getSets(eventId, { upcomingOnly: true }, onFetchProgress);
+
+    setLoading(false);
   };
 
   return (

@@ -132,9 +132,13 @@ function EventSets() {
       return;
     }
 
+    setLoading(true);
+
     await platformById(eventId.platform)
       .withApiKey(savedApiKey)
       .getSets(eventId, { upcomingOnly: false }, onFetchProgress);
+
+    setLoading(false);
   };
 
   return (
